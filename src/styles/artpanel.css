@@ -1,0 +1,142 @@
+.artpanel {
+  --panel: clamp(180px, 30vh, 330px);
+  position: relative;
+  width: var(--panel);
+  flex: none;
+}
+
+.artpanel-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  perspective: 900px;
+  background: var(--ink);
+  box-shadow:
+    0 0 0 1px var(--ink),
+    10px 10px 0 var(--hard-shadow);
+}
+
+.artpanel-half,
+.artpanel-leaf {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--ink);
+}
+
+.artpanel-top,
+.artpanel-leaf-top {
+  top: 0;
+}
+
+.artpanel-bottom,
+.artpanel-leaf-bottom {
+  bottom: 0;
+}
+
+.artpanel-leaf-top {
+  transform-origin: 50% 100%;
+  z-index: 3;
+  opacity: 0;
+}
+
+.artpanel-leaf-bottom {
+  transform-origin: 50% 0%;
+  z-index: 3;
+  opacity: 0;
+}
+
+.artpanel-half img,
+.artpanel-leaf img {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  object-fit: cover;
+  /* Hard, printed, high-contrast — the opposite of the hi-fi grade. */
+  filter: grayscale(0.12) contrast(1.16) saturate(1.04) brightness(1.02);
+}
+
+.artpanel-top img,
+.artpanel-leaf-top img {
+  top: 0;
+}
+
+.artpanel-bottom img,
+.artpanel-leaf-bottom img {
+  top: -100%;
+}
+
+.artpanel-slot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 1px);
+  height: 2px;
+  background: rgba(22, 24, 28, 0.55);
+  z-index: 6;
+}
+
+/* ── No artwork: a blank flap with a hatched face ────────────────────────── */
+
+.artpanel-card.is-blank {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--ink) 0 6px,
+    var(--ink-soft) 6px 12px
+  );
+}
+
+.artpanel-card.is-blank .artpanel-half,
+.artpanel-card.is-blank .artpanel-leaf {
+  background: transparent;
+}
+
+.artpanel-blank-mark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  z-index: 7;
+  text-align: center;
+  font-family: var(--face);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  color: var(--paper);
+}
+
+/* ── The running light strip: a board announcing a live departure ────────── */
+
+.artpanel-rail {
+  display: block;
+  height: 6px;
+  margin-top: 10px;
+  background: var(--rule);
+}
+
+.artpanel.is-running .artpanel-rail {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--signal) 0 14px,
+    transparent 14px 28px
+  );
+  background-size: 28px 100%;
+  animation: rail-run 900ms linear infinite;
+}
+
+@keyframes rail-run {
+  to {
+    background-position: 28px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .artpanel.is-running .artpanel-rail {
+    animation: none;
+  }
+}

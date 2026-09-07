@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { livePosition, useSonos } from '../store/useSonos';
+import { useSkin } from '../store/skin';
+import SplitFlap from './SplitFlap';
 import { mmss } from '../lib/format';
 import '../styles/progress.css';
 
@@ -30,6 +32,7 @@ function useLivePosition(receivedAt: number) {
 export default function Progress() {
   const state = useSonos((s) => s.state);
   const receivedAt = useSonos((s) => s.receivedAt);
+  const board = useSkin((s) => s.skin === 'board');
   const seekTo = useSonos((s) => s.seekTo);
   const trackRef = useRef<HTMLDivElement>(null);
   const [scrub, setScrub] = useState<number | null>(null);
@@ -74,7 +77,11 @@ export default function Progress() {
         <span className="live-pip" aria-hidden="true" />
         <span className="label">Live</span>
         <span className="progress-live-rule" />
-        <span className="num progress-time">{mmss(live)}</span>
+        {board ? (
+          <SplitFlap text={mmss(live)} drum="digits" size="sm" className="progress-flaps" />
+        ) : (
+          <span className="num progress-time">{mmss(live)}</span>
+        )}
       </div>
     );
   }
@@ -83,7 +90,11 @@ export default function Progress() {
 
   return (
     <div className="progress">
-      <span className="num progress-time">{mmss(position)}</span>
+      {board ? (
+        <SplitFlap text={mmss(position)} drum="digits" size="sm" className="progress-flaps" />
+      ) : (
+        <span className="num progress-time">{mmss(position)}</span>
+      )}
       <div
         className={`progress-track${scrub !== null ? ' is-scrubbing' : ''}`}
         ref={trackRef}
@@ -107,7 +118,11 @@ export default function Progress() {
         <div className="progress-played" style={{ width: `${pct}%` }} />
         <div className="progress-cap" style={{ left: `${pct}%` }} />
       </div>
-      <span className="num progress-time progress-total">{mmss(duration)}</span>
+      {board ? (
+        <SplitFlap text={mmss(duration)} drum="digits" size="sm" className="progress-flaps" />
+      ) : (
+        <span className="num progress-time progress-total">{mmss(duration)}</span>
+      )}
     </div>
   );
 }

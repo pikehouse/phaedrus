@@ -43,10 +43,10 @@ function Sleeve({
   const queueable = fav.playable && fav.kind !== 'station';
 
   return (
-    <div className={`sleeve${fav.playable ? '' : ' is-dim'}`}>
+    <div className={`crate-item${fav.playable ? '' : ' is-dim'}`}>
       <button
         type="button"
-        className="sleeve-face"
+        className="crate-face"
         disabled={!fav.playable}
         onClick={() => onPlay('replace')}
         aria-label={fav.playable ? `Play ${fav.title}` : `${fav.title} (not playable)`}
@@ -55,20 +55,20 @@ function Sleeve({
         {fav.art ? (
           <img src={fav.art} alt="" loading="lazy" draggable={false} />
         ) : (
-          <span className={`sleeve-print ground-${ground}`}>
-            <span className="sleeve-print-title">{fav.title}</span>
-            {fav.service && <span className="label sleeve-print-mark">{serviceLabel(fav.service)}</span>}
+          <span className={`crate-bill ground-${ground}`}>
+            <span className="crate-bill-title">{fav.title}</span>
+            {fav.service && <span className="label crate-bill-mark">{serviceLabel(fav.service)}</span>}
           </span>
         )}
-        <span className="sleeve-wear" aria-hidden="true" />
+        <span className="crate-wear" aria-hidden="true" />
       </button>
 
       {/* Siblings, not children — a button inside a button is not a button. */}
       {queueable && (
-        <div className="sleeve-tools">
+        <div className="crate-tools">
           <button
             type="button"
-            className="sleeve-tool"
+            className="crate-tool"
             aria-label={`Play ${fav.title} next`}
             onClick={() => onPlay('next')}
           >
@@ -76,7 +76,7 @@ function Sleeve({
           </button>
           <button
             type="button"
-            className="sleeve-tool"
+            className="crate-tool"
             aria-label={`Add ${fav.title} to the queue`}
             onClick={() => onPlay('later')}
           >
@@ -85,8 +85,8 @@ function Sleeve({
         </div>
       )}
 
-      <span className="sleeve-title">{fav.title}</span>
-      {fav.description && <span className="sleeve-sub">{fav.description}</span>}
+      <span className="crate-caption">{fav.title}</span>
+      {fav.description && <span className="crate-caption-sub">{fav.description}</span>}
     </div>
   );
 }

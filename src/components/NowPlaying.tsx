@@ -1,5 +1,8 @@
 import { useSonos } from '../store/useSonos';
+import { useSkin } from '../store/skin';
 import Hero from './Hero';
+import ArtPanel from './ArtPanel';
+import SplitFlap from './SplitFlap';
 import Progress from './Progress';
 import Transport from './Transport';
 import VolumeKnob from './VolumeKnob';
@@ -18,10 +21,15 @@ const SOURCE_LABEL: Record<string, string> = {
 /**
  * The stage: turntable above (jacket, disc, track, transport), amplifier
  * faceplate below (volume knob, one fader per room).
+ *
+ * The board skin keeps that skeleton but turns the head of it on its side —
+ * a departure line reads across, not down — and swaps the jacket for a flap
+ * panel and the title for split-flap cells.
  */
 export default function NowPlaying() {
   const state = useSonos((s) => s.state);
   const group = useSonos((s) => s.group);
+  const board = useSkin((s) => s.skin === 'board');
 
   const playing = state?.state === 'PLAYING' || state?.state === 'TRANSITIONING';
   const track = state?.track;
@@ -38,6 +46,66 @@ export default function NowPlaying() {
   const position =
     state?.queueIndex && state.queueLength ? `${state.queueIndex} of ${state.queueLength}` : undefined;
 
+  const over = (
+    <div className="meta-over">
+      <span className="meta-room">{group?.name ?? '—'}</span>
+      {state && (
+        <>
+          <span className="meta-sep" aria-hidden="true" />
+          <span>{SOURCE_LABEL[state.source] ?? state.source}</span>
+        </>
+      )}
+      {position && (
+        <>
+          <span className="meta-sep" aria-hidden="true" />
+          <span className="num">{position}</span>
+        </>
+      )}
+    </div>
+  );
+
+  const faceplate = (
+    <div className="faceplate" aria-label="Volume">
+      <VolumeKnob />
+      <Faders />
+      <div className="faceplate-brand" aria-hidden="true">
+        <i className={`faceplate-led${playing ? ' is-lit' : ''}`} />
+        <span>Phædrus</span>
+      </div>
+    </div>
+  );
+
+  if (board) {
+    return (
+      <section className="stage stage-board" aria-label="Now playing">
+        <div className="stage-scroll">
+          <div className="stage-body">
+            {over}
+
+            <div className="board-head">
+              <ArtPanel art={track?.art} title={title} playing={!!playing} />
+
+              <div className="meta">
+                <SplitFlap
+                  text={idle ? 'Nothing on' : (title ?? '')}
+                  size="xl"
+                  className="board-title"
+                />
+                {secondary && <SplitFlap text={secondary} size="lg" className="board-artist" />}
+                {tertiary && <p className="meta-album">{tertiary}</p>}
+              </div>
+            </div>
+
+            <Progress />
+            <Transport />
+          </div>
+        </div>
+
+        {faceplate}
+      </section>
+    );
+  }
+
   return (
     <section className="stage" aria-label="Now playing">
       <div className="stage-scroll">
@@ -45,21 +113,7 @@ export default function NowPlaying() {
           <Hero art={track?.art} playing={!!playing} loaded={!idle} title={title} />
 
           <div className="meta">
-            <div className="meta-over">
-              <span className="meta-room">{group?.name ?? '—'}</span>
-              {state && (
-                <>
-                  <span className="meta-sep" aria-hidden="true" />
-                  <span>{SOURCE_LABEL[state.source] ?? state.source}</span>
-                </>
-              )}
-              {position && (
-                <>
-                  <span className="meta-sep" aria-hidden="true" />
-                  <span className="num">{position}</span>
-                </>
-              )}
-            </div>
+            {over}
 
             {idle ? (
               <h1 className="meta-title meta-title-idle">Nothing on</h1>
@@ -79,14 +133,7 @@ export default function NowPlaying() {
         </div>
       </div>
 
-      <div className="faceplate" aria-label="Volume">
-        <VolumeKnob />
-        <Faders />
-        <div className="faceplate-brand" aria-hidden="true">
-          <i className={`faceplate-led${playing ? ' is-lit' : ''}`} />
-          <span>Phædrus</span>
-        </div>
-      </div>
+      {faceplate}
     </section>
   );
 }

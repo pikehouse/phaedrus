@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSonos } from '../store/useSonos';
+import { SKINS, useSkin } from '../store/skin';
 import { plural } from '../lib/format';
 import { Radar } from './Icons';
 import type { Zone } from '../api/types';
@@ -83,6 +84,8 @@ export default function RoomsRail() {
         </button>
       )}
 
+      <SkinPicker />
+
       <footer className="rooms-foot">
         <span className="rooms-status num">
           {topology ? plural(roomCount, 'room') : 'looking…'}
@@ -99,6 +102,27 @@ export default function RoomsRail() {
         </button>
       </footer>
     </aside>
+  );
+}
+
+function SkinPicker() {
+  const skin = useSkin((s) => s.skin);
+  const setSkin = useSkin((s) => s.setSkin);
+  return (
+    <div className="skinpick" role="group" aria-label="Appearance">
+      {SKINS.map((s) => (
+        <button
+          key={s.id}
+          type="button"
+          className={`skinpick-btn${skin === s.id ? ' is-on' : ''}`}
+          aria-pressed={skin === s.id}
+          title={s.hint}
+          onClick={() => setSkin(s.id)}
+        >
+          {s.label}
+        </button>
+      ))}
+    </div>
   );
 }
 

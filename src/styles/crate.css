@@ -13,7 +13,7 @@
   padding: 20px 2px;
 }
 
-.sleeve {
+.crate-item {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -21,7 +21,7 @@
   min-width: 0;
 }
 
-.sleeve-face {
+.crate-face {
   position: relative;
   aspect-ratio: 1;
   width: 100%;
@@ -34,7 +34,7 @@
   transition: transform var(--t) var(--ease), box-shadow var(--t) var(--ease);
 }
 
-.sleeve-face img {
+.crate-face img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -42,7 +42,7 @@
   transition: filter var(--t) var(--ease);
 }
 
-.sleeve:hover .sleeve-face:not(:disabled) {
+.crate-item:hover .crate-face:not(:disabled) {
   transform: translateY(-2px);
   box-shadow:
     0 8px 20px rgba(6, 3, 2, 0.68),
@@ -50,12 +50,12 @@
     0 0 24px rgba(226, 154, 74, 0.12);
 }
 
-.sleeve:hover .sleeve-face img {
+.crate-item:hover .crate-face img {
   filter: sepia(0.1) saturate(1.16) contrast(1.05) brightness(1.06);
 }
 
-/* Paper tooth plus the darkened, worn edge of a sleeve that's been pulled a lot. */
-.sleeve-wear {
+/* Paper tooth plus the darkened, worn edge of a crate-item that's been pulled a lot. */
+.crate-wear {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -68,9 +68,9 @@
     inset 0 0 0 1px rgba(242, 228, 201, 0.07);
 }
 
-/* ── Typographic sleeve (no artwork) ─────────────────────────────────────── */
+/* ── Typographic crate-item (no artwork) ─────────────────────────────────────── */
 
-.sleeve-print {
+.crate-bill {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -81,7 +81,7 @@
   text-align: left;
 }
 
-.sleeve-print-title {
+.crate-bill-title {
   font-family: var(--display);
   font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 60;
   font-size: 17px;
@@ -96,7 +96,7 @@
   overflow: hidden;
 }
 
-.sleeve-print-mark {
+.crate-bill-mark {
   font-size: 8px;
   letter-spacing: 0.16em;
   color: rgba(242, 228, 201, 0.5);
@@ -118,11 +118,11 @@
   background: linear-gradient(152deg, var(--mustard), #6a4d13);
 }
 
-.ground-mustard .sleeve-print-title {
+.ground-mustard .crate-bill-title {
   color: #241505;
 }
 
-.ground-mustard .sleeve-print-mark {
+.ground-mustard .crate-bill-mark {
   color: rgba(36, 21, 5, 0.6);
 }
 
@@ -132,7 +132,7 @@
 
 /* ── Hover tools ─────────────────────────────────────────────────────────── */
 
-.sleeve-tools {
+.crate-tools {
   position: absolute;
   top: 5px;
   right: 5px;
@@ -143,13 +143,13 @@
   transition: opacity var(--t) var(--ease), transform var(--t) var(--ease);
 }
 
-.sleeve:hover .sleeve-tools,
-.sleeve-tools:focus-within {
+.crate-item:hover .crate-tools,
+.crate-tools:focus-within {
   opacity: 1;
   transform: none;
 }
 
-.sleeve-tool {
+.crate-tool {
   display: grid;
   place-items: center;
   width: 24px;
@@ -161,14 +161,14 @@
   transition: background var(--t) var(--ease), color var(--t) var(--ease);
 }
 
-.sleeve-tool:hover {
+.crate-tool:hover {
   background: rgba(226, 154, 74, 0.85);
   color: #1b0f08;
 }
 
 /* ── Caption ─────────────────────────────────────────────────────────────── */
 
-.sleeve-title {
+.crate-caption {
   font-family: var(--display);
   font-variation-settings: 'SOFT' 30, 'WONK' 0, 'opsz' 18;
   font-size: 12.5px;
@@ -179,7 +179,7 @@
   text-overflow: ellipsis;
 }
 
-.sleeve-sub {
+.crate-caption-sub {
   font-family: var(--face);
   font-size: 9.5px;
   letter-spacing: 0.05em;
@@ -189,10 +189,10 @@
   text-overflow: ellipsis;
 }
 
-.sleeve.is-dim {
+.crate-item.is-dim {
   opacity: 0.42;
 }
 
-.sleeve.is-dim .sleeve-face {
+.crate-item.is-dim .crate-face {
   cursor: default;
 }

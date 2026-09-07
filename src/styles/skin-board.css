@@ -1,0 +1,1001 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   BOARD SKIN — station enamel, split-flaps, hard light.
+
+   Everything is keyed off [data-skin='board'] on <html>. The first block
+   re-points the hi-fi tokens so every component that only speaks in tokens
+   restyles for free; the rest is the work the tokens can't do — squaring off
+   corners, replacing warm blur with hard offsets, and inverting the markers.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin='board'] {
+  /* ── The board's own vocabulary ────────────────────────────────────────── */
+  --paper: #eeebe3;
+  --paper-lit: #f8f6f1;
+  --paper-sunk: #e1ddd2;
+  --ink: #16181c;
+  --ink-soft: #2b2f36;
+  --ink-mid: #5c626c;
+  --signal: #c8102e;
+  --signal-hot: #e21b3d;
+  --rule: rgba(22, 24, 28, 0.2);
+  --rule-strong: rgba(22, 24, 28, 0.42);
+  --hard-shadow: rgba(22, 24, 28, 0.14);
+
+  /* ── Hi-fi tokens, re-pointed ──────────────────────────────────────────── */
+  --bg-deep: #e4e1d7;
+  --bg: var(--paper);
+  --bg-raised: var(--paper-lit);
+  --walnut: #dbd7cb;
+  --walnut-light: #cbc6b8;
+
+  --cream: var(--ink);
+  --cream-dim: #3b4048;
+  --cream-faint: rgba(22, 24, 28, 0.52);
+  --cream-ghost: rgba(22, 24, 28, 0.18);
+
+  --amber: var(--signal);
+  --amber-hot: var(--signal-hot);
+  --amber-glow: rgba(200, 16, 46, 0.18);
+
+  --rust: var(--signal);
+  --burgundy: #8d1226;
+  --wine: #5d0d1a;
+  --olive: #4a5230;
+  --mustard: #d8a026;
+
+  /* ── One family, two widths: the board has a single alphabet ──────────── */
+  --display: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+  --face: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+
+  --radius: 0px;
+
+  /* Hard light: hairlines and offsets, never a warm blur. */
+  --sink: inset 0 1px 0 rgba(22, 24, 28, 0.28), inset 0 0 0 1px var(--rule);
+  --lift: 0 2px 0 var(--hard-shadow), 0 0 0 1px var(--rule);
+
+  /* Split-flap cell surfaces. */
+  --flap-back: var(--ink);
+  --flap-face-top: linear-gradient(180deg, #fcfbf8, #efece4);
+  --flap-face-bottom: linear-gradient(180deg, #e6e2d8, #f7f4ee);
+  --flap-seam: rgba(22, 24, 28, 0.5);
+  --flap-ink: var(--ink);
+  --flap-radius: 0px;
+  --flap-shadow: 0 1px 0 rgba(22, 24, 28, 0.3);
+  --flap-font: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+  --flap-wdth: 78;
+  --flap-wght: 700;
+}
+
+[data-skin='board'] body {
+  background: var(--paper);
+}
+
+/* Archivo has no SOFT/WONK/opsz — restate the axes it does have so the
+   hi-fi display rules don't leave everything at default width. */
+[data-skin='board'] .meta-title,
+[data-skin='board'] .meta-artist,
+[data-skin='board'] .room-name,
+[data-skin='board'] .arrange-name,
+[data-skin='board'] .qrow-title,
+[data-skin='board'] .crate-caption,
+[data-skin='board'] .crate-bill-title,
+[data-skin='board'] .sresult-title,
+[data-skin='board'] .search-input,
+[data-skin='board'] .search-drill-title,
+[data-skin='board'] .curtain-title,
+[data-skin='board'] .boundary-title,
+[data-skin='board'] .panel-empty-line,
+[data-skin='board'] .search-prompt,
+[data-skin='board'] .linkcard-title {
+  font-variation-settings: 'wdth' 82, 'wght' 700;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+/* ── Shell ─────────────────────────────────────────────────────────────── */
+
+[data-skin='board'] .shell {
+  background: var(--paper);
+}
+
+[data-skin='board'] .rooms,
+[data-skin='board'] .right-rail {
+  background: var(--bg-deep);
+  box-shadow: none;
+}
+
+[data-skin='board'] .rooms {
+  border-right: 1px solid var(--rule-strong);
+}
+
+[data-skin='board'] .right-rail {
+  border-left: 1px solid var(--rule-strong);
+}
+
+/* ── Atmosphere: no grain, no leak. A faint printed grid instead. ───────── */
+
+[data-skin='board'] .atmo-grain,
+[data-skin='board'] .atmo-leak {
+  display: none;
+}
+
+[data-skin='board'] .atmo-vignette {
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(22, 24, 28, 0.028) 0 1px,
+    transparent 1px 4px
+  );
+}
+
+/* ── Labels: silkscreened, tight, uppercase ────────────────────────────── */
+
+[data-skin='board'] .label {
+  font-weight: 700;
+  font-variation-settings: 'wdth' 92, 'wght' 700;
+  letter-spacing: 0.2em;
+}
+
+/* ── Rooms rail ────────────────────────────────────────────────────────── */
+
+[data-skin='board'] .rooms-head {
+  border-bottom: 1px solid var(--rule-strong);
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+}
+
+[data-skin='board'] .room {
+  padding: 9px 12px 10px 14px;
+  border-bottom: 1px solid var(--rule);
+}
+
+[data-skin='board'] .room:hover {
+  background: var(--paper-sunk);
+}
+
+/* The selected group inverts — the strongest marker a two-colour board has. */
+[data-skin='board'] .room.is-selected {
+  background: var(--ink);
+}
+
+[data-skin='board'] .room.is-selected .room-name {
+  color: var(--paper);
+}
+
+[data-skin='board'] .room.is-selected .room-with {
+  color: rgba(238, 235, 227, 0.6);
+}
+
+[data-skin='board'] .room.is-selected .room-marker {
+  background: var(--signal);
+  box-shadow: none;
+  width: 4px;
+}
+
+[data-skin='board'] .room-name {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+[data-skin='board'] .room-with {
+  font-variation-settings: 'wdth' 90, 'wght' 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 9.5px;
+}
+
+[data-skin='board'] .bars i {
+  background: var(--signal);
+  width: 2px;
+}
+
+[data-skin='board'] .rooms-everywhere-rule {
+  background: var(--rule-strong);
+}
+
+[data-skin='board'] .rooms-foot {
+  border-top: 1px solid var(--rule-strong);
+}
+
+[data-skin='board'] .switch {
+  border-radius: 0;
+  background: var(--paper-sunk);
+  box-shadow: inset 0 0 0 1px var(--rule-strong);
+}
+
+[data-skin='board'] .switch-thumb {
+  border-radius: 0;
+  background: var(--ink);
+  box-shadow: none;
+}
+
+[data-skin='board'] .switch.is-on {
+  background: var(--signal);
+  box-shadow: inset 0 0 0 1px var(--signal);
+}
+
+[data-skin='board'] .switch.is-on .switch-thumb {
+  background: var(--paper-lit);
+  box-shadow: none;
+}
+
+/* ── Skin picker ───────────────────────────────────────────────────────── */
+
+.skinpick {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 18px 12px;
+  flex: none;
+}
+
+.skinpick-btn {
+  flex: 1;
+  padding: 6px 4px 7px;
+  font-family: var(--face);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px var(--cream-ghost);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.skinpick-btn + .skinpick-btn {
+  margin-left: -1px;
+}
+
+.skinpick-btn:hover {
+  color: var(--cream);
+}
+
+.skinpick-btn.is-on {
+  color: var(--bg);
+  background: var(--amber);
+  box-shadow: inset 0 0 0 1px var(--amber);
+}
+
+[data-skin='board'] .skinpick-btn.is-on {
+  color: var(--paper);
+  background: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+/* ── Now playing ───────────────────────────────────────────────────────── */
+
+[data-skin='board'] .meta-over {
+  gap: 12px;
+  padding-bottom: 2px;
+}
+
+[data-skin='board'] .meta-sep {
+  width: 1px;
+  height: 10px;
+  border-radius: 0;
+  background: var(--rule-strong);
+}
+
+[data-skin='board'] .meta {
+  gap: 10px;
+  align-items: center;
+  max-width: min(720px, 100%);
+}
+
+[data-skin='board'] .meta-title-idle {
+  color: var(--cream-faint);
+}
+
+/* Flap rows centre themselves and are allowed to wrap onto a second line. */
+[data-skin='board'] .meta .flaps-row {
+  justify-content: center;
+}
+
+/* ── Progress: a ruler, not a groove ───────────────────────────────────── */
+
+[data-skin='board'] .progress-groove {
+  inset: 9px 0;
+  border-radius: 0;
+  background: var(--paper-sunk);
+  box-shadow: inset 0 0 0 1px var(--rule-strong);
+}
+
+[data-skin='board'] .progress-played {
+  border-radius: 0;
+  background: var(--ink);
+  box-shadow: none;
+  top: 9px;
+  height: 4px;
+}
+
+[data-skin='board'] .progress-cap {
+  border-radius: 0;
+  width: 3px;
+  height: 18px;
+  background: var(--signal);
+  box-shadow: none;
+}
+
+[data-skin='board'] .progress-track:hover .progress-cap,
+[data-skin='board'] .progress-track.is-scrubbing .progress-cap {
+  height: 22px;
+  width: 4px;
+}
+
+[data-skin='board'] .live-pip {
+  border-radius: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--signal);
+  box-shadow: none;
+}
+
+[data-skin='board'] .progress-live-rule {
+  background: var(--rule-strong);
+}
+
+/* ── Transport: square keys, inverted when pressed ─────────────────────── */
+
+[data-skin='board'] .tactile {
+  border-radius: 0;
+  background: var(--paper-lit);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink), 3px 3px 0 var(--hard-shadow);
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+[data-skin='board'] .tactile-lg {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 0 0 1px var(--ink), 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .tactile:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 0 0 1px var(--ink), 3px 3px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .tactile-lg:hover:not(:disabled) {
+  background: var(--signal);
+  color: var(--paper-lit);
+  box-shadow: 0 0 0 1px var(--signal), 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .tactile:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 1px var(--ink), 0 0 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .tactile:disabled {
+  background: transparent;
+  color: var(--cream-ghost);
+  box-shadow: 0 0 0 1px var(--cream-ghost);
+}
+
+[data-skin='board'] .tactile-lg.is-playing {
+  color: var(--paper);
+}
+
+[data-skin='board'] .mod {
+  border-radius: 0;
+  color: var(--ink-mid);
+  box-shadow: inset 0 0 0 1px var(--cream-ghost);
+}
+
+[data-skin='board'] .mod:hover:not(:disabled) {
+  background: var(--paper-sunk);
+  color: var(--ink);
+}
+
+[data-skin='board'] .mod.is-on {
+  background: var(--signal);
+  color: var(--paper-lit);
+  box-shadow: inset 0 0 0 1px var(--signal);
+  text-shadow: none;
+}
+
+[data-skin='board'] .mod.is-on::after {
+  display: none;
+}
+
+/* ── Volume: a machined dial on an enamel plate ────────────────────────── */
+
+[data-skin='board'] .knob-body {
+  background: var(--paper-lit);
+  box-shadow: 0 0 0 1px var(--ink), 3px 3px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .knob-body::before {
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(22, 24, 28, 0.09) 0deg 1.2deg,
+    transparent 1.2deg 4deg
+  );
+}
+
+[data-skin='board'] .knob:hover .knob-body,
+[data-skin='board'] .knob.is-dragging .knob-body {
+  box-shadow: 0 0 0 1px var(--ink), 3px 3px 0 var(--hard-shadow), 0 0 0 4px rgba(200, 16, 46, 0.16);
+}
+
+[data-skin='board'] .knob-pointer {
+  border-radius: 0;
+  width: 3px;
+  height: 20px;
+  background: var(--signal);
+  box-shadow: none;
+}
+
+[data-skin='board'] .knob-value {
+  color: var(--ink);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  text-shadow: none;
+}
+
+[data-skin='board'] .knob-tick {
+  stroke: var(--rule-strong);
+}
+
+[data-skin='board'] .knob-tick.is-lit,
+[data-skin='board'] .knob-tick.is-major.is-lit {
+  stroke: var(--ink);
+}
+
+[data-skin='board'] .fader-slot {
+  border-radius: 0;
+  background: var(--paper-sunk);
+  box-shadow: inset 0 0 0 1px var(--rule-strong);
+}
+
+[data-skin='board'] .fader-fill {
+  border-radius: 0;
+  background: var(--ink);
+}
+
+[data-skin='board'] .fader-cap {
+  border-radius: 0;
+  width: 7px;
+  height: 17px;
+  background: var(--signal);
+  box-shadow: none;
+}
+
+[data-skin='board'] .fader-cap::after {
+  background: rgba(255, 255, 255, 0.55);
+}
+
+[data-skin='board'] .fader-rail:hover .fader-cap,
+[data-skin='board'] .fader-rail.is-dragging .fader-cap {
+  box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.18);
+}
+
+[data-skin='board'] .fader.is-muted .fader-fill {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--rule-strong) 0 3px,
+    transparent 3px 6px
+  );
+  opacity: 1;
+}
+
+[data-skin='board'] .fader-name {
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+}
+
+[data-skin='board'] .faceplate {
+  border-top: 1px solid var(--rule-strong);
+}
+
+/* ── Queue: a departure list ───────────────────────────────────────────── */
+
+[data-skin='board'] .right-tab {
+  border-radius: 0;
+}
+
+[data-skin='board'] .right-tab.is-active::after {
+  background: var(--ink);
+  height: 2px;
+  box-shadow: none;
+}
+
+[data-skin='board'] .panel-head {
+  border-bottom: 1px solid var(--rule-strong);
+  padding-bottom: 8px;
+  margin: 0 16px 6px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+[data-skin='board'] .qrow {
+  border-radius: 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+[data-skin='board'] .qrow:hover {
+  background: var(--paper-sunk);
+}
+
+[data-skin='board'] .qrow.is-current {
+  background: var(--ink);
+}
+
+[data-skin='board'] .qrow.is-current .qrow-title {
+  color: var(--paper);
+}
+
+[data-skin='board'] .qrow.is-current .qrow-artist,
+[data-skin='board'] .qrow.is-current .qrow-time {
+  color: rgba(238, 235, 227, 0.62);
+}
+
+[data-skin='board'] .qrow.is-current .qrow-marker {
+  background: var(--signal);
+  width: 4px;
+  box-shadow: none;
+}
+
+[data-skin='board'] .qrow-art,
+[data-skin='board'] .sresult-art {
+  border-radius: 0;
+  background: var(--paper-sunk);
+  box-shadow: 0 0 0 1px var(--rule-strong);
+}
+
+[data-skin='board'] .qrow-art img,
+[data-skin='board'] .sresult-art img,
+[data-skin='board'] .crate-face img {
+  filter: grayscale(0.14) contrast(1.16) saturate(1.02);
+}
+
+[data-skin='board'] .qrow-art-glow {
+  box-shadow: inset 0 0 0 2px var(--signal);
+  border-radius: 0;
+}
+
+[data-skin='board'] .qrow-title {
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+}
+
+[data-skin='board'] .qrow-artist,
+[data-skin='board'] .sresult-sub,
+[data-skin='board'] .crate-caption-sub {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-variation-settings: 'wdth' 90, 'wght' 500;
+  font-size: 9.5px;
+}
+
+[data-skin='board'] .qrow-remove {
+  border-radius: 0;
+  color: var(--signal);
+}
+
+[data-skin='board'] .qrow-remove:hover {
+  background: var(--signal);
+  color: var(--paper-lit);
+}
+
+[data-skin='board'] .panel-action.is-armed {
+  background: var(--signal);
+  color: var(--paper-lit);
+}
+
+/* ── Crate: pasted-up bills ────────────────────────────────────────────── */
+
+[data-skin='board'] .crate-face {
+  border-radius: 0;
+  background: var(--paper-sunk);
+  box-shadow: 0 0 0 1px var(--ink), 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .crate-item:hover .crate-face:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 0 0 0 1px var(--ink), 6px 6px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .crate-wear {
+  background-image: none;
+  box-shadow: none;
+}
+
+[data-skin='board'] .crate-bill-title {
+  font-size: 15px;
+  line-height: 1.06;
+}
+
+[data-skin='board'] .ground-walnut {
+  background: var(--ink);
+}
+
+[data-skin='board'] .ground-burgundy {
+  background: var(--signal);
+}
+
+[data-skin='board'] .ground-olive {
+  background: var(--olive);
+}
+
+[data-skin='board'] .ground-mustard {
+  background: var(--mustard);
+}
+
+[data-skin='board'] .ground-mustard .crate-bill-title,
+[data-skin='board'] .ground-mustard .crate-bill-mark {
+  color: var(--ink);
+}
+
+[data-skin='board'] .ground-wine {
+  background: var(--ink-soft);
+}
+
+[data-skin='board'] .crate-bill-title,
+[data-skin='board'] .crate-bill-mark {
+  color: var(--paper-lit);
+}
+
+[data-skin='board'] .crate-tool {
+  border-radius: 0;
+  background: var(--paper-lit);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+[data-skin='board'] .crate-tool:hover {
+  background: var(--signal);
+  color: var(--paper-lit);
+  box-shadow: 0 0 0 1px var(--signal);
+}
+
+/* ── Search: a light box, not a dark one ───────────────────────────────── */
+
+[data-skin='board'] .search-scrim {
+  background: rgba(238, 235, 227, 0.97);
+}
+
+[data-skin='board'] .search-bar {
+  border-bottom: 2px solid var(--ink);
+}
+
+[data-skin='board'] .search-bar:focus-within {
+  border-bottom-color: var(--signal);
+}
+
+[data-skin='board'] .search-input::placeholder {
+  color: var(--cream-ghost);
+  font-style: normal;
+}
+
+[data-skin='board'] .search-section-head {
+  color: var(--paper-lit);
+  background: var(--ink);
+  opacity: 1;
+  padding: 4px 8px 5px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
+
+[data-skin='board'] .sresult {
+  border-radius: 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+[data-skin='board'] .sresult:hover {
+  background: var(--paper-sunk);
+}
+
+[data-skin='board'] .sresult-art.is-round {
+  border-radius: 0;
+}
+
+[data-skin='board'] .sresult-badge {
+  color: var(--ink-mid);
+  box-shadow: inset 0 0 0 1px var(--cream-ghost);
+  padding: 3px 6px;
+}
+
+[data-skin='board'] .sresult-tool {
+  border-radius: 0;
+  background: var(--paper-lit);
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+[data-skin='board'] .sresult-tool:hover {
+  background: var(--signal);
+  color: var(--paper-lit);
+  box-shadow: 0 0 0 1px var(--signal);
+}
+
+[data-skin='board'] .search-close {
+  border-radius: 0;
+}
+
+[data-skin='board'] .search-close:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+[data-skin='board'] .linkcard {
+  border-radius: 0;
+  background: var(--paper-lit);
+  box-shadow: 0 0 0 1px var(--ink), 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .linkcard-btn {
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--paper-lit);
+}
+
+[data-skin='board'] .linkcard-btn:hover {
+  background: var(--signal);
+  box-shadow: none;
+}
+
+[data-skin='board'] .linkcard-dot {
+  border-radius: 0;
+  background: var(--signal);
+}
+
+[data-skin='board'] .search-prompt,
+[data-skin='board'] .panel-empty-line {
+  font-style: normal;
+}
+
+/* ── Status strip: a board announcement ────────────────────────────────── */
+
+[data-skin='board'] .status-pill {
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .status-pill.is-bad {
+  background: var(--signal);
+  color: var(--paper-lit);
+  box-shadow: 4px 4px 0 var(--hard-shadow);
+}
+
+/* ── Curtains and the error boundary ───────────────────────────────────── */
+
+[data-skin='board'] .curtain,
+[data-skin='board'] .boundary {
+  background: var(--paper);
+}
+
+[data-skin='board'] .curtain-btn,
+[data-skin='board'] .boundary-btn {
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .curtain-btn:hover:not(:disabled),
+[data-skin='board'] .boundary-btn:hover {
+  background: var(--signal);
+  color: var(--paper-lit);
+  box-shadow: 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .boundary-label {
+  color: var(--signal);
+}
+
+/* ── Scrollbars ────────────────────────────────────────────────────────── */
+
+[data-skin='board'] .scroll {
+  scrollbar-color: var(--rule-strong) transparent;
+}
+
+[data-skin='board'] .scroll::-webkit-scrollbar-thumb {
+  background: var(--rule-strong);
+  border-radius: 0;
+  background-clip: padding-box;
+}
+
+[data-skin='board'] .scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--ink);
+  background-clip: padding-box;
+}
+
+[data-skin='board'] ::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+[data-skin='board'] :focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 1px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   BOARD LAYOUT
+   The record wants to be centred; a departure line wants to be read left to
+   right. This is where the skin stops being a palette and becomes a layout.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.stage-board .stage-scroll {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: clamp(14px, 2.4vh, 28px);
+  padding: clamp(14px, 2.4vh, 26px) clamp(22px, 4cqw, 52px);
+}
+
+.stage-board .stage-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(14px, 2.2vh, 26px);
+  min-width: 0;
+  /* The hi-fi body is sized to the jacket-plus-record composition; a board
+     line wants the whole column. */
+  width: 100%;
+  max-width: 1040px;
+}
+
+.stage-board .meta-over {
+  justify-content: flex-start;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.board-head {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(18px, 2.6vw, 36px);
+  min-width: 0;
+}
+
+.stage-board .meta {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  align-items: flex-start;
+  padding-bottom: 4px;
+}
+
+.stage-board .meta .flaps-row {
+  justify-content: flex-start;
+}
+
+.stage-board .meta-album {
+  letter-spacing: 0.22em;
+  color: var(--ink-mid);
+  padding-top: 2px;
+}
+
+.stage-board .progress,
+.stage-board .transport,
+.stage-board .faceplate {
+  max-width: none;
+}
+
+.stage-board .transport {
+  justify-content: space-between;
+}
+
+.stage-board .faceplate {
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: clamp(24px, 4vw, 64px);
+}
+
+.stage-board .faders {
+  max-width: 420px;
+}
+
+/* The artist row is set in the board's own ink, without card faces —
+   a sub-line, not a second headline. */
+.board-artist {
+  --flap-wght: 600;
+  opacity: 0.9;
+}
+
+.progress-flaps {
+  flex: none;
+}
+
+/* At narrow widths the panel and the destination stack. */
+@media (max-width: 1180px) {
+  .board-head {
+    gap: 18px;
+  }
+
+  .stage-board .artpanel {
+    --panel: clamp(130px, 20vh, 200px);
+  }
+}
+
+@media (max-height: 780px) {
+  .stage-board .artpanel {
+    --panel: clamp(120px, 22vh, 190px);
+  }
+}
+
+
+/* ── Faceplate: an enamel instrument plate, not a walnut amplifier ──────── */
+
+[data-skin='board'] .faceplate {
+  background: var(--paper-lit);
+  border-top: 1px solid var(--rule-strong);
+  box-shadow: none;
+}
+
+[data-skin='board'] .faceplate-brand {
+  color: var(--ink-mid);
+  font-variation-settings: 'wdth' 92, 'wght' 700;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+}
+
+[data-skin='board'] .faceplate-led {
+  border-radius: 0;
+  background: var(--rule-strong);
+  box-shadow: none;
+}
+
+[data-skin='board'] .faceplate-led.is-lit {
+  background: var(--signal);
+  box-shadow: none;
+}
+
+/* ── Stage ─────────────────────────────────────────────────────────────── */
+
+[data-skin='board'] .stage-body {
+  align-items: stretch;
+}
+
+[data-skin='board'] .meta-over {
+  color: var(--ink-mid);
+}
+
+[data-skin='board'] .meta-room {
+  color: var(--ink);
+}
+
+[data-skin='board'] .meta-sep {
+  background: var(--rule-strong);
+}
+
+[data-skin='board'] .meta-album {
+  color: var(--ink-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-variation-settings: 'wdth' 92, 'wght' 600;
+}
+
+/* The stage and faceplate paint their own warm gradients — repaint them flat. */
+
+[data-skin='board'] .stage {
+  background: var(--paper);
+}
+
+[data-skin='board'] .faceplate {
+  background: var(--paper-lit);
+  box-shadow: none;
+  border-top: 1px solid var(--rule-strong);
+}
+
+[data-skin='board'] .faceplate::before {
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(22, 24, 28, 0.035) 0 1px,
+    transparent 1px 4px
+  );
+}
+
+
+/* The faceplate captions sit on the lightest panel in the app — they need
+   more ink than the rails do to hold the same weight. */
+[data-skin='board'] .faceplate .label,
+[data-skin='board'] .knob-caption,
+[data-skin='board'] .faders-caption {
+  color: var(--ink-mid);
+}
