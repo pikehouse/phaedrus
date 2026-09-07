@@ -1,0 +1,927 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   DRIVE SKIN — Los Angeles at night, 2011, from the driver's seat.
+
+   Night blue-black grounds, a sunset that never finishes, hot-pink neon
+   script, chrome, sodium streetlights sliding over a black dash. Everything
+   is keyed off [data-skin='drive'] on <html>.
+
+   The first block re-points the hi-fi tokens so anything that only speaks
+   in tokens restyles for free; the rest is the work tokens cannot do —
+   neon, chrome, rubber, and the 1985 digital dash.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* The sign is Archivo's real italic; fonts.css only ships the roman. */
+@import '@fontsource-variable/archivo/wdth-italic.css';
+
+[data-skin='drive'] {
+  /* ── The night's own vocabulary ────────────────────────────────────────── */
+  --night: #07060f;
+  --night-2: #100b22;
+  --night-3: #171235;
+
+  --pink: #ff2d95;
+  --pink-hot: #ff6fb8;
+  --pink-glow: rgba(255, 45, 149, 0.38);
+  --cyan: #2de2ff;
+  --sodium: #ffb347;
+  --sodium-deep: #ff8a3d;
+  --sodium-glow: rgba(255, 138, 61, 0.5);
+  --violet: #7a2bff;
+
+  --ink: #eef0ff;
+  --ink-dim: #9aa0c0;
+  --ink-faint: rgba(238, 240, 255, 0.42);
+  --ink-ghost: rgba(238, 240, 255, 0.16);
+
+  /* Chrome is a gradient, never a colour: it only reads as metal clipped to
+     type or turned into a ring. */
+  --chrome: linear-gradient(180deg, #f4f4ff 0%, #b8bdd0 45%, #6a7090 50%, #dfe3f2 55%, #8c93b0 100%);
+  --chrome-line: rgba(226, 230, 250, 0.28);
+
+  /* ── Hi-fi tokens, re-pointed ──────────────────────────────────────────── */
+  --bg-deep: var(--night);
+  --bg: var(--night-2);
+  --bg-raised: var(--night-3);
+  --walnut: #1a1436;
+  --walnut-light: #261d4c;
+
+  --cream: var(--ink);
+  --cream-dim: var(--ink-dim);
+  --cream-faint: var(--ink-faint);
+  --cream-ghost: var(--ink-ghost);
+
+  /* "Active" is neon. */
+  --amber: var(--pink);
+  --amber-hot: var(--pink-hot);
+  --amber-glow: var(--pink-glow);
+
+  --rust: var(--sodium-deep);
+  --burgundy: #2c1054;
+  --wine: #180a32;
+  --olive: #14304a;
+  --mustard: var(--sodium);
+
+  --display: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+  --face: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+
+  --radius: 3px;
+
+  /* Deep blue-black, and a faint pink rim where the hi-fi had a warm blur. */
+  --sink: inset 0 1px 2px rgba(0, 0, 0, 0.8), inset 0 -1px 0 rgba(238, 240, 255, 0.05);
+  --lift: 0 2px 10px rgba(3, 2, 10, 0.7), 0 0 0 0.5px rgba(238, 240, 255, 0.08);
+}
+
+[data-skin='drive'] body {
+  background: var(--night);
+}
+
+/* Archivo carries wdth and wght, not Fraunces's SOFT/WONK/opsz — restate the
+   axes it does have or the hi-fi display rules leave everything at default. */
+[data-skin='drive'] .meta-title,
+[data-skin='drive'] .meta-artist,
+[data-skin='drive'] .room-name,
+[data-skin='drive'] .arrange-name,
+[data-skin='drive'] .qrow-title,
+[data-skin='drive'] .crate-caption,
+[data-skin='drive'] .crate-bill-title,
+[data-skin='drive'] .sresult-title,
+[data-skin='drive'] .search-input,
+[data-skin='drive'] .search-drill-title,
+[data-skin='drive'] .curtain-title,
+[data-skin='drive'] .boundary-title,
+[data-skin='drive'] .panel-empty-line,
+[data-skin='drive'] .search-prompt,
+[data-skin='drive'] .linkcard-title {
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+/* ── Shell and rails ───────────────────────────────────────────────────── */
+
+[data-skin='drive'] .shell {
+  background: var(--night);
+}
+
+[data-skin='drive'] .stage {
+  background: var(--night);
+}
+
+[data-skin='drive'] .rooms,
+[data-skin='drive'] .right-rail {
+  background: linear-gradient(180deg, #0d0a1c 0%, #07060f 100%);
+}
+
+[data-skin='drive'] .rooms {
+  box-shadow: inset -1px 0 0 rgba(226, 230, 250, 0.1), 12px 0 34px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='drive'] .right-rail {
+  box-shadow: inset 1px 0 0 rgba(226, 230, 250, 0.1), -12px 0 34px rgba(0, 0, 0, 0.5);
+}
+
+/* ── No lamp, no grain: the film is the skin's own ─────────────────────── */
+
+[data-skin='drive'] .atmo-grain,
+[data-skin='drive'] .atmo-leak,
+[data-skin='drive'] .atmo-vignette {
+  display: none;
+}
+
+/* ── Labels: condensed caps, cool and dim ──────────────────────────────── */
+
+[data-skin='drive'] .label {
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  color: var(--ink-dim);
+}
+
+/* ── Rooms rail: stations, one pilot lamp per row ──────────────────────── */
+
+[data-skin='drive'] .rooms-head {
+  margin: 0 10px 6px;
+  padding: 10px 8px 10px;
+  border-bottom: 1px solid rgba(238, 240, 255, 0.06);
+}
+
+[data-skin='drive'] .rooms-head .label {
+  letter-spacing: 0.26em;
+}
+
+[data-skin='drive'] .room {
+  padding: 9px 10px 10px 27px;
+  border-radius: 3px;
+  border-bottom: 1px solid rgba(238, 240, 255, 0.035);
+}
+
+[data-skin='drive'] .room:hover {
+  background: rgba(238, 240, 255, 0.035);
+}
+
+[data-skin='drive'] .room.is-selected {
+  background: linear-gradient(90deg, rgba(255, 45, 149, 0.11), rgba(255, 45, 149, 0.02));
+  box-shadow: inset 0 0 0 1px rgba(255, 45, 149, 0.16);
+}
+
+[data-skin='drive'] .room-marker {
+  left: 10px;
+  top: 50%;
+  bottom: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: #130f20;
+  box-shadow: inset 0 0 0 1px rgba(238, 240, 255, 0.12), inset 0 1px 1px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='drive'] .room.is-selected .room-marker {
+  background: var(--pink-hot);
+  box-shadow: 0 0 6px var(--pink), 0 0 14px rgba(255, 45, 149, 0.5), 0 0 2px #ffd6ec;
+}
+
+[data-skin='drive'] .room-name {
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-skin='drive'] .room-with,
+[data-skin='drive'] .qrow-artist,
+[data-skin='drive'] .sresult-sub,
+[data-skin='drive'] .crate-caption-sub {
+  font-variation-settings: 'wdth' 80, 'wght' 500;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-skin='drive'] .bars i {
+  width: 2px;
+  border-radius: 0;
+  background: var(--pink);
+  box-shadow: 0 0 4px rgba(255, 45, 149, 0.6);
+}
+
+[data-skin='drive'] .rooms-foot {
+  border-top: 1px solid rgba(238, 240, 255, 0.06);
+}
+
+[data-skin='drive'] .arrange-name {
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+[data-skin='drive'] .switch {
+  border-radius: 3px;
+  background: #06050d;
+  box-shadow: var(--sink), 0 0 0 1px rgba(226, 230, 250, 0.1);
+}
+
+[data-skin='drive'] .switch-thumb {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #3a3852, #1b1a2a);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='drive'] .switch.is-on {
+  background: rgba(255, 45, 149, 0.14);
+  box-shadow: var(--sink), 0 0 0 1px rgba(255, 45, 149, 0.3), 0 0 10px rgba(255, 45, 149, 0.16);
+}
+
+[data-skin='drive'] .switch.is-on .switch-thumb {
+  background: linear-gradient(180deg, #ff9fd0, #d61d78);
+  box-shadow: 0 0 8px rgba(255, 45, 149, 0.55);
+}
+
+/* ── Skin picker ───────────────────────────────────────────────────────── */
+
+[data-skin='drive'] .skinpick-btn {
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(226, 230, 250, 0.12);
+}
+
+[data-skin='drive'] .skinpick-btn.is-on {
+  color: #1c0714;
+  background: var(--pink);
+  box-shadow: inset 0 0 0 1px var(--pink), 0 0 14px rgba(255, 45, 149, 0.3);
+}
+
+/* ── Transport: black rubber keys in a chrome bezel ────────────────────── */
+
+[data-skin='drive'] .tactile {
+  border-radius: 4px;
+  color: var(--ink-dim);
+  background: linear-gradient(180deg, #26243a 0%, #16141f 52%, #0d0c14 100%);
+  box-shadow:
+    0 0 0 1px rgba(200, 205, 232, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.6),
+    0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .tactile-sm {
+  width: 40px;
+  height: 30px;
+}
+
+[data-skin='drive'] .tactile-lg {
+  width: 54px;
+  height: 34px;
+  color: var(--ink);
+}
+
+[data-skin='drive'] .tactile:hover:not(:disabled),
+[data-skin='drive'] .tactile-lg:hover:not(:disabled) {
+  color: var(--ink);
+  background: linear-gradient(180deg, #2c2a42 0%, #1a1826 52%, #0f0e17 100%);
+  box-shadow:
+    0 0 0 1px rgba(255, 45, 149, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.6),
+    0 2px 6px rgba(0, 0, 0, 0.6),
+    0 0 14px rgba(255, 45, 149, 0.16);
+}
+
+[data-skin='drive'] .tactile:active:not(:disabled) {
+  transform: none;
+  background: linear-gradient(180deg, #0d0c14 0%, #14121c 60%, #191724 100%);
+  box-shadow:
+    0 0 0 1px rgba(200, 205, 232, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='drive'] .tactile:disabled {
+  color: var(--ink-ghost);
+  background: linear-gradient(180deg, #1a1826 0%, #100f18 100%);
+  box-shadow: 0 0 0 1px rgba(200, 205, 232, 0.14), inset 0 -2px 3px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='drive'] .tactile-lg.is-playing {
+  color: var(--pink-hot);
+}
+
+[data-skin='drive'] .tactile-lg.is-playing svg {
+  filter: drop-shadow(0 0 4px rgba(255, 45, 149, 0.85)) drop-shadow(0 0 9px rgba(255, 45, 149, 0.35));
+}
+
+/* Backlit toggles: the icon is the lamp. */
+[data-skin='drive'] .mod {
+  width: 32px;
+  height: 26px;
+  border-radius: 3px;
+  color: rgba(238, 240, 255, 0.26);
+  background: linear-gradient(180deg, #1f1d2e 0%, #13111c 52%, #0c0b12 100%);
+  box-shadow:
+    0 0 0 1px rgba(200, 205, 232, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .mod:hover:not(:disabled) {
+  color: var(--ink);
+  background: linear-gradient(180deg, #262438 0%, #17151f 52%, #0e0d14 100%);
+}
+
+[data-skin='drive'] .mod.is-on {
+  color: var(--pink-hot);
+  text-shadow: none;
+  box-shadow:
+    0 0 0 1px rgba(255, 45, 149, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .mod.is-on svg {
+  filter: drop-shadow(0 0 4px rgba(255, 45, 149, 0.8));
+}
+
+[data-skin='drive'] .mod.is-on::after {
+  display: none;
+}
+
+[data-skin='drive'] .mod:disabled {
+  color: rgba(238, 240, 255, 0.1);
+}
+
+/* ── Progress: the road ────────────────────────────────────────────────── */
+
+[data-skin='drive'] .drive-dash .progress {
+  gap: 12px;
+}
+
+/* Elapsed and total read like the digital dash of a 1985 Testarossa. */
+[data-skin='drive'] .progress-time {
+  font-variation-settings: 'wdth' 100, 'wght' 500;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  min-width: 36px;
+  color: var(--sodium);
+  text-shadow: 0 0 6px rgba(255, 138, 61, 0.55), 0 0 14px rgba(255, 138, 61, 0.2);
+}
+
+[data-skin='drive'] .progress-track {
+  height: 20px;
+}
+
+[data-skin='drive'] .progress-groove {
+  inset: 9.5px 0;
+  border-radius: 0;
+  background: rgba(255, 45, 149, 0.18);
+  box-shadow: none;
+}
+
+[data-skin='drive'] .progress-played {
+  top: 9px;
+  height: 2px;
+  border-radius: 0;
+  background: linear-gradient(90deg, rgba(255, 45, 149, 0.45), var(--pink));
+  box-shadow: 0 0 6px rgba(255, 45, 149, 0.7), 0 0 14px rgba(255, 45, 149, 0.3);
+}
+
+[data-skin='drive'] .progress-cap {
+  width: 3px;
+  height: 12px;
+  margin-left: -1.5px;
+  border-radius: 1px;
+  background: var(--chrome);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+[data-skin='drive'] .progress-track:hover .progress-cap,
+[data-skin='drive'] .progress-track.is-scrubbing .progress-cap {
+  width: 3px;
+  height: 15px;
+}
+
+[data-skin='drive'] .live-pip {
+  width: 6px;
+  height: 6px;
+  background: var(--pink-hot);
+  box-shadow: 0 0 8px rgba(255, 45, 149, 0.7);
+}
+
+[data-skin='drive'] .progress-live .label {
+  color: var(--pink-hot);
+  letter-spacing: 0.22em;
+  text-shadow: 0 0 6px rgba(255, 45, 149, 0.4);
+}
+
+[data-skin='drive'] .progress-live-rule {
+  background: linear-gradient(90deg, rgba(255, 45, 149, 0.3), transparent);
+}
+
+/* ── The volume knob: a black dial in a chrome ring ────────────────────── */
+
+[data-skin='drive'] .knob {
+  width: 104px;
+  height: 104px;
+}
+
+[data-skin='drive'] .knob-caption,
+[data-skin='drive'] .faders-caption {
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  color: var(--ink-dim);
+}
+
+[data-skin='drive'] .knob-body {
+  inset: 12px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.05), transparent 42%),
+    radial-gradient(circle at 38% 28%, #2a2840, #12111d 58%, #06060c 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.75),
+    0 8px 18px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='drive'] .knob-body::before {
+  background: conic-gradient(
+    from 208deg,
+    #6a7090,
+    #dfe3f2 9%,
+    #8c93b0 19%,
+    #f4f4ff 30%,
+    #7a8098 41%,
+    #c9cfe0 52%,
+    #5f6580 63%,
+    #b8bdd0 76%,
+    #6a7090 88%,
+    #6a7090
+  );
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 84%, #000 86% 100%);
+  mask-image: radial-gradient(circle closest-side, transparent 0 84%, #000 86% 100%);
+}
+
+[data-skin='drive'] .knob:hover .knob-body,
+[data-skin='drive'] .knob.is-dragging .knob-body {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.75),
+    0 8px 20px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    0 0 22px rgba(255, 45, 149, 0.18);
+}
+
+[data-skin='drive'] .knob-pointer {
+  top: 9px;
+  width: 2px;
+  height: 15px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--pink-hot);
+  box-shadow: 0 0 5px var(--pink), 0 0 12px rgba(255, 45, 149, 0.45);
+}
+
+[data-skin='drive'] .knob-value {
+  font-variation-settings: 'wdth' 100, 'wght' 500;
+  font-size: 17px;
+  color: var(--sodium);
+  text-shadow: 0 0 6px rgba(255, 138, 61, 0.55);
+}
+
+[data-skin='drive'] .knob-tick {
+  stroke: rgba(238, 240, 255, 0.14);
+}
+
+[data-skin='drive'] .knob-tick.is-major {
+  stroke: rgba(238, 240, 255, 0.28);
+}
+
+[data-skin='drive'] .knob-tick.is-lit,
+[data-skin='drive'] .knob-tick.is-major.is-lit {
+  stroke: var(--pink);
+}
+
+/* ── Faders: orange digital level bars ─────────────────────────────────── */
+
+[data-skin='drive'] .fader {
+  min-height: 30px;
+}
+
+[data-skin='drive'] .fader-name {
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+}
+
+[data-skin='drive'] .fader-value {
+  font-variation-settings: 'wdth' 100, 'wght' 500;
+  color: var(--sodium);
+  text-shadow: 0 0 5px rgba(255, 138, 61, 0.45);
+}
+
+/* Blocky segments, seven px on a two px gap, unlit ones just visible. */
+[data-skin='drive'] .fader-slot {
+  inset: 6px 0;
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, rgba(255, 179, 71, 0.1) 0 5px, transparent 5px 7px);
+  box-shadow: none;
+}
+
+[data-skin='drive'] .fader-fill {
+  top: 6px;
+  height: 8px;
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--sodium) 0 5px, transparent 5px 7px);
+  box-shadow: 0 0 8px rgba(255, 138, 61, 0.3);
+}
+
+[data-skin='drive'] .fader.is-muted .fader-fill {
+  background: repeating-linear-gradient(90deg, var(--sodium-deep) 0 5px, transparent 5px 7px);
+  opacity: 0.35;
+}
+
+[data-skin='drive'] .fader.is-muted .fader-mute {
+  color: var(--sodium-deep);
+}
+
+[data-skin='drive'] .fader-cap {
+  width: 2px;
+  height: 14px;
+  margin-left: -1px;
+  border-radius: 0;
+  background: #eef0ff;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.45), 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+[data-skin='drive'] .fader-cap::after {
+  display: none;
+}
+
+[data-skin='drive'] .fader-rail:hover .fader-cap,
+[data-skin='drive'] .fader-rail.is-dragging .fader-cap {
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 12px rgba(255, 45, 149, 0.4);
+}
+
+[data-skin='drive'] .fader-mute:hover {
+  color: var(--ink);
+  background: rgba(238, 240, 255, 0.06);
+}
+
+/* ── Faceplate ─────────────────────────────────────────────────────────── */
+
+[data-skin='drive'] .faceplate {
+  background: linear-gradient(180deg, #13111d 0%, #0c0a15 55%, #08070f 100%);
+  border-top: 1px solid var(--chrome-line);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.7), 0 -14px 30px rgba(0, 0, 0, 0.45);
+}
+
+[data-skin='drive'] .faceplate::before {
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px);
+}
+
+[data-skin='drive'] .faceplate-brand {
+  font-variation-settings: 'wdth' 125, 'wght' 500;
+  font-style: italic;
+  letter-spacing: 0.34em;
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 0.55;
+}
+
+[data-skin='drive'] .faceplate-led {
+  background: #130f20;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='drive'] .faceplate-led.is-lit {
+  background: var(--pink-hot);
+  box-shadow: 0 0 8px rgba(255, 45, 149, 0.8);
+}
+
+/* ── Right rail: tabs and the queue ────────────────────────────────────── */
+
+[data-skin='drive'] .right-tab {
+  border-radius: 3px;
+  letter-spacing: 0.22em;
+}
+
+[data-skin='drive'] .right-tab.is-active::after {
+  height: 2px;
+  background: var(--pink);
+  box-shadow: 0 0 8px rgba(255, 45, 149, 0.6);
+}
+
+[data-skin='drive'] .panel-head {
+  border-bottom: 1px solid rgba(238, 240, 255, 0.06);
+  margin: 0 16px 6px;
+  padding: 0 0 8px;
+}
+
+[data-skin='drive'] .qrow {
+  border-radius: 2px;
+  border-bottom: 1px solid rgba(238, 240, 255, 0.035);
+}
+
+[data-skin='drive'] .qrow-main {
+  gap: 9px;
+  padding: 5px 8px 5px 10px;
+}
+
+[data-skin='drive'] .qrow:hover {
+  background: rgba(238, 240, 255, 0.035);
+}
+
+[data-skin='drive'] .qrow.is-current {
+  background: linear-gradient(90deg, rgba(255, 45, 149, 0.1), rgba(255, 45, 149, 0.02));
+}
+
+[data-skin='drive'] .qrow.is-current .qrow-marker {
+  width: 2px;
+  background: var(--pink);
+  box-shadow: 0 0 8px rgba(255, 45, 149, 0.7);
+}
+
+[data-skin='drive'] .qrow.is-current .qrow-title {
+  color: var(--pink-hot);
+  text-shadow: 0 0 8px rgba(255, 45, 149, 0.35);
+}
+
+[data-skin='drive'] .qrow-title {
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+[data-skin='drive'] .qrow-time {
+  font-variation-settings: 'wdth' 100, 'wght' 500;
+  color: var(--sodium);
+  text-shadow: 0 0 5px rgba(255, 138, 61, 0.35);
+  opacity: 0.85;
+}
+
+[data-skin='drive'] .qrow-art,
+[data-skin='drive'] .sresult-art {
+  width: 32px;
+  height: 32px;
+  border-radius: 1px;
+  background: #0c0b14;
+  box-shadow: 0 0 0 1px var(--chrome-line), 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Every picture in the app was shot on the same night: a milder cousin of
+   the cover's grade — a little less colour, a little more contrast, and a
+   violet-to-magenta veil — still itself at forty pixels. */
+[data-skin='drive'] .qrow-art img,
+[data-skin='drive'] .sresult-art img,
+[data-skin='drive'] .crate-face img {
+  filter: saturate(0.7) contrast(1.1) brightness(0.94);
+}
+
+[data-skin='drive'] .sresult-art {
+  position: relative;
+}
+
+[data-skin='drive'] .qrow-art::after,
+[data-skin='drive'] .sresult-art::after,
+[data-skin='drive'] .crate-face:has(> img)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(150deg, rgba(122, 43, 255, 0.34), rgba(255, 45, 149, 0.26));
+  mix-blend-mode: multiply;
+}
+
+[data-skin='drive'] .qrow-art-glow {
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px rgba(255, 45, 149, 0.7);
+}
+
+[data-skin='drive'] .qrow-remove:hover {
+  background: rgba(255, 138, 61, 0.16);
+}
+
+[data-skin='drive'] .panel-empty-line {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+[data-skin='drive'] .panel-action.is-armed {
+  color: var(--sodium-deep);
+  background: rgba(255, 138, 61, 0.14);
+}
+
+/* ── Crate: sleeves with a chrome edge ─────────────────────────────────── */
+
+[data-skin='drive'] .crate-face {
+  border-radius: 1px;
+  background: #0f0d1a;
+  box-shadow: 0 0 0 1px var(--chrome-line), 0 3px 10px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .crate-item:hover .crate-face:not(:disabled) {
+  box-shadow:
+    0 0 0 1px rgba(255, 45, 149, 0.6),
+    0 8px 20px rgba(0, 0, 0, 0.7),
+    0 0 22px rgba(255, 45, 149, 0.22);
+}
+
+[data-skin='drive'] .crate-item:hover .crate-face img {
+  filter: saturate(0.82) contrast(1.1) brightness(1.02);
+}
+
+[data-skin='drive'] .crate-wear {
+  background-image: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+[data-skin='drive'] .crate-bill-title {
+  font-size: 14px;
+  line-height: 1.12;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+[data-skin='drive'] .ground-walnut { background: linear-gradient(152deg, #261d4c, #0f0b22); }
+[data-skin='drive'] .ground-burgundy { background: linear-gradient(152deg, #4a1252, #170a2a); }
+[data-skin='drive'] .ground-olive { background: linear-gradient(152deg, #14304a, #080f1c); }
+[data-skin='drive'] .ground-wine { background: linear-gradient(152deg, #2c1054, #0d0620); }
+
+[data-skin='drive'] .ground-mustard {
+  background: linear-gradient(152deg, #ff8a3d, #7a2a10);
+}
+
+[data-skin='drive'] .ground-mustard .crate-bill-title {
+  color: #1c0a06;
+}
+
+[data-skin='drive'] .ground-mustard .crate-bill-mark {
+  color: rgba(28, 10, 6, 0.6);
+}
+
+[data-skin='drive'] .crate-tool,
+[data-skin='drive'] .sresult-tool {
+  border-radius: 2px;
+  background: rgba(10, 8, 22, 0.88);
+  box-shadow: inset 0 0 0 1px var(--chrome-line);
+}
+
+[data-skin='drive'] .crate-tool:hover,
+[data-skin='drive'] .sresult-tool:hover {
+  background: var(--pink);
+  color: #1c0714;
+}
+
+/* ── Search ────────────────────────────────────────────────────────────── */
+
+[data-skin='drive'] .search-scrim {
+  background:
+    radial-gradient(72% 46% at 50% 104%, rgba(122, 43, 255, 0.2), transparent 70%),
+    radial-gradient(60% 34% at 50% -4%, rgba(255, 45, 149, 0.12), transparent 70%),
+    rgba(7, 6, 15, 0.96);
+}
+
+[data-skin='drive'] .search-bar {
+  border-bottom: 1px solid var(--chrome-line);
+}
+
+[data-skin='drive'] .search-bar:focus-within {
+  border-bottom-color: var(--pink);
+  box-shadow: 0 1px 0 rgba(255, 45, 149, 0.3), 0 6px 18px -8px rgba(255, 45, 149, 0.35);
+}
+
+[data-skin='drive'] .search-input {
+  font-variation-settings: 'wdth' 100, 'wght' 500;
+  letter-spacing: 0;
+  caret-color: var(--pink);
+}
+
+[data-skin='drive'] .search-input::placeholder {
+  font-style: normal;
+  color: var(--ink-ghost);
+}
+
+[data-skin='drive'] .search-prompt,
+[data-skin='drive'] .panel-empty-line {
+  font-style: normal;
+}
+
+[data-skin='drive'] .search-section-head {
+  letter-spacing: 0.26em;
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 1;
+}
+
+[data-skin='drive'] .sresult {
+  border-radius: 2px;
+  border-bottom: 1px solid rgba(238, 240, 255, 0.035);
+}
+
+[data-skin='drive'] .sresult:hover {
+  background: rgba(255, 45, 149, 0.06);
+}
+
+[data-skin='drive'] .sresult:hover .sresult-title {
+  color: var(--pink-hot);
+}
+
+[data-skin='drive'] .search-crumb:hover {
+  color: var(--pink-hot);
+}
+
+[data-skin='drive'] .linkcard {
+  border-radius: 3px;
+  background: linear-gradient(100deg, rgba(122, 43, 255, 0.24), rgba(255, 45, 149, 0.1));
+  box-shadow: inset 0 0 0 1px rgba(255, 45, 149, 0.25), 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .linkcard-btn {
+  border-radius: 3px;
+  background: var(--pink);
+  color: #1c0714;
+}
+
+[data-skin='drive'] .linkcard-btn:hover {
+  background: var(--pink-hot);
+}
+
+[data-skin='drive'] .linkcard-dot {
+  background: var(--pink);
+}
+
+/* ── Status, curtains, boundary ────────────────────────────────────────── */
+
+[data-skin='drive'] .status-pill {
+  border-radius: 3px;
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  background: rgba(10, 8, 22, 0.94);
+  box-shadow: inset 0 0 0 1px var(--chrome-line), 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .status-pill.is-bad {
+  color: var(--sodium);
+  box-shadow: inset 0 0 0 1px rgba(255, 138, 61, 0.45), 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .curtain,
+[data-skin='drive'] .boundary {
+  background:
+    linear-gradient(180deg, transparent 58%, rgba(255, 45, 149, 0.16) 66%, rgba(122, 43, 255, 0.1) 70%, transparent 76%),
+    linear-gradient(180deg, #07060f, #100b22 55%, #07060f);
+}
+
+[data-skin='drive'] .curtain-title,
+[data-skin='drive'] .boundary-title {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+[data-skin='drive'] .curtain-btn,
+[data-skin='drive'] .boundary-btn {
+  border-radius: 3px;
+  background: linear-gradient(180deg, #26243a, #0d0c14);
+  box-shadow: 0 0 0 1px rgba(200, 205, 232, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .curtain-btn:hover:not(:disabled),
+[data-skin='drive'] .boundary-btn:hover {
+  color: var(--pink-hot);
+  box-shadow: 0 0 0 1px rgba(255, 45, 149, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.09), 0 0 14px rgba(255, 45, 149, 0.16);
+}
+
+[data-skin='drive'] .boundary-label {
+  color: var(--sodium-deep);
+}
+
+/* ── Scrollbars, selection, focus ──────────────────────────────────────── */
+
+[data-skin='drive'] .scroll {
+  scrollbar-color: rgba(238, 240, 255, 0.16) transparent;
+}
+
+[data-skin='drive'] .scroll::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background: rgba(238, 240, 255, 0.14);
+  background-clip: padding-box;
+}
+
+[data-skin='drive'] .scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 45, 149, 0.45);
+  background-clip: padding-box;
+}
+
+[data-skin='drive'] ::selection {
+  background: rgba(255, 45, 149, 0.35);
+  color: var(--ink);
+}
+
+[data-skin='drive'] :focus-visible {
+  outline: 1px solid var(--pink);
+  outline-offset: 2px;
+}

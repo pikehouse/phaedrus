@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 
-export type Skin = 'hifi' | 'board' | 'tuner';
+export type Skin = 'hifi' | 'board' | 'tuner' | 'drive';
 
 export const SKINS: { id: Skin; label: string; hint: string }[] = [
   { id: 'hifi', label: 'Hi-Fi', hint: 'Late night, warm lamp, a record spinning' },
   { id: 'board', label: 'Board', hint: 'Station enamel, split-flaps, hard light' },
   { id: 'tuner', label: 'Tuner', hint: '1988 black faceplate, glowing green display' },
+  { id: 'drive', label: 'Drive', hint: 'LA at 2 a.m., neon script, sodium streetlights' },
 ];
 
 const KEY = 'phaedrus.skin';
@@ -13,7 +14,7 @@ const KEY = 'phaedrus.skin';
 function recall(): Skin {
   try {
     const v = localStorage.getItem(KEY);
-    if (v === 'hifi' || v === 'board' || v === 'tuner') return v;
+    if (v === 'hifi' || v === 'board' || v === 'tuner' || v === 'drive') return v;
   } catch {
     /* private mode — fall through to the default */
   }

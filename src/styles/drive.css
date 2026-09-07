@@ -1,0 +1,700 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   DRIVE — the windshield and the dash.
+
+   Shared components are re-pointed in skin-drive.css; this file owns the
+   scene: the sky, the sun, the ground, the cover floating over it with its
+   reflection, the neon lockup, the dashboard strip, and the film the whole
+   window is seen through. Every colour here comes from the [data-skin='drive']
+   block, which is the only place these classes are ever rendered.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The stage becomes one windshield ──────────────────────────────────── */
+
+.stage-drive .stage-scroll {
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+}
+
+.stage-drive .stage-body {
+  width: 100%;
+  max-width: none;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.drive {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Where the road runs out. The sun sits on it; the grid reads it too. */
+  --vp: 40%;
+  --horizon: 58%;
+  --cover: clamp(140px, min(36vh, 30cqw), 250px);
+  --cover-x: clamp(18px, 4cqw, 44px);
+  --sun: clamp(96px, min(21cqw, 30vh), 200px);
+  /* Set from the cover's average colour once it has been sampled. */
+  --tint: transparent;
+}
+
+.drive-view {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.drive-view > i {
+  display: block;
+  pointer-events: none;
+}
+
+/* ── Sky ───────────────────────────────────────────────────────────────── */
+
+.drive-sky {
+  position: absolute;
+  inset: 0;
+  background:
+    /* The last light: low, thin, behind the hills. */
+    linear-gradient(
+      180deg,
+      transparent calc(var(--horizon) - 12%),
+      rgba(122, 43, 255, 0.2) calc(var(--horizon) - 6.5%),
+      rgba(255, 45, 149, 0.34) calc(var(--horizon) - 2.2%),
+      rgba(255, 106, 61, 0.66) var(--horizon),
+      transparent var(--horizon)
+    ),
+    /* Sodium smog, warmest where the sun is. */
+    radial-gradient(64% 34% at var(--vp) var(--horizon), rgba(255, 106, 61, 0.3), transparent 72%),
+    linear-gradient(180deg, #07060f 0%, #0a0818 34%, #0f0a24 calc(var(--horizon) - 12%), #180d34 var(--horizon));
+}
+
+.drive-sun-glow {
+  position: absolute;
+  left: var(--vp);
+  top: var(--horizon);
+  width: calc(var(--sun) * 2.6);
+  height: calc(var(--sun) * 1.6);
+  transform: translate(-50%, -60%);
+  background: radial-gradient(closest-side, rgba(255, 106, 61, 0.26), rgba(255, 45, 149, 0.12) 46%, transparent 100%);
+}
+
+/* The synth sun: sodium at the top, violet at the foot, the classic stripes
+   cut out of its lower half. Its bottom sets behind the ground plane. */
+.drive-sun {
+  position: absolute;
+  left: var(--vp);
+  top: var(--horizon);
+  width: var(--sun);
+  height: var(--sun);
+  transform: translate(-50%, -64%);
+  border-radius: 50%;
+  isolation: isolate;
+  opacity: 0.88;
+  background: linear-gradient(180deg, #ffcf7a 0%, #ff8a3d 30%, #ff3d8f 62%, #7a2bff 100%);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0 47%,
+    transparent 47% 49.4%,
+    #000 49.4% 56%,
+    transparent 56% 59.6%,
+    #000 59.6% 66%,
+    transparent 66% 70.6%,
+    #000 70.6% 77%,
+    transparent 77% 82.6%,
+    #000 82.6% 88%,
+    transparent 88% 94%,
+    #000 94% 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0 47%,
+    transparent 47% 49.4%,
+    #000 49.4% 56%,
+    transparent 56% 59.6%,
+    #000 59.6% 66%,
+    transparent 66% 70.6%,
+    #000 70.6% 77%,
+    transparent 77% 82.6%,
+    #000 82.6% 88%,
+    transparent 88% 94%,
+    #000 94% 100%
+  );
+}
+
+/* Each track shifts the sky a little. */
+.drive-sun::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--tint);
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+}
+
+/* ── Ground ────────────────────────────────────────────────────────────── */
+
+.drive-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--horizon);
+  bottom: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1c0f38 0%, #0e0922 26%, #07060f 72%);
+}
+
+.drive-grid {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: visible;
+}
+
+.drive-grid path {
+  fill: none;
+  stroke-linecap: butt;
+}
+
+.drive-grid-rails {
+  stroke: rgba(45, 226, 255, 0.13);
+  stroke-width: 1;
+}
+
+.drive-grid-rails-glow {
+  stroke: rgba(45, 226, 255, 0.045);
+  stroke-width: 3;
+}
+
+.drive-grid-rungs {
+  stroke: rgba(45, 226, 255, 0.19);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.drive-grid-rungs-glow {
+  stroke: rgba(45, 226, 255, 0.06);
+  stroke-width: 3;
+}
+
+/* The far grid dissolves into the sunset before it can shimmer. */
+.drive-haze {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--horizon);
+  height: 36%;
+  background:
+    radial-gradient(56% 100% at var(--vp) 0%, rgba(255, 106, 61, 0.26), transparent 72%),
+    linear-gradient(180deg, rgba(255, 45, 149, 0.17), rgba(122, 43, 255, 0.08) 38%, transparent 100%),
+    linear-gradient(180deg, rgba(20, 10, 44, 0.95), transparent 24%);
+}
+
+.drive-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--horizon);
+  height: 1px;
+  margin-top: -0.5px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 45, 149, 0) 0%,
+    rgba(255, 45, 149, 0.7) 18%,
+    #ff8ac6 var(--vp),
+    rgba(255, 45, 149, 0.7) 82%,
+    rgba(255, 45, 149, 0) 100%
+  );
+  box-shadow: 0 0 6px rgba(255, 45, 149, 0.65), 0 0 18px rgba(255, 45, 149, 0.3);
+}
+
+/* ── The cover ─────────────────────────────────────────────────────────── */
+
+.drive-cover {
+  position: absolute;
+  left: var(--cover-x);
+  /* Its base sits a little below the horizon, on the wet ground. */
+  bottom: calc(100% - var(--horizon) - 5%);
+  width: var(--cover);
+  height: var(--cover);
+  perspective: 900px;
+  perspective-origin: 50% 50%;
+}
+
+.drive-cover-glow {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -8%;
+  height: 26%;
+  display: block;
+  background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--pink) 72%, var(--tint)), transparent 72%);
+  opacity: 0.6;
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.drive-cover-panel,
+.drive-cover-mirror {
+  position: absolute;
+  inset: 0;
+  padding: 1px; /* the chrome edge */
+  background: var(--chrome);
+}
+
+.drive-cover-panel {
+  transform: rotateY(-8deg);
+  box-shadow:
+    0 18px 44px rgba(0, 0, 0, 0.62),
+    0 0 30px rgba(255, 45, 149, 0.16);
+}
+
+.drive-cover-face {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate; /* the grade blends with the picture, never the chrome */
+  background: linear-gradient(160deg, #0d0c16, #030308);
+}
+
+.drive-cover-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── The night grade ───────────────────────────────────────────────────── */
+
+/* The mosaic: 96 × 96 blocks, drawn small and shown big with no smoothing —
+   roughly three pixels a block on a full-size panel. It sits over the true
+   picture, which stays underneath for COLOR and as the fallback. */
+.drive-cover-pix {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+.drive-cover-face.is-art img,
+.drive-cover-face.is-art .drive-cover-pix {
+  filter: grayscale(1) contrast(1.15) brightness(0.95);
+}
+
+.drive-cover-face.is-art::before,
+.drive-cover-face.is-art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* The tritone: highlights take the sunset's colours, warmest on the sun's
+   side; mids fall through magenta into violet. */
+.drive-cover-face.is-art::before {
+  background: linear-gradient(150deg, #a86dff 0%, #ff4fae 52%, #ffa66a 100%);
+  mix-blend-mode: multiply;
+}
+
+/* No true black: the floor of the picture is indigo, and the corner nearest
+   the sun catches a little sodium. */
+.drive-cover-face.is-art::after {
+  background:
+    radial-gradient(64% 64% at 100% 100%, rgba(255, 138, 61, 0.24), transparent 70%),
+    #120c2c;
+  mix-blend-mode: screen;
+}
+
+/* Scanlines, and a hairline of chromatic fringe at the edges of the panel. */
+.drive-cover-scan {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 3px);
+  box-shadow:
+    inset 1px 0 0 rgba(45, 226, 255, 0.34),
+    inset -1px 0 0 rgba(255, 45, 149, 0.34);
+}
+
+/* COLOR: the picture as it is. The panel is still a panel. */
+.drive-cover.is-color .drive-cover-face img {
+  filter: none;
+}
+
+.drive-cover.is-color .drive-cover-pix,
+.drive-cover.is-color .drive-cover-face::before,
+.drive-cover.is-color .drive-cover-face::after {
+  display: none;
+}
+
+.drive-cover.is-color .drive-cover-scan {
+  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0 1px, transparent 1px 3px);
+  box-shadow: none;
+}
+
+.drive-cover-color {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 3;
+  padding: 3px 7px 4px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: rgba(7, 6, 15, 0.8);
+  box-shadow: inset 0 0 0 1px var(--chrome-line);
+  opacity: 0;
+  transition: opacity var(--t) var(--ease);
+}
+
+.drive-cover-panel:hover .drive-cover-color,
+.drive-cover-color:focus-visible,
+.drive-cover-color[aria-pressed='true'] {
+  opacity: 1;
+}
+
+.drive-cover-color[aria-pressed='true'] {
+  color: var(--pink-hot);
+  box-shadow: inset 0 0 0 1px rgba(255, 45, 149, 0.45);
+}
+
+.drive-cover-badge {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 125, 'wght' 500;
+  font-style: italic;
+  font-size: clamp(11px, 1.7cqw, 15px);
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  text-transform: uppercase;
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
+}
+
+.drive-cover-reflection {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 100%;
+  transform: rotateY(-8deg);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.2) 22%, transparent 42%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.58) 0%, rgba(0, 0, 0, 0.2) 22%, transparent 42%);
+}
+
+.drive-cover-mirror {
+  transform: scaleY(-1);
+  filter: url(#drive-hblur);
+}
+
+/* The wet ground colours what it reflects: the underglow, and the track. */
+.drive-cover-reflection::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pink) 55%, var(--tint)), transparent 70%);
+  mix-blend-mode: screen;
+  opacity: 0.32;
+}
+
+/* ── The lockup ────────────────────────────────────────────────────────── */
+
+.drive-lockup {
+  position: absolute;
+  left: max(
+    calc(var(--cover-x) + var(--cover) + clamp(20px, 4cqw, 48px)),
+    calc(var(--vp) + var(--sun) / 2 + clamp(14px, 3cqw, 36px))
+  );
+  right: clamp(14px, 3cqw, 36px);
+  top: 5%;
+  bottom: calc(100% - var(--horizon) - 5%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.drive-over {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 10px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.drive-over-room {
+  color: var(--pink-hot);
+  text-shadow: 0 0 6px rgba(255, 45, 149, 0.45);
+}
+
+.drive-over-sep {
+  width: 3px;
+  height: 3px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--ink-ghost);
+}
+
+/* The sign: a bent tube. An outline that glows, with almost nothing inside
+   it — the glow is a drop-shadow of what is drawn, so it hugs the tube. */
+.drive-title {
+  margin: 0;
+  padding: 0;
+  font-family: var(--face);
+  font-style: italic;
+  font-variation-settings: 'wdth' 115, 'wght' 600;
+  font-size: 56px; /* DriveTitle fits this to two lines */
+  line-height: 1.1; /* must match LINE in DriveTitle.tsx */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+  color: rgba(255, 45, 149, 0.12);
+  -webkit-text-stroke: 1.7px #ff62b2;
+  filter:
+    drop-shadow(0 0 3px rgba(255, 45, 149, 0.9))
+    drop-shadow(0 0 9px rgba(255, 45, 149, 0.55))
+    drop-shadow(0 0 22px rgba(255, 45, 149, 0.32));
+  /* ±6% over four seconds — a transformer humming, not a fault. */
+  animation: drive-breathe 4s ease-in-out infinite;
+}
+
+@keyframes drive-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.88;
+  }
+}
+
+.drive.is-hidden .drive-title {
+  animation-play-state: paused;
+}
+
+/* One letter loses its arc for 120 ms. Its light goes with it: the glow is
+   computed from what is drawn, and a dim letter draws almost nothing. */
+.drive-title-ch.is-dip {
+  opacity: 0.16;
+}
+
+/* Switched off: the glass is still there, but there is no light in it. */
+.drive-title:not(.is-lit) {
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(255, 45, 149, 0.32);
+  filter: none;
+  animation: none;
+}
+
+.drive-chrome {
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.7));
+}
+
+.drive-artist {
+  margin-top: 8px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 125, 'wght' 600;
+  font-style: italic;
+  font-size: clamp(13px, 1.9cqw, 18px);
+  line-height: 1.3;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-bottom: 2px; /* room for the drop shadow under the clip */
+}
+
+.drive-album {
+  margin-top: 6px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── The dash ──────────────────────────────────────────────────────────── */
+
+.drive-dash {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px clamp(16px, 3cqw, 34px);
+  min-height: 62px;
+  padding: 10px clamp(16px, 3cqw, 32px) 12px;
+  background: linear-gradient(180deg, #17151f 0%, #0e0c16 58%, #09080f 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(226, 230, 250, 0.2),
+    inset 0 2px 0 rgba(0, 0, 0, 0.7),
+    0 -14px 34px rgba(0, 0, 0, 0.5);
+}
+
+/* Grained vinyl, seen close. */
+.drive-dash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px);
+}
+
+.drive-dash .transport {
+  width: auto;
+  max-width: none;
+  flex: none;
+  gap: 12px;
+}
+
+.drive-dash .transport-mods {
+  flex: none;
+  gap: 6px;
+}
+
+.drive-dash .transport-main {
+  gap: 8px;
+}
+
+.drive-dash .progress {
+  flex: 1 1 240px;
+  min-width: 200px;
+  max-width: none;
+}
+
+/* ── The film ──────────────────────────────────────────────────────────── */
+
+.drive-scan,
+.drive-sweep {
+  position: fixed;
+  pointer-events: none;
+  display: block;
+}
+
+.drive-scan {
+  inset: 0;
+  z-index: 9000;
+  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.035) 0 1px, transparent 1px 3px);
+}
+
+/* A streetlight: one soft sodium band, once, from the top left corner out
+   through the bottom right — you notice the mood, not the effect. */
+.drive-sweep {
+  top: -60%;
+  bottom: -60%;
+  left: 0;
+  width: 60vw;
+  z-index: 9001;
+  opacity: 0;
+  transform: rotate(16deg) translateX(-140%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 150, 60, 0.05) 30%,
+    rgba(255, 184, 96, 0.13) 50%,
+    rgba(255, 150, 60, 0.05) 70%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+}
+
+.drive-sweep.is-passing {
+  animation: drive-sweep 2.4s cubic-bezier(0.35, 0, 0.65, 1) both;
+}
+
+@keyframes drive-sweep {
+  0% {
+    transform: rotate(16deg) translateX(-140%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(16deg) translateX(300%);
+    opacity: 0;
+  }
+}
+
+/* ── Narrow windshields ────────────────────────────────────────────────── */
+
+@container (max-width: 600px) {
+  .drive {
+    --vp: 33%;
+    --cover: clamp(120px, min(30vh, 30cqw), 250px);
+  }
+
+  .drive-lockup {
+    top: 4%;
+  }
+
+  .drive-over {
+    margin-bottom: 6px;
+  }
+}
+
+/* Short windows: the sky gives its height back before anything else. */
+@media (max-height: 720px) {
+  .drive {
+    --horizon: 56%;
+  }
+
+  .drive-dash {
+    min-height: 56px;
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drive-title {
+    animation: none;
+  }
+
+  .drive-sweep {
+    display: none;
+  }
+}

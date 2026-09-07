@@ -9,6 +9,7 @@ import Transport from './Transport';
 import VolumeKnob from './VolumeKnob';
 import Faders from './Faders';
 import TunerStage from './TunerStage';
+import DriveStage from './DriveStage';
 import '../styles/nowplaying.css';
 
 /** How long each line of the board's cycling sub-head holds before it turns. */
@@ -151,6 +152,20 @@ export default function NowPlaying() {
         <div className="stage-scroll">
           <div className="stage-body">
             <TunerStage />
+          </div>
+        </div>
+
+        {faceplate}
+      </section>
+    );
+  }
+
+  if (skin === 'drive') {
+    return (
+      <section className="stage stage-drive" aria-label="Now playing">
+        <div className="stage-scroll">
+          <div className="stage-body">
+            <DriveStage />
           </div>
         </div>
 
