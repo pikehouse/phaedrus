@@ -194,6 +194,9 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   padding: 0 4px;
+  /* Room for descenders: the clamp's overflow clip would cut a g or y. */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
 }
 
 .dl-title.is-idle {
