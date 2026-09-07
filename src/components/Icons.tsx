@@ -176,3 +176,47 @@ export const Radar = ({ size = 24, className }: P) =>
       <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
     </>,
   );
+
+export const Disc = ({ size = 24, className }: P) =>
+  svg(
+    size,
+    className,
+    <>
+      <circle cx="12" cy="12" r="8.4" />
+      <path d="M12 6.6a5.4 5.4 0 0 1 5.4 5.4" opacity="0.45" />
+      <circle cx="12" cy="12" r="2.1" fill="currentColor" stroke="none" />
+    </>,
+  );
+
+export const Tracklist = ({ size = 24, className }: P) =>
+  svg(
+    size,
+    className,
+    <>
+      <path d="M8.5 7H20M8.5 12H20M8.5 17h7.5" />
+      <circle cx="4.6" cy="7" r="1" fill="currentColor" stroke="none" />
+      <circle cx="4.6" cy="12" r="1" fill="currentColor" stroke="none" />
+      <circle cx="4.6" cy="17" r="1" fill="currentColor" stroke="none" />
+    </>,
+  );
+
+export const Sleeves = ({ size = 24, className }: P) =>
+  svg(
+    size,
+    className,
+    <>
+      <path d="M4 9.5h16v9.3a1.2 1.2 0 0 1-1.2 1.2H5.2A1.2 1.2 0 0 1 4 18.8z" />
+      <path d="M5.2 9.5 6.4 5h11.2l1.2 4.5" />
+      <path d="M8.6 9.5V20M12 9.5V20M15.4 9.5V20" opacity="0.5" />
+    </>,
+  );
+
+export const Swatch = ({ size = 24, className }: P) =>
+  svg(
+    size,
+    className,
+    <>
+      <circle cx="12" cy="12" r="8.3" />
+      <path d="M12 3.7a8.3 8.3 0 0 1 0 16.6z" fill="currentColor" stroke="none" />
+    </>,
+  );

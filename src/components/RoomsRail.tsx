@@ -105,7 +105,7 @@ export default function RoomsRail() {
   );
 }
 
-function SkinPicker() {
+export function SkinPicker() {
   const skin = useSkin((s) => s.skin);
   const setSkin = useSkin((s) => s.setSkin);
   return (

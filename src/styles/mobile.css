@@ -1,0 +1,976 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   PHONE SHELL — the same instrument, stood upright.
+
+   Header strip · one page · tab bar. The pages are the desktop components
+   rendered whole; everything here is either the chrome around them (which
+   speaks only in tokens, so every skin colours it) or the handful of
+   corrections a component needs to work in one column under a thumb.
+
+   `html[data-shell='phone']` is stamped by MobileShell while it is mounted.
+   It is the hook for chrome that lives outside the shell (the status strip,
+   the search overlay) and, as a bonus, an extra point of specificity over
+   the `[data-skin] .thing` rules the skins are written in. `:where()` is
+   used where a rule should yield to a skin's own layout instead.
+
+   Nothing in this file matches without that attribute, so the desktop shell
+   renders exactly as before.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The frame ─────────────────────────────────────────────────────────── */
+
+.phone {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --head-h: 48px;
+  --tabs-h: 54px;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-deep);
+  color: var(--cream);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Header strip ──────────────────────────────────────────────────────── */
+
+.phone-head {
+  position: relative;
+  z-index: 3;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: calc(var(--head-h) + var(--safe-top));
+  padding: var(--safe-top) 6px 0 8px;
+  background: var(--bg-deep);
+  box-shadow: inset 0 -1px 0 var(--cream-ghost);
+}
+
+.phone-room {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 10px 0 8px;
+  border-radius: var(--radius);
+  text-align: left;
+  transition: background var(--t-fast) var(--ease);
+}
+
+.phone-room:active {
+  background: var(--cream-ghost);
+}
+
+/* The lit marker from the rooms rail, carried up to the name it belongs to. */
+.phone-room-marker {
+  flex: none;
+  width: 2px;
+  height: 20px;
+  border-radius: 1px;
+  background: var(--amber);
+  box-shadow: 0 0 12px var(--amber-glow);
+}
+
+.phone-room-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.phone .phone-room .room-name {
+  font-size: 19px;
+  line-height: 1.15;
+  color: var(--cream);
+}
+
+.phone-tool {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--cream-faint);
+  transition: color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+}
+
+.phone-tool:active {
+  color: var(--cream);
+  background: var(--cream-ghost);
+}
+
+/* ── The page ──────────────────────────────────────────────────────────── */
+
+.phone-page {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Tab bar ───────────────────────────────────────────────────────────── */
+
+.phone-tabs {
+  position: relative;
+  z-index: 3;
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0 6px var(--safe-bottom);
+  background: var(--bg-deep);
+  box-shadow: inset 0 1px 0 var(--cream-ghost);
+}
+
+.mtab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: var(--tabs-h);
+  min-height: 44px;
+  color: var(--cream-faint);
+  border-radius: var(--radius);
+  transition: color var(--t) var(--ease);
+}
+
+.mtab svg {
+  width: 22px;
+  height: 22px;
+  transition: color var(--t) var(--ease);
+}
+
+.mtab-label {
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  transition: color var(--t) var(--ease);
+}
+
+.mtab.is-active,
+.mtab.is-active .mtab-label {
+  color: var(--cream);
+}
+
+.mtab.is-active svg {
+  color: var(--amber);
+}
+
+/* The lit filament from the queue tabs, hung from the top edge of the bar. */
+.mtab.is-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 32px;
+  height: 2px;
+  margin-left: -16px;
+  border-radius: 0 0 2px 2px;
+  background: var(--amber);
+  box-shadow: 0 0 10px var(--amber-glow);
+}
+
+/* ── Sheets ────────────────────────────────────────────────────────────── */
+
+.sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: color-mix(in srgb, var(--bg-deep) 64%, transparent);
+  animation: sheet-scrim-in 240ms var(--ease) both;
+}
+
+@keyframes sheet-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.sheet-dismiss {
+  position: absolute;
+  inset: 0;
+  cursor: default;
+}
+
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100% - var(--safe-top) - 40px);
+  padding: 8px 16px calc(18px + var(--safe-bottom));
+  background: var(--bg-raised);
+  border-radius: calc(var(--radius) + 14px) calc(var(--radius) + 14px) 0 0;
+  box-shadow: var(--lift), 0 -24px 60px rgba(0, 0, 0, 0.35);
+  animation: sheet-up 340ms var(--ease) both;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.sheet-grip {
+  display: block;
+  flex: none;
+  width: 36px;
+  height: 4px;
+  margin: 4px auto 10px;
+  border-radius: 2px;
+  background: var(--cream-ghost);
+}
+
+.sheet-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin-bottom: 4px;
+}
+
+.sheet-title {
+  letter-spacing: 0.26em;
+  color: var(--cream-dim);
+}
+
+/* The skin picker at thumb size — same markup as the rail's, so each skin's
+   own colours for it apply. */
+.sheet .skinpick {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0;
+}
+
+.sheet .skinpick-btn {
+  min-height: 48px;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.sheet-hint {
+  margin: 16px 4px 2px;
+  text-align: center;
+  font-size: 15px;
+}
+
+/* The rooms rail inside a sheet: no rail chrome, just its list. */
+.sheet .rooms {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+}
+
+/* ── Rooms as a page ───────────────────────────────────────────────────── */
+
+html[data-shell='phone'] .phone-page > .rooms {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+}
+
+html[data-shell='phone'] .rooms-drag {
+  display: none;
+}
+
+/* Appearance has its own glyph in the header; the rail's picker would say it twice. */
+html[data-shell='phone'] .rooms .skinpick {
+  display: none;
+}
+
+html[data-shell='phone'] .rooms-head {
+  align-items: center;
+  padding: 8px 20px 6px;
+}
+
+html[data-shell='phone'] .rooms-arrange {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  font-size: 11px;
+}
+
+html[data-shell='phone'] .rooms-list {
+  padding: 0 12px 8px;
+}
+
+html[data-shell='phone'] .room {
+  padding: 13px 14px 14px 18px;
+}
+
+html[data-shell='phone'] .rooms-everywhere {
+  min-height: 48px;
+  padding: 0 20px;
+}
+
+html[data-shell='phone'] .rooms-foot {
+  padding: 8px 20px calc(10px + var(--safe-bottom, 0px));
+}
+
+html[data-shell='phone'] .rooms-rescan {
+  min-height: 44px;
+  padding: 0 8px;
+}
+
+html[data-shell='phone'] .arrange {
+  padding: 0 20px 10px;
+}
+
+html[data-shell='phone'] .arrange-row {
+  min-height: 52px;
+}
+
+html[data-shell='phone'] .arrange-name {
+  font-size: 16px;
+}
+
+/* A rocker switch under a thumb: the visible pill is unchanged (it lives in
+   the padding box, where the thumb is positioned); the transparent border is
+   pure hit area. */
+html[data-shell='phone'] .switch {
+  width: 62px;
+  height: 45px;
+  border: 12px solid transparent;
+  border-radius: 23px;
+}
+
+/* Every skin paints the lit switch with the `background` shorthand, which
+   would reset the clip and flood the hit area — restate it above them. */
+html[data-shell='phone'] .switch,
+html[data-shell='phone'] .switch.is-on {
+  background-clip: padding-box;
+}
+
+html[data-skin='daylight'][data-shell='phone'] .switch {
+  width: 64px;
+  height: 48px;
+  border-radius: 24px;
+}
+
+/* ── Queue and crate as pages ──────────────────────────────────────────── */
+
+html[data-shell='phone'] .phone-page > .panel {
+  padding-top: 14px;
+}
+
+html[data-shell='phone'] .panel-head {
+  min-height: 24px;
+}
+
+html[data-shell='phone'] .panel-action {
+  min-height: 32px;
+  padding: 0 10px;
+}
+
+html[data-shell='phone'] .queue,
+html[data-shell='phone'] .crate {
+  padding-bottom: 28px;
+  overscroll-behavior: contain;
+}
+
+/* Queue rows: the ✕ is always there, quietly, and the time makes room for it. */
+html[data-shell='phone'] .qrow-main {
+  padding: 9px 44px 9px 12px;
+}
+
+html[data-shell='phone'] .qrow-remove {
+  right: 4px;
+  width: 36px;
+  height: 36px;
+  opacity: 0.45;
+}
+
+html[data-shell='phone'] .qrow-remove:active {
+  opacity: 1;
+}
+
+html[data-shell='phone'] .qrow:hover .qrow-time {
+  opacity: 1;
+}
+
+/* Crate: three sleeves across; hold one and its tools come up along the bottom edge. */
+html[data-shell='phone'] .crate {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 12px;
+  padding: 4px 16px 28px;
+}
+
+html[data-shell='phone'] .crate-face,
+html[data-shell='phone'] .crate-face img {
+  -webkit-touch-callout: none;
+}
+
+/* The face is a square as wide as the item, so its bottom edge is 100cqw
+   down — the tools hang just above it, clear of the caption. */
+html[data-shell='phone'] .crate-item {
+  container-type: inline-size;
+}
+
+html[data-shell='phone'] .crate-tools {
+  top: calc(100cqw - 46px);
+  right: 6px;
+  bottom: auto;
+  left: 6px;
+  justify-content: flex-end;
+  gap: 6px;
+  transform: translateY(4px);
+}
+
+html[data-shell='phone'] .crate-item.is-held .crate-tools {
+  opacity: 1;
+  transform: none;
+}
+
+html[data-shell='phone'] .crate-item.is-held .crate-face {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+html[data-shell='phone'] .crate-item.is-held .crate-face img {
+  filter: brightness(0.62);
+}
+
+html[data-shell='phone'] .crate-tool {
+  width: 40px;
+  height: 40px;
+}
+
+/* ── Chrome that lives outside the shell ───────────────────────────────── */
+
+html[data-shell='phone'] .status-strip {
+  bottom: calc(54px + env(safe-area-inset-bottom, 0px) + 12px);
+}
+
+html[data-shell='phone'] .status-pill {
+  max-width: 88vw;
+}
+
+html[data-shell='phone'] .search-scrim {
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px calc(env(safe-area-inset-bottom, 0px) + 8px);
+}
+
+html[data-shell='phone'] .search-input {
+  font-size: 26px;
+}
+
+html[data-shell='phone'] .search-close {
+  width: 44px;
+  height: 44px;
+}
+
+html[data-shell='phone'] .search-results {
+  margin-right: 0;
+  padding-right: 0;
+  overscroll-behavior: contain;
+}
+
+html[data-shell='phone'] .sresult-main {
+  padding: 10px 4px 10px 6px;
+}
+
+/* No hover to reveal them: the row plays, and the two queue tools stand beside it. */
+html[data-shell='phone'] .sresult-badge {
+  display: none;
+}
+
+html[data-shell='phone'] .sresult-tools {
+  position: static;
+  flex: none;
+  gap: 2px;
+  padding-right: 2px;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html[data-shell='phone'] .sresult-tool {
+  width: 40px;
+  height: 40px;
+}
+
+html[data-shell='phone'] .sresult-tool:first-child {
+  display: none;
+}
+
+/* ── The stage in one column ───────────────────────────────────────────── */
+
+/* The whole column scrolls if it must — the faceplate goes with it. */
+html[data-shell='phone'] .stage {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+html[data-shell='phone'] .stage::-webkit-scrollbar {
+  display: none;
+}
+
+html[data-shell='phone'] .stage-scroll {
+  flex: 1 0 auto;
+  overflow: visible;
+}
+
+/* Yields to any skin that lays its own stage out. */
+html[data-shell='phone'] :where(.stage-scroll) {
+  padding: 12px 20px 12px;
+}
+
+html[data-shell='phone'] :where(.stage-body) {
+  gap: 12px;
+}
+
+/* ── Faceplate: the amplifier under a thumb ────────────────────────────── */
+
+html[data-shell='phone'] :where(.faceplate) {
+  gap: 14px;
+  padding: 12px 16px 14px;
+}
+
+html[data-shell='phone'] .knob {
+  width: 96px;
+  height: 96px;
+}
+
+html[data-shell='phone'] .knob-value {
+  font-size: 17px;
+}
+
+html[data-shell='phone'] .faders {
+  max-width: none;
+}
+
+html[data-shell='phone'] .faders-list {
+  max-height: none;
+}
+
+html[data-shell='phone'] .fader {
+  min-height: 40px;
+  gap: 8px;
+}
+
+html[data-shell='phone'] .fader-mute {
+  width: 40px;
+  height: 40px;
+}
+
+html[data-shell='phone'] .fader-name {
+  width: 56px;
+}
+
+/* A 44px hit area without touching the geometry: the slot, fill and cap are
+   positioned in the padding box, which keeps each skin's height exactly. The
+   rail is allowed to lap 2px into the rows above and below so three rooms
+   still fit a small phone without the column scrolling. */
+html[data-shell='phone'] .fader-rail {
+  height: 44px;
+  margin-block: -2px;
+  border-top: 12px solid transparent;
+  border-bottom: 12px solid transparent;
+}
+
+html[data-skin='deck'][data-shell='phone'] .fader-rail {
+  border-top-width: 8px;
+  border-bottom-width: 8px;
+}
+
+html[data-skin='daylight'][data-shell='phone'] .fader-rail {
+  border-top-width: 10px;
+  border-bottom-width: 10px;
+}
+
+html[data-shell='phone'] .progress-track {
+  height: 44px;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+}
+
+html[data-skin='drive'][data-shell='phone'] .progress-track {
+  border-top-width: 12px;
+  border-bottom-width: 12px;
+}
+
+html[data-shell='phone'] .mod {
+  width: 40px;
+  height: 40px;
+}
+
+/* ── Per-skin stage corrections ────────────────────────────────────────── */
+
+@media (max-width: 760px) {
+  html[data-shell='phone'] .stage-body {
+    width: 100%;
+  }
+
+  /* Hi-fi: the jacket takes the width; the record slides out past the edge. */
+  html[data-shell='phone'] .hero {
+    --sleeve: min(72vw, 38vh);
+  }
+
+  html[data-shell='phone'] .meta-title {
+    font-size: clamp(28px, 8.6vw, 40px);
+  }
+
+  html[data-shell='phone'] .meta-artist {
+    font-size: 17px;
+  }
+
+  /* Board: the panel sits above the departure line, not beside it. */
+  html[data-shell='phone'] .board-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  html[data-shell='phone'] .stage-board .artpanel {
+    --panel: min(46vw, 24vh);
+  }
+
+  html[data-shell='phone'] .stage-board .stage-scroll {
+    gap: 12px;
+    padding: 12px 22px;
+  }
+
+  html[data-shell='phone'] .stage-board .stage-body {
+    gap: 12px;
+  }
+
+  html[data-shell='phone'] .board-artist {
+    --flap-w: 17px;
+    --flap-h: 25px;
+    --flap-fs: 17px;
+  }
+
+  /* Tuner: the display becomes two rows — clock and lamps, then programme —
+     and the panel gives up its vents and the small analyzer. */
+  html[data-shell='phone'] .tuner-face {
+    gap: 12px;
+    padding: 14px 14px 24px;
+  }
+
+  html[data-shell='phone'] .tuner-vents,
+  html[data-shell='phone'] .tvfd-spec,
+  html[data-shell='phone'] .tvfd-signal {
+    display: none;
+  }
+
+  html[data-shell='phone'] .tvfd .tvfd-inner,
+  html[data-shell='phone'] .tvfd[data-mode='spectrum'] .tvfd-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'clock  lamps'
+      'centre centre'
+      'source source';
+    gap: 12px 14px;
+    padding: 12px 14px 0;
+  }
+
+  html[data-shell='phone'] .tvfd-clock-big {
+    height: 40px;
+  }
+
+  html[data-shell='phone'] .tvfd-strip {
+    display: contents;
+  }
+
+  html[data-shell='phone'] .tvfd-lamps {
+    grid-area: lamps;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-content: center;
+    max-width: 160px;
+    gap: 6px 9px;
+  }
+
+  html[data-shell='phone'] .tvfd-source {
+    grid-area: source;
+    padding: 7px 0 9px;
+    border-top: 1px solid rgba(141, 255, 240, 0.12);
+  }
+
+  html[data-shell='phone'] .tvfd-centre {
+    gap: 14px;
+    padding-top: 10px;
+  }
+
+  /* Seven keys on one line: six transport keys and DISPLAY, then the dial. */
+  html[data-shell='phone'] .tuner-controls {
+    gap: 28px 8px;
+    padding: 2px 2px 17px;
+  }
+
+  html[data-shell='phone'] .tuner-progress {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  html[data-shell='phone'] .tuner-presets {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  html[data-shell='phone'] .tkey,
+  html[data-skin='tuner'][data-shell='phone'] .tactile,
+  html[data-skin='tuner'][data-shell='phone'] .mod {
+    height: 40px;
+  }
+
+  html[data-skin='tuner'][data-shell='phone'] .mod {
+    width: 40px;
+  }
+
+  html[data-skin='tuner'][data-shell='phone'] .tactile-sm {
+    width: 44px;
+  }
+
+  html[data-skin='tuner'][data-shell='phone'] .tactile-lg {
+    width: 56px;
+  }
+
+  html[data-shell='phone'] .tkey-display {
+    min-width: 44px;
+    padding: 0 8px;
+  }
+
+  html[data-shell='phone'] .tkey-preset {
+    min-width: 42px;
+    height: 40px;
+  }
+
+  /* Drive: the sun and the road stay full-bleed; the cover floats in front
+     of the sun, and the sign hangs under it over the wet ground. */
+  html[data-shell='phone'] .drive {
+    --vp: 50%;
+    --horizon: 44%;
+    --cover: min(46vw, 24vh);
+    --sun: min(72vw, 34vh);
+  }
+
+  html[data-shell='phone'] .drive-view {
+    min-height: 300px;
+  }
+
+  html[data-shell='phone'] .drive-cover {
+    left: calc(50% - var(--cover) / 2);
+    bottom: calc(100% - var(--horizon) - 3%);
+  }
+
+  html[data-shell='phone'] .drive-lockup {
+    left: 16px;
+    right: 16px;
+    top: calc(var(--horizon) + 10%);
+    bottom: 4%;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+  }
+
+  html[data-shell='phone'] .drive-over {
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  html[data-shell='phone'] .drive-artist {
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  html[data-shell='phone'] .drive-dash {
+    justify-content: center;
+    gap: 10px 16px;
+    padding: 10px 16px 12px;
+  }
+
+  html[data-shell='phone'] .drive-dash .progress {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  html[data-skin='drive'][data-shell='phone'] .tactile-sm {
+    width: 52px;
+    height: 40px;
+  }
+
+  html[data-skin='drive'][data-shell='phone'] .tactile-lg {
+    width: 68px;
+    height: 44px;
+  }
+
+  html[data-skin='drive'][data-shell='phone'] .mod {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Daylight: already a phone screen. The tab bar says "Now Playing", so the
+     head keeps only its room · source · position line, centred. */
+  html[data-shell='phone'] .daylight {
+    --dl-cover: min(58vw, 27vh);
+    gap: 10px;
+  }
+
+  html[data-shell='phone'] .stage-daylight .stage-scroll {
+    padding: 12px 16px 10px;
+  }
+
+  html[data-shell='phone'] .dl-head {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  html[data-shell='phone'] .dl-head-title {
+    display: none;
+  }
+
+  html[data-shell='phone'] .dl-head-meta {
+    grid-column: 1;
+    justify-self: center;
+    max-width: 100%;
+  }
+
+  html[data-shell='phone'] .dl-heart {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* Deck: strips, then the jog, then the transport, then eight pads in two
+     rows of four. The badge row is the first thing to go. */
+  html[data-shell='phone'] .deck {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 8px 14px 8px;
+  }
+
+  html[data-shell='phone'] .deck-head {
+    display: none;
+  }
+
+  html[data-shell='phone'] .deck-row {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  html[data-shell='phone'] .deck-controls {
+    display: contents;
+  }
+
+  html[data-shell='phone'] .jog {
+    --jog: min(48vw, 22vh);
+    order: 1;
+    align-self: center;
+  }
+
+  html[data-shell='phone'] .deck-transport {
+    order: 2;
+    flex-basis: auto;
+    padding-bottom: 14px;
+  }
+
+  html[data-skin='deck'][data-shell='phone'] .deck-transport .transport {
+    justify-content: center;
+  }
+
+  html[data-shell='phone'] .pads {
+    order: 3;
+    align-self: stretch;
+  }
+
+  html[data-shell='phone'] .pads-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px 10px;
+    padding-bottom: 12px;
+  }
+
+  html[data-shell='phone'] .pad {
+    width: auto;
+    aspect-ratio: 2 / 1;
+  }
+
+  /* The scrub field is 32px of glass; the finger gets the whole strip. The
+     seek maths reads the field's horizontal extent only, so this is safe. */
+  html[data-shell='phone'] .dwave-field[role='slider']::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    right: 0;
+    bottom: -8px;
+    left: 0;
+  }
+
+  html[data-shell='phone'] .pad:nth-child(n + 7) {
+    display: block;
+  }
+
+  html[data-shell='phone'] .dwave-a .dwave-glass {
+    height: 62px;
+  }
+
+  html[data-shell='phone'] .dwave-b .dwave-glass {
+    height: 38px;
+  }
+
+  html[data-skin='deck'][data-shell='phone'] .mod {
+    width: 44px;
+    height: 40px;
+  }
+}
+
+/* ── Skins that do not glow ────────────────────────────────────────────── */
+
+[data-skin='board'] .mtab.is-active::before,
+[data-skin='board'] .phone-room-marker,
+[data-skin='daylight'] .mtab.is-active::before,
+[data-skin='daylight'] .phone-room-marker {
+  box-shadow: none;
+}
+
+[data-skin='board'] .mtab.is-active::before,
+[data-skin='board'] .phone-room-marker,
+[data-skin='board'] .sheet {
+  border-radius: 0;
+}
+
+[data-skin='board'] .phone-room-marker {
+  width: 4px;
+}
+
+[data-skin='daylight'] .phone-head,
+[data-skin='daylight'] .phone-tabs,
+[data-skin='daylight'] .sheet {
+  background: var(--paper);
+}
+
+[data-skin='daylight'] .sheet {
+  box-shadow: 0 -12px 40px rgba(17, 19, 24, 0.14);
+}

@@ -1,4 +1,6 @@
+import { useEffect, useRef, useState } from 'react';
 import { useSonos } from '../store/useSonos';
+import { useLongPress } from '../hooks/useLongPress';
 import { pickBy } from '../lib/hash';
 import { serviceLabel } from '../lib/format';
 import { Plus, QueueNext } from './Icons';
@@ -42,13 +44,40 @@ function Sleeve({
   const ground = pickBy(fav.title, GROUNDS);
   const queueable = fav.playable && fav.kind !== 'station';
 
+  // A finger cannot hover: holding the sleeve for half a second brings its
+  // tools up instead, and a tap anywhere else puts them away.
+  const [held, setHeld] = useState(false);
+  const item = useRef<HTMLDivElement>(null);
+  const press = useLongPress(() => setHeld(true));
+
+  useEffect(() => {
+    if (!held) return;
+    const away = (e: PointerEvent) => {
+      if (!item.current?.contains(e.target as Node)) setHeld(false);
+    };
+    document.addEventListener('pointerdown', away, true);
+    return () => document.removeEventListener('pointerdown', away, true);
+  }, [held]);
+
+  const act = (action: 'replace' | 'next' | 'later') => {
+    setHeld(false);
+    onPlay(action);
+  };
+
   return (
-    <div className={`crate-item${fav.playable ? '' : ' is-dim'}`}>
+    <div ref={item} className={`crate-item${fav.playable ? '' : ' is-dim'}${held ? ' is-held' : ''}`}>
       <button
         type="button"
         className="crate-face"
         disabled={!fav.playable}
-        onClick={() => onPlay('replace')}
+        {...(queueable ? press.handlers : undefined)}
+        onClick={() => {
+          if (press.consumed()) return;
+          act('replace');
+        }}
+        onContextMenu={(e) => {
+          if (queueable) e.preventDefault();
+        }}
         aria-label={fav.playable ? `Play ${fav.title}` : `${fav.title} (not playable)`}
         title={fav.description ? `${fav.title} — ${fav.description}` : fav.title}
       >
@@ -70,7 +99,7 @@ function Sleeve({
             type="button"
             className="crate-tool"
             aria-label={`Play ${fav.title} next`}
-            onClick={() => onPlay('next')}
+            onClick={() => act('next')}
           >
             <QueueNext size={13} />
           </button>
@@ -78,7 +107,7 @@ function Sleeve({
             type="button"
             className="crate-tool"
             aria-label={`Add ${fav.title} to the queue`}
-            onClick={() => onPlay('later')}
+            onClick={() => act('later')}
           >
             <Plus size={13} />
           </button>

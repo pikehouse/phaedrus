@@ -7,11 +7,14 @@ import RightRail from './components/RightRail';
 import SearchOverlay from './components/SearchOverlay';
 import StatusStrip from './components/StatusStrip';
 import Vinyl from './components/Vinyl';
+import MobileShell from './components/MobileShell';
+import { useViewport } from './hooks/useViewport';
 import './styles/app.css';
 
 export default function App() {
   const phase = useSonos((s) => s.phase);
   const boot = useSonos((s) => s.boot);
+  const shell = useViewport();
 
   useEffect(() => {
     void boot();
@@ -26,13 +29,16 @@ export default function App() {
       <Atmosphere />
       {phase === 'booting' && <Booting />}
       {phase === 'nothing' && <Nothing />}
-      {phase === 'ready' && (
-        <div className="shell">
-          <RoomsRail />
-          <NowPlaying />
-          <RightRail />
-        </div>
-      )}
+      {phase === 'ready' &&
+        (shell === 'phone' ? (
+          <MobileShell />
+        ) : (
+          <div className="shell">
+            <RoomsRail />
+            <NowPlaying />
+            <RightRail />
+          </div>
+        ))}
       <SearchOverlay />
       <StatusStrip />
     </>
