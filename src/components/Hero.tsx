@@ -57,6 +57,7 @@ export default function Hero({ art, playing, loaded, title, fallbackLine }: Prop
             className="sleeve-art"
             src={art}
             alt={title ? `Album art for ${title}` : ''}
+            fetchPriority="high"
             draggable={false}
             onError={() => setArtOk(false)}
           />

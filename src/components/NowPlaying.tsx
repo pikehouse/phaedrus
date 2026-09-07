@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useSonos } from '../store/useSonos';
 import { useSkin } from '../store/skin';
 import Hero from './Hero';
@@ -7,7 +8,11 @@ import Progress from './Progress';
 import Transport from './Transport';
 import VolumeKnob from './VolumeKnob';
 import Faders from './Faders';
+import TunerStage from './TunerStage';
 import '../styles/nowplaying.css';
+
+/** How long each line of the board's cycling sub-head holds before it turns. */
+const CYCLE_MS = 14_000;
 
 const SOURCE_LABEL: Record<string, string> = {
   queue: 'Queue',
@@ -19,17 +24,59 @@ const SOURCE_LABEL: Record<string, string> = {
 };
 
 /**
+ * A departure board is never quite still: the sub-head rotates through what
+ * else is worth knowing. Timers stop while the tab is hidden, and the whole
+ * thing is inert in the hi-fi skin.
+ */
+function useCyclingLine(lines: string[], enabled: boolean): string {
+  const [step, setStep] = useState(0);
+  const key = lines.join('\u0000');
+
+  useEffect(() => setStep(0), [key]); // a new track starts on the artist again
+
+  useEffect(() => {
+    if (!enabled || lines.length < 2) return;
+    let timer: number | undefined;
+
+    const start = () => {
+      timer = window.setInterval(() => setStep((n) => n + 1), CYCLE_MS);
+    };
+    const stop = () => {
+      clearInterval(timer);
+      timer = undefined;
+    };
+    const onVisibility = () => {
+      if (document.hidden) stop();
+      else if (timer === undefined) start();
+    };
+
+    if (!document.hidden) start();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [enabled, key, lines.length]);
+
+  return lines.length ? lines[step % lines.length] : '';
+}
+
+/**
  * The stage: turntable above (jacket, disc, track, transport), amplifier
  * faceplate below (volume knob, one fader per room).
  *
  * The board skin keeps that skeleton but turns the head of it on its side —
  * a departure line reads across, not down — and swaps the jacket for a flap
  * panel and the title for split-flap cells.
+ *
+ * The tuner skin keeps only the faceplate: everything above it becomes one
+ * black front panel with a vacuum-fluorescent display across it.
  */
 export default function NowPlaying() {
   const state = useSonos((s) => s.state);
   const group = useSonos((s) => s.group);
-  const board = useSkin((s) => s.skin === 'board');
+  const skin = useSkin((s) => s.skin);
+  const board = skin === 'board';
 
   const playing = state?.state === 'PLAYING' || state?.state === 'TRANSITIONING';
   const track = state?.track;
@@ -45,6 +92,29 @@ export default function NowPlaying() {
 
   const position =
     state?.queueIndex && state.queueLength ? `${state.queueIndex} of ${state.queueLength}` : undefined;
+
+  const queue = useSonos((s) => s.queue);
+  const upNext = useMemo(() => {
+    if (!state?.queueIndex || state.isRadio) return undefined;
+    return queue.find((q) => q.index === state.queueIndex! + 1)?.title;
+  }, [queue, state?.queueIndex, state?.isRadio]);
+
+  const rooms = useMemo(() => {
+    if (!group) return undefined;
+    const others = group.members.length - 1;
+    return others > 0 ? `${group.name} + ${others} MORE` : group.name;
+  }, [group]);
+
+  const boardLines = useMemo(() => {
+    const lines: string[] = [];
+    if (secondary) lines.push(secondary);
+    if (upNext) lines.push(`UP NEXT · ${upNext}`);
+    if (rooms) lines.push(`PLAYING IN · ${rooms}`);
+    if (tertiary) lines.push(tertiary);
+    return lines;
+  }, [secondary, upNext, rooms, tertiary]);
+
+  const boardLine = useCyclingLine(boardLines, board);
 
   const over = (
     <div className="meta-over">
@@ -75,6 +145,20 @@ export default function NowPlaying() {
     </div>
   );
 
+  if (skin === 'tuner') {
+    return (
+      <section className="stage stage-tuner" aria-label="Now playing">
+        <div className="stage-scroll">
+          <div className="stage-body">
+            <TunerStage />
+          </div>
+        </div>
+
+        {faceplate}
+      </section>
+    );
+  }
+
   if (board) {
     return (
       <section className="stage stage-board" aria-label="Now playing">
@@ -90,8 +174,9 @@ export default function NowPlaying() {
                   text={idle ? 'Nothing on' : (title ?? '')}
                   size="xl"
                   className="board-title"
+                  tic
                 />
-                {secondary && <SplitFlap text={secondary} size="lg" className="board-artist" />}
+                {boardLine && <SplitFlap text={boardLine} size="lg" className="board-artist" />}
                 {tertiary && <p className="meta-album">{tertiary}</p>}
               </div>
             </div>

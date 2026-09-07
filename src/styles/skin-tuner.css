@@ -1,0 +1,930 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   TUNER SKIN — a 1988 Japanese separate.
+
+   Matte black brushed aluminium, a vacuum-fluorescent display glowing
+   blue-green behind smoked glass, amber indicator lamps, one red power LED,
+   soft-touch rubber keys with white silkscreen. Everything horizontal,
+   everything machined. Keyed off [data-skin='tuner'] on <html>.
+
+   The first block re-points the hi-fi tokens so anything that only speaks in
+   tokens restyles for free; the rest is the work tokens cannot do — chamfers,
+   brushing, rubber, chrome, and phosphor.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin='tuner'] {
+  /* ── The panel's own vocabulary ────────────────────────────────────────── */
+  --panel: #111214;
+  --panel-raised: #191b1e;
+  --panel-well: #0b0c0e;
+  --chamfer-hi: rgba(255, 255, 255, 0.09);
+  --chamfer-lo: rgba(0, 0, 0, 0.7);
+
+  --silk: #d9dcdf;
+  --silk-dim: #8b9096;
+
+  /* Phosphor. Unlit is genuinely visible on a real VFD, but only at about a
+     tenth of the lit luminance — hairline type needs more alpha than a solid
+     bar does to read at the same brightness, hence three values, not one. */
+  --vfd-lit: #8dfff0;
+  --vfd-dim: rgba(141, 255, 240, 0.24);
+  --vfd-seg-off: rgba(141, 255, 240, 0.06);
+  --vfd-dot: rgba(141, 255, 240, 0.11);
+  --vfd-bloom: 0 0 6px rgba(120, 255, 235, 0.55), 0 0 18px rgba(80, 230, 210, 0.25);
+
+  --lamp-amber: #ffb347;
+  --led-red: #ff3b30;
+
+  /* ── Hi-fi tokens, re-pointed ──────────────────────────────────────────── */
+  --bg-deep: var(--panel-well);
+  --bg: var(--panel);
+  --bg-raised: var(--panel-raised);
+  --walnut: #1e2126;
+  --walnut-light: #2b2f35;
+
+  --cream: var(--silk);
+  --cream-dim: #aeb3b8;
+  --cream-faint: rgba(217, 220, 223, 0.46);
+  --cream-ghost: rgba(217, 220, 223, 0.16);
+
+  /* "Active" is the phosphor, not a lamp — the display is the loudest thing. */
+  --amber: var(--vfd-lit);
+  --amber-hot: #b8fff5;
+  --amber-glow: rgba(120, 255, 235, 0.32);
+
+  --rust: var(--led-red);
+  --burgundy: #262a30;
+  --wine: #17191c;
+  --olive: #2c3239;
+  --mustard: var(--lamp-amber);
+
+  /* One family, two widths: condensed for silkscreen, extended for badges. */
+  --display: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+  --face: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+
+  --radius: 2px;
+
+  --sink: inset 0 1px 2px rgba(0, 0, 0, 0.85), inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  --lift: inset 0 1px 0 var(--chamfer-hi), 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] body {
+  background: var(--panel-well);
+}
+
+/* Archivo carries wdth and wght, not Fraunces's SOFT/WONK/opsz — restate the
+   axes it does have or the hi-fi display rules leave everything at default. */
+[data-skin='tuner'] .meta-title,
+[data-skin='tuner'] .meta-artist,
+[data-skin='tuner'] .room-name,
+[data-skin='tuner'] .arrange-name,
+[data-skin='tuner'] .qrow-title,
+[data-skin='tuner'] .crate-caption,
+[data-skin='tuner'] .crate-bill-title,
+[data-skin='tuner'] .sresult-title,
+[data-skin='tuner'] .search-input,
+[data-skin='tuner'] .search-drill-title,
+[data-skin='tuner'] .curtain-title,
+[data-skin='tuner'] .boundary-title,
+[data-skin='tuner'] .panel-empty-line,
+[data-skin='tuner'] .search-prompt,
+[data-skin='tuner'] .linkcard-title {
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+/* ── Shell and rails ───────────────────────────────────────────────────── */
+
+[data-skin='tuner'] .shell {
+  background: var(--panel-well);
+}
+
+[data-skin='tuner'] .rooms,
+[data-skin='tuner'] .right-rail {
+  background: linear-gradient(180deg, #0f1113 0%, #0a0b0d 100%);
+}
+
+[data-skin='tuner'] .rooms {
+  box-shadow: inset -1px 0 0 var(--chamfer-hi);
+}
+
+[data-skin='tuner'] .right-rail {
+  box-shadow: inset 1px 0 0 var(--chamfer-hi);
+}
+
+/* The stage is the front panel: brushed, 1px pitch, almost no contrast. */
+[data-skin='tuner'] .stage {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0 1px, rgba(0, 0, 0, 0.024) 1px 2px),
+    linear-gradient(180deg, #141619 0%, #0f1113 62%, #0b0c0e 100%);
+}
+
+/* ── No room, no lamp, no film: this thing lives in a rack ─────────────── */
+
+[data-skin='tuner'] .atmo-grain,
+[data-skin='tuner'] .atmo-leak,
+[data-skin='tuner'] .atmo-vignette {
+  display: none;
+}
+
+/* ── Silkscreen ────────────────────────────────────────────────────────── */
+
+[data-skin='tuner'] .label {
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--silk-dim);
+}
+
+/* ── Rooms rail: a source selector, one LED per row ────────────────────── */
+
+[data-skin='tuner'] .rooms-head {
+  margin: 0 10px 6px;
+  padding: 10px 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-skin='tuner'] .rooms-head .label {
+  letter-spacing: 0.26em;
+}
+
+[data-skin='tuner'] .room {
+  padding: 8px 10px 9px 27px;
+  border-radius: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.032);
+}
+
+[data-skin='tuner'] .room:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+[data-skin='tuner'] .room.is-selected {
+  background: rgba(141, 255, 240, 0.055);
+  box-shadow: inset 0 0 0 1px rgba(141, 255, 240, 0.11);
+}
+
+[data-skin='tuner'] .room-marker {
+  left: 10px;
+  top: 50%;
+  bottom: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: #0a1113;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.11), inset 0 1px 1px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='tuner'] .room.is-selected .room-marker {
+  background: var(--vfd-lit);
+  box-shadow: 0 0 7px rgba(120, 255, 235, 0.8), 0 0 2px #d6fff8;
+}
+
+[data-skin='tuner'] .room-name {
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-skin='tuner'] .room-with,
+[data-skin='tuner'] .qrow-artist,
+[data-skin='tuner'] .sresult-sub,
+[data-skin='tuner'] .crate-caption-sub {
+  font-variation-settings: 'wdth' 78, 'wght' 500;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-skin='tuner'] .bars i {
+  width: 2px;
+  border-radius: 0;
+  background: var(--vfd-lit);
+}
+
+[data-skin='tuner'] .rooms-foot {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-skin='tuner'] .arrange-name {
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+[data-skin='tuner'] .switch {
+  border-radius: 2px;
+  background: #08090b;
+  box-shadow: var(--sink);
+}
+
+[data-skin='tuner'] .switch-thumb {
+  border-radius: 1px;
+  background: linear-gradient(180deg, #3b4046, #1b1e22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='tuner'] .switch.is-on {
+  background: rgba(141, 255, 240, 0.14);
+  box-shadow: var(--sink), 0 0 10px rgba(120, 255, 235, 0.16);
+}
+
+[data-skin='tuner'] .switch.is-on .switch-thumb {
+  background: linear-gradient(180deg, #b8fff5, #4fbfae);
+  box-shadow: 0 0 8px rgba(120, 255, 235, 0.5);
+}
+
+/* ── Skin picker: three source keys ────────────────────────────────────── */
+
+[data-skin='tuner'] .skinpick-btn {
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+[data-skin='tuner'] .skinpick-btn.is-on {
+  color: #06110f;
+  background: var(--vfd-lit);
+  box-shadow: inset 0 0 0 1px var(--vfd-lit), 0 0 12px rgba(120, 255, 235, 0.22);
+}
+
+/* ── Transport: a row of soft-touch keys, all one height ───────────────── */
+
+/* The panel lays the keys, the toggles, the DISPLAY key and the progress
+   track out as one row; letting Transport's own box dissolve is what makes
+   that possible without forking the component. */
+[data-skin='tuner'] .tuner-controls .transport {
+  display: contents;
+}
+
+[data-skin='tuner'] .tuner-controls .transport-main {
+  order: 1;
+  gap: 7px;
+}
+
+[data-skin='tuner'] .tuner-controls .transport-mods-left {
+  order: 2;
+  flex: none;
+  gap: 7px;
+  margin-left: clamp(6px, 1cqw, 16px);
+}
+
+[data-skin='tuner'] .tuner-controls .transport-mods-right {
+  order: 3;
+  flex: none;
+  gap: 7px;
+}
+
+[data-skin='tuner'] .tuner-controls .tkey-display {
+  order: 4;
+}
+
+[data-skin='tuner'] .tuner-progress {
+  order: 5;
+}
+
+[data-skin='tuner'] .tactile {
+  position: relative;
+  border-radius: 2px;
+  color: #e4e8eb;
+  background: linear-gradient(180deg, #31353b 0%, #24282d 46%, #1a1d21 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(0, 0, 0, 0.8),
+    0 2px 5px rgba(0, 0, 0, 0.42);
+}
+
+[data-skin='tuner'] .tactile-sm {
+  width: 54px;
+  height: 34px;
+}
+
+[data-skin='tuner'] .tactile-lg {
+  width: 68px;
+  height: 34px;
+  color: #f1f4f6;
+}
+
+[data-skin='tuner'] .tactile:hover:not(:disabled),
+[data-skin='tuner'] .tactile-lg:hover:not(:disabled) {
+  background: linear-gradient(180deg, #383d44 0%, #2a2e34 46%, #1d2125 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(0, 0, 0, 0.8),
+    0 2px 5px rgba(0, 0, 0, 0.42);
+}
+
+[data-skin='tuner'] .tactile:active:not(:disabled) {
+  transform: none;
+  background: linear-gradient(180deg, #1b1e22 0%, #23272c 60%, #282c31 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.65);
+}
+
+[data-skin='tuner'] .tactile:disabled {
+  color: rgba(217, 220, 223, 0.16);
+  background: linear-gradient(180deg, #22252a 0%, #1b1e22 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .tactile-lg.is-playing {
+  color: var(--vfd-lit);
+}
+
+[data-skin='tuner'] .mod {
+  width: 36px;
+  height: 34px;
+  border-radius: 2px;
+  color: rgba(217, 220, 223, 0.34);
+  background: linear-gradient(180deg, #2b2f34 0%, #212429 46%, #181b1f 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(0, 0, 0, 0.75);
+}
+
+[data-skin='tuner'] .mod:hover:not(:disabled) {
+  color: var(--silk);
+  background: linear-gradient(180deg, #33383e 0%, #262a2f 46%, #1c1f23 100%);
+}
+
+[data-skin='tuner'] .mod.is-on {
+  color: var(--lamp-amber);
+  text-shadow: 0 0 9px rgba(255, 179, 71, 0.4);
+}
+
+[data-skin='tuner'] .mod:disabled {
+  color: rgba(217, 220, 223, 0.11);
+}
+
+/* The dot the hi-fi skin parks under a live toggle becomes the indicator
+   lamp above the key, which is where a Japanese deck put it. */
+[data-skin='tuner'] .mod.is-on::after {
+  margin-top: -23px;
+  width: 6px;
+  height: 3px;
+  border-radius: 1px;
+  background: var(--lamp-amber);
+  box-shadow: 0 0 6px rgba(255, 179, 71, 0.75);
+}
+
+/* ── Silkscreen under every key ────────────────────────────────────────── */
+
+[data-skin='tuner'] .transport-main .tactile::before,
+[data-skin='tuner'] .transport-mods .mod::before {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+[data-skin='tuner'] .transport-main .tactile:nth-child(1)::before { content: 'Prev'; }
+[data-skin='tuner'] .transport-main .tactile:nth-child(2)::before { content: 'Play / Pause'; }
+[data-skin='tuner'] .transport-main .tactile:nth-child(3)::before { content: 'Next'; }
+[data-skin='tuner'] .transport-mods-left .mod::before { content: 'Shuffle'; }
+[data-skin='tuner'] .transport-mods-right .mod:nth-child(1)::before { content: 'Repeat'; }
+[data-skin='tuner'] .transport-mods-right .mod:nth-child(2)::before { content: 'X-Fade'; }
+
+/* ── Progress: a recessed track with a white-tipped indicator ──────────── */
+
+[data-skin='tuner'] .progress {
+  gap: 12px;
+  max-width: none;
+}
+
+[data-skin='tuner'] .progress-time {
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--silk-dim);
+  min-width: 32px;
+}
+
+[data-skin='tuner'] .progress-track {
+  height: 18px;
+}
+
+[data-skin='tuner'] .progress-groove {
+  inset: 7px 0;
+  border-radius: 1px;
+  background: #08090b;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(0, 0, 0, 0.85), 0 1px 0 var(--chamfer-hi);
+}
+
+[data-skin='tuner'] .progress-played {
+  top: 7px;
+  height: 4px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, rgba(141, 255, 240, 0.32), var(--vfd-lit));
+  box-shadow: 0 0 8px rgba(120, 255, 235, 0.32);
+}
+
+[data-skin='tuner'] .progress-cap {
+  width: 2px;
+  height: 14px;
+  margin-left: -1px;
+  border-radius: 0;
+  background: #f2f5f7;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.45), 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+[data-skin='tuner'] .progress-track:hover .progress-cap,
+[data-skin='tuner'] .progress-track.is-scrubbing .progress-cap {
+  width: 2px;
+  height: 18px;
+}
+
+[data-skin='tuner'] .live-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 1px;
+  background: var(--vfd-lit);
+  box-shadow: 0 0 8px rgba(120, 255, 235, 0.6);
+}
+
+[data-skin='tuner'] .progress-live .label {
+  color: var(--vfd-lit);
+  letter-spacing: 0.22em;
+}
+
+[data-skin='tuner'] .progress-live-rule {
+  background: linear-gradient(90deg, rgba(217, 220, 223, 0.16), transparent);
+}
+
+/* ── The tuning knob: heavy black cap in a chrome ring ─────────────────── */
+
+[data-skin='tuner'] .knob {
+  width: 104px;
+  height: 104px;
+}
+
+[data-skin='tuner'] .knob-caption {
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  color: var(--silk-dim);
+}
+
+[data-skin='tuner'] .knob-body {
+  inset: 12px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.055), transparent 42%),
+    radial-gradient(circle at 38% 28%, #30343b, #15171a 58%, #0a0b0d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.7),
+    0 8px 16px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+/* The ring, turned from bar stock. */
+[data-skin='tuner'] .knob-body::before {
+  background: conic-gradient(
+    from 208deg,
+    #63696f,
+    #dae0e5 9%,
+    #7d848c 19%,
+    #eef2f5 30%,
+    #767d85 41%,
+    #c6ced5 52%,
+    #5c626a 63%,
+    #b7bfc7 76%,
+    #6b7178 88%,
+    #63696f
+  );
+  /* closest-side, or the ring lands outside the cap and gets clipped away. */
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 84%, #000 86% 100%);
+  mask-image: radial-gradient(circle closest-side, transparent 0 84%, #000 86% 100%);
+}
+
+[data-skin='tuner'] .knob:hover .knob-body,
+[data-skin='tuner'] .knob.is-dragging .knob-body {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.7),
+    0 8px 18px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(120, 255, 235, 0.14);
+}
+
+/* One line, machined into the cap. */
+[data-skin='tuner'] .knob-pointer {
+  top: 9px;
+  width: 2px;
+  height: 15px;
+  margin-left: -1px;
+  border-radius: 0;
+  background: #f2f5f7;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+[data-skin='tuner'] .knob-value {
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+  font-size: 17px;
+  color: var(--silk);
+  text-shadow: none;
+}
+
+[data-skin='tuner'] .knob-tick {
+  stroke: rgba(217, 220, 223, 0.18);
+}
+
+[data-skin='tuner'] .knob-tick.is-major {
+  stroke: rgba(217, 220, 223, 0.34);
+}
+
+[data-skin='tuner'] .knob-tick.is-lit,
+[data-skin='tuner'] .knob-tick.is-major.is-lit {
+  stroke: var(--vfd-lit);
+}
+
+/* ── Faders: ridged caps on a tick-marked scale ────────────────────────── */
+
+[data-skin='tuner'] .faders-caption {
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  color: var(--silk-dim);
+}
+
+[data-skin='tuner'] .fader {
+  min-height: 32px;
+}
+
+[data-skin='tuner'] .fader-name {
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+}
+
+[data-skin='tuner'] .fader-rail::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1px;
+  height: 4px;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, rgba(217, 220, 223, 0.26) 0 1px, transparent 1px 10%);
+}
+
+[data-skin='tuner'] .fader-slot {
+  inset: 8px 0 10px;
+  border-radius: 1px;
+  background: #08090b;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 1px 0 var(--chamfer-hi);
+}
+
+[data-skin='tuner'] .fader-fill {
+  top: 8px;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, rgba(217, 220, 223, 0.22), var(--silk));
+}
+
+[data-skin='tuner'] .fader.is-muted .fader-fill {
+  background: var(--led-red);
+  opacity: 0.45;
+}
+
+[data-skin='tuner'] .fader-cap {
+  width: 11px;
+  height: 18px;
+  margin-left: -5.5px;
+  border-radius: 1px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.07) 0 1px, transparent 1px 2px),
+    linear-gradient(180deg, #3d4248 0%, #24282d 52%, #13161a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='tuner'] .fader-cap::after {
+  left: 50%;
+  right: auto;
+  top: 3px;
+  bottom: 3px;
+  height: auto;
+  width: 1px;
+  margin-left: -0.5px;
+  background: #f2f5f7;
+}
+
+[data-skin='tuner'] .fader-rail:hover .fader-cap,
+[data-skin='tuner'] .fader-rail.is-dragging .fader-cap {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 2px 5px rgba(0, 0, 0, 0.75),
+    0 0 12px rgba(120, 255, 235, 0.22);
+}
+
+[data-skin='tuner'] .fader-mute:hover {
+  color: var(--silk);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Faceplate ─────────────────────────────────────────────────────────── */
+
+[data-skin='tuner'] .faceplate {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0 1px, rgba(0, 0, 0, 0.028) 1px 2px),
+    linear-gradient(180deg, #17191c 0%, #111315 55%, #0c0e10 100%);
+  border-top: 1px solid var(--chamfer-hi);
+  box-shadow: inset 0 -1px 0 var(--chamfer-lo), 0 -14px 30px rgba(0, 0, 0, 0.4);
+}
+
+[data-skin='tuner'] .faceplate::before {
+  background: none;
+}
+
+[data-skin='tuner'] .faceplate-brand {
+  font-variation-settings: 'wdth' 125, 'wght' 500;
+  letter-spacing: 0.34em;
+  color: rgba(217, 220, 223, 0.26);
+}
+
+[data-skin='tuner'] .faceplate-led {
+  background: #131719;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='tuner'] .faceplate-led.is-lit {
+  background: var(--vfd-lit);
+  box-shadow: 0 0 8px rgba(120, 255, 235, 0.7);
+}
+
+/* ── Queue: a dot-matrix list ──────────────────────────────────────────── */
+
+[data-skin='tuner'] .right-tab {
+  border-radius: 2px;
+  letter-spacing: 0.22em;
+}
+
+[data-skin='tuner'] .right-tab.is-active::after {
+  height: 2px;
+  background: var(--vfd-lit);
+  box-shadow: 0 0 8px rgba(120, 255, 235, 0.5);
+}
+
+[data-skin='tuner'] .panel-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 0 16px 6px;
+  padding: 0 0 8px;
+}
+
+[data-skin='tuner'] .qrow {
+  border-radius: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.032);
+}
+
+[data-skin='tuner'] .qrow-main {
+  gap: 9px;
+  padding: 5px 8px 5px 10px;
+}
+
+[data-skin='tuner'] .qrow:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+[data-skin='tuner'] .qrow.is-current {
+  background: rgba(141, 255, 240, 0.05);
+}
+
+[data-skin='tuner'] .qrow.is-current .qrow-marker {
+  width: 2px;
+  background: var(--vfd-lit);
+  box-shadow: 0 0 8px rgba(120, 255, 235, 0.6);
+}
+
+[data-skin='tuner'] .qrow.is-current .qrow-title {
+  color: var(--vfd-lit);
+  text-shadow: 0 0 6px rgba(120, 255, 235, 0.28);
+}
+
+[data-skin='tuner'] .qrow-title {
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+}
+
+[data-skin='tuner'] .qrow-art,
+[data-skin='tuner'] .sresult-art {
+  width: 30px;
+  height: 30px;
+  border-radius: 1px;
+  background: #0d0f11;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+
+[data-skin='tuner'] .qrow-art img,
+[data-skin='tuner'] .sresult-art img,
+[data-skin='tuner'] .crate-face img {
+  filter: grayscale(0.55) contrast(1.18) brightness(0.92);
+}
+
+[data-skin='tuner'] .qrow-art-glow {
+  border-radius: 1px;
+  box-shadow: inset 0 0 0 1px rgba(141, 255, 240, 0.55);
+}
+
+[data-skin='tuner'] .qrow-remove:hover {
+  background: rgba(255, 59, 48, 0.16);
+}
+
+[data-skin='tuner'] .panel-empty-line {
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+}
+
+[data-skin='tuner'] .panel-action.is-armed {
+  color: var(--led-red);
+  background: rgba(255, 59, 48, 0.14);
+}
+
+/* ── Crate ─────────────────────────────────────────────────────────────── */
+
+[data-skin='tuner'] .crate-face {
+  border-radius: 1px;
+  background: #16181b;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 3px 9px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='tuner'] .crate-item:hover .crate-face:not(:disabled) {
+  box-shadow:
+    inset 0 0 0 1px rgba(141, 255, 240, 0.28),
+    0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .crate-item:hover .crate-face img {
+  filter: grayscale(0.2) contrast(1.14) brightness(1.02);
+}
+
+[data-skin='tuner'] .crate-wear {
+  background-image: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+[data-skin='tuner'] .crate-bill-title {
+  font-size: 14px;
+  line-height: 1.12;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+[data-skin='tuner'] .ground-walnut { background: linear-gradient(152deg, #2b2f35, #131518); }
+[data-skin='tuner'] .ground-burgundy { background: linear-gradient(152deg, #2a2e34, #111316); }
+[data-skin='tuner'] .ground-olive { background: linear-gradient(152deg, #262c31, #0f1215); }
+[data-skin='tuner'] .ground-wine { background: linear-gradient(152deg, #212429, #0d0f11); }
+
+[data-skin='tuner'] .ground-mustard {
+  background: linear-gradient(152deg, #2f3339, #141619);
+}
+
+[data-skin='tuner'] .ground-mustard .crate-bill-title {
+  color: var(--lamp-amber);
+}
+
+[data-skin='tuner'] .ground-mustard .crate-bill-mark {
+  color: rgba(255, 179, 71, 0.55);
+}
+
+[data-skin='tuner'] .crate-tool,
+[data-skin='tuner'] .sresult-tool {
+  border-radius: 1px;
+}
+
+/* ── Search ────────────────────────────────────────────────────────────── */
+
+[data-skin='tuner'] .search-scrim {
+  background: rgba(9, 10, 12, 0.94);
+}
+
+[data-skin='tuner'] .search-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+[data-skin='tuner'] .search-bar:focus-within {
+  border-bottom-color: var(--vfd-lit);
+}
+
+[data-skin='tuner'] .search-input::placeholder {
+  font-style: normal;
+  color: var(--cream-ghost);
+}
+
+[data-skin='tuner'] .search-prompt,
+[data-skin='tuner'] .panel-empty-line {
+  font-style: normal;
+}
+
+[data-skin='tuner'] .search-section-head {
+  letter-spacing: 0.24em;
+  color: var(--vfd-lit);
+  opacity: 0.85;
+}
+
+[data-skin='tuner'] .sresult {
+  border-radius: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.032);
+}
+
+[data-skin='tuner'] .linkcard {
+  border-radius: 2px;
+  background: var(--panel-raised);
+  box-shadow: inset 0 1px 0 var(--chamfer-hi), 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .linkcard-btn {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #31353b, #1a1d21);
+  color: var(--silk);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.11), 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='tuner'] .linkcard-dot {
+  background: var(--vfd-lit);
+}
+
+/* ── Status, curtains, boundary ────────────────────────────────────────── */
+
+[data-skin='tuner'] .status-pill {
+  border-radius: 2px;
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  background: rgba(17, 18, 20, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09), 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .status-pill.is-bad {
+  color: #ff9d95;
+  box-shadow: inset 0 0 0 1px rgba(255, 59, 48, 0.42), 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .curtain,
+[data-skin='tuner'] .boundary {
+  background: linear-gradient(180deg, #141619, #0b0c0e);
+}
+
+[data-skin='tuner'] .curtain-title,
+[data-skin='tuner'] .boundary-title {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+[data-skin='tuner'] .curtain-btn,
+[data-skin='tuner'] .boundary-btn {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #31353b, #1a1d21);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.11), 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+[data-skin='tuner'] .curtain-btn:hover:not(:disabled),
+[data-skin='tuner'] .boundary-btn:hover {
+  color: var(--vfd-lit);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+[data-skin='tuner'] .boundary-label {
+  color: var(--led-red);
+}
+
+/* ── Scrollbars, selection, focus ──────────────────────────────────────── */
+
+[data-skin='tuner'] .scroll {
+  scrollbar-color: rgba(217, 220, 223, 0.16) transparent;
+}
+
+[data-skin='tuner'] .scroll::-webkit-scrollbar-thumb {
+  border-radius: 1px;
+  background: rgba(217, 220, 223, 0.14);
+  background-clip: padding-box;
+}
+
+[data-skin='tuner'] .scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(141, 255, 240, 0.4);
+  background-clip: padding-box;
+}
+
+[data-skin='tuner'] ::selection {
+  background: rgba(141, 255, 240, 0.3);
+  color: var(--silk);
+}
+
+[data-skin='tuner'] :focus-visible {
+  outline: 1px solid var(--vfd-lit);
+  outline-offset: 2px;
+}

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import '../styles/artpanel.css';
 
 const FLIP_MS = 460;
+/** How long the slot line lingers after the panel settles before fading out. */
+const SLOT_LINGER_MS = 900;
 
 interface Props {
   art?: string;
@@ -23,11 +25,39 @@ export default function ArtPanel({ art, title, playing }: Props) {
   const leafTopImg = useRef<HTMLImageElement>(null);
   const leafBottomImg = useRef<HTMLImageElement>(null);
   const shown = useRef<string | undefined>(undefined);
+  const slot = useRef<HTMLSpanElement>(null);
+  const slotTimer = useRef<number | undefined>(undefined);
   const [broken, setBroken] = useState(false);
+
+  /* The slot is the mechanism: it belongs on screen while the panel is
+     turning, and gets out of the way of the artwork once it has settled. */
+  const showSlot = () => {
+    const el = slot.current;
+    if (!el) return;
+    clearTimeout(slotTimer.current);
+    el.style.transition = 'none';
+    el.style.opacity = '1';
+    void el.offsetHeight; // commit the jump before the fade can transition
+    el.style.transition = '';
+  };
+
+  const retireSlot = (delay: number) => {
+    clearTimeout(slotTimer.current);
+    slotTimer.current = window.setTimeout(() => {
+      if (slot.current) slot.current.style.opacity = '0';
+    }, delay);
+  };
+
+  useEffect(() => () => clearTimeout(slotTimer.current), []);
 
   useEffect(() => {
     const next = art ?? '';
-    if (shown.current === next) return;
+    if (shown.current === next) {
+      // StrictMode re-runs this effect after clearing our timer; the art is
+      // already on the card, so just make sure the slot still retires.
+      retireSlot(SLOT_LINGER_MS);
+      return;
+    }
     const first = shown.current === undefined;
     shown.current = next;
     setBroken(false);
@@ -41,8 +71,13 @@ export default function ArtPanel({ art, title, playing }: Props) {
     if (first || !leafTop.current || !leafBottom.current) {
       set(top.current, next);
       set(bottom.current, next);
+      showSlot();
+      retireSlot(SLOT_LINGER_MS);
       return;
     }
+
+    showSlot();
+    retireSlot(FLIP_MS + SLOT_LINGER_MS);
 
     const previous = bottom.current?.src ?? '';
     set(top.current, next); // revealed as the old top falls
@@ -85,7 +120,7 @@ export default function ArtPanel({ art, title, playing }: Props) {
           <img ref={leafBottomImg} alt="" aria-hidden="true" draggable={false} />
         </div>
         {blank && <span className="artpanel-blank-mark">PHAEDRUS</span>}
-        <span className="artpanel-slot" aria-hidden="true" />
+        <span className="artpanel-slot" ref={slot} aria-hidden="true" />
       </div>
       <span className="artpanel-rail" aria-hidden="true" />
     </div>

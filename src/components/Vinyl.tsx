@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import '../styles/vinyl.css';
 
-const RPM_DEG_PER_SEC = 200; // 33⅓ rpm → one revolution every 1.8s
-const TAU_UP = 0.3; // ≈1.2s to reach speed
-const TAU_DOWN = 0.55; // ≈2s to coast to rest — heavier than it starts
+// Real 33⅓ rpm is a turn every 1.8s, which is hard to look at from across
+// the room. This is a lazy, hypnotic third of that — a turn every ~5s.
+const RPM_DEG_PER_SEC = 75;
+const TAU_UP = 0.6; // ≈2s to reach speed
+const TAU_DOWN = 0.9; // ≈3s to coast to rest — heavier than it starts
 
 interface Props {
   art?: string;

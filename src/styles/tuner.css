@@ -1,0 +1,893 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   TUNER — the front panel and the things that only exist on it.
+
+   Shared components are re-pointed in skin-tuner.css; this file owns the new
+   structure: the plate, the screws, the badge, the VFD and everything behind
+   its glass. Every colour here comes from the [data-skin='tuner'] block, which
+   is the only place these classes are ever rendered.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The stage becomes one wide panel ───────────────────────────────────── */
+
+.stage-tuner .stage-scroll {
+  align-items: stretch;
+  padding: 0;
+}
+
+/* No card floating in a void: the chassis is the rack space. */
+.stage-tuner .stage-body {
+  width: 100%;
+  max-width: none;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── The plate ─────────────────────────────────────────────────────────── */
+
+.tuner-face {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* When the chassis is taller than its contents the block centres; when it
+     is shorter, `safe` keeps the badge row from sliding off the top edge. */
+  justify-content: safe center;
+  gap: clamp(11px, 2.6vh, 26px);
+  padding: clamp(14px, 2.6vh, 28px) clamp(22px, 3cqw, 46px) clamp(16px, 2.8vh, 30px);
+  border-radius: 0;
+  /* Brushed aluminium: a 1px horizontal pitch at almost no contrast, over a
+     panel that is very slightly lighter at the top than the bottom. */
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.026) 0 1px, rgba(0, 0, 0, 0.05) 1px 2px),
+    linear-gradient(180deg, #212429 0%, #17191d 38%, #131518 72%, #0e1012 100%);
+  box-shadow:
+    inset 0 1px 0 var(--chamfer-hi),
+    inset 0 -1px 0 var(--chamfer-lo),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 10px 26px rgba(0, 0, 0, 0.45);
+}
+
+/* ── Machine screws, one at each corner ────────────────────────────────── */
+
+.tuner-screw {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #61666e, #2a2e33 55%, #0d0f11 100%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px rgba(0, 0, 0, 0.62);
+}
+
+.tuner-screw::after {
+  content: '';
+  position: absolute;
+  inset: 1.4px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent 43%, rgba(0, 0, 0, 0.7) 43% 57%, transparent 57%);
+}
+
+/* No two screws were ever driven to the same angle. */
+.tuner-screw.is-tl { left: 13px; top: 13px; }
+.tuner-screw.is-tr { right: 13px; top: 13px; }
+.tuner-screw.is-bl { left: 13px; bottom: 13px; }
+.tuner-screw.is-br { right: 13px; bottom: 13px; }
+.tuner-screw.is-tl::after { transform: rotate(26deg); }
+.tuner-screw.is-tr::after { transform: rotate(-52deg); }
+.tuner-screw.is-bl::after { transform: rotate(71deg); }
+.tuner-screw.is-br::after { transform: rotate(8deg); }
+
+/* A machined seam: the join between two pressings, and the thing that keeps
+   an empty stretch of panel reading as metal rather than as nothing. */
+.tuner-seam {
+  flex: none;
+  height: 1px;
+  margin: 0 -6px;
+  background: rgba(0, 0, 0, 0.62);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+/* Ventilation slots pressed into the lower panel — the honest way to use the
+   metal a rack unit has left over, and the first thing to give up its height
+   when the window gets short. */
+.tuner-vents {
+  flex: 0 1 42px;
+  min-height: 0;
+  margin: clamp(4px, 1.4vh, 16px) 0 0;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.66) 0 2px,
+    rgba(255, 255, 255, 0.05) 2px 3px,
+    transparent 3px 7px
+  );
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+/* ── Badge row ─────────────────────────────────────────────────────────── */
+
+.tuner-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 8px 0 4px;
+  min-height: 22px;
+  flex: none;
+}
+
+.tuner-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* Extended, widely tracked — the Eurostile plate every Japanese deck wore. */
+.tuner-brand {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 125, 'wght' 500;
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--silk);
+}
+
+.tuner-model {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--silk-dim);
+}
+
+.tuner-legend {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 500;
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(217, 220, 223, 0.32);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* ── Soft-touch keys ───────────────────────────────────────────────────── */
+
+.tkey {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 34px;
+  min-width: 46px;
+  padding: 0 11px;
+  flex: none;
+  border-radius: 2px;
+  color: var(--silk);
+  background: linear-gradient(180deg, #31353b 0%, #24282d 46%, #1a1d21 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(0, 0, 0, 0.8),
+    0 2px 5px rgba(0, 0, 0, 0.42);
+  transition: background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+}
+
+/* The silkscreen sits on the panel under the key, never on the rubber. */
+.tkey::before {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+button.tkey:hover {
+  background: linear-gradient(180deg, #383d44 0%, #2a2e34 46%, #1d2125 100%);
+}
+
+button.tkey:active {
+  background: linear-gradient(180deg, #1c1f23 0%, #22262b 60%, #272b30 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 0 rgba(0, 0, 0, 0.8);
+}
+
+.tkey-power {
+  min-width: 34px;
+  padding: 0;
+}
+
+.tkey-power::before {
+  content: 'Power';
+}
+
+.tkey-display::before {
+  content: 'Display';
+}
+
+.tkey-face {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.5);
+}
+
+.tuner-led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #2b1210;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.65);
+}
+
+.tuner-led.is-lit {
+  background: var(--led-red);
+  box-shadow: 0 0 7px rgba(255, 59, 48, 0.8), 0 0 2px #ff7b73;
+}
+
+/* ── Controls row ──────────────────────────────────────────────────────── */
+
+.tuner-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 30px clamp(13px, 1.7cqw, 22px);
+  /* The silkscreen hangs below each key — the box has to own that space or
+     it collides with the preset row underneath. */
+  padding: 2px 8px 17px 4px;
+  flex: none;
+}
+
+.tuner-progress {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  flex: 1 1 230px;
+  min-width: 190px;
+}
+
+/* The dial is a tuning dial, whatever it is really pointing at. */
+.tuner-progress::after {
+  content: 'Tuning';
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ── Presets: six numbered keys onto the head of the queue ─────────────── */
+
+.tuner-presets {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 8px 4px 4px;
+  min-width: 0;
+  flex: none;
+}
+
+.tuner-presets-cap {
+  margin-right: 6px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  flex: none;
+}
+
+.tkey-preset {
+  min-width: 36px;
+  height: 28px;
+  padding: 0;
+}
+
+.tkey-preset .tkey-face {
+  color: var(--silk-dim);
+  text-shadow: none;
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.tkey-preset.is-on .tkey-face {
+  color: var(--vfd-lit);
+  text-shadow: 0 0 6px rgba(120, 255, 235, 0.55);
+}
+
+.tkey-preset:disabled {
+  background: linear-gradient(180deg, #22252a 0%, #1a1d21 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.tkey-preset:disabled .tkey-face {
+  color: rgba(217, 220, 223, 0.14);
+}
+
+.tuner-presets-name {
+  margin-left: 12px;
+  min-width: 0;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 500;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(217, 220, 223, 0.34);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   THE VACUUM-FLUORESCENT DISPLAY
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.tvfd {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* The window takes whatever height the chassis has left, up to the size a
+     real one was ever built at. */
+  flex: 1 1 auto;
+  max-height: 400px;
+  border-radius: 2px;
+  padding: 4px;
+  background: linear-gradient(180deg, #26292e, #111315 58%, #0b0c0e);
+  box-shadow:
+    inset 0 1px 0 var(--chamfer-hi),
+    inset 0 -1px 0 var(--chamfer-lo),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 3px 10px rgba(0, 0, 0, 0.45);
+}
+
+.tvfd-glass {
+  position: relative;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  border-radius: 1px;
+  min-height: 180px;
+  background: radial-gradient(122% 132% at 26% -12%, #0a1f19 0%, #061410 46%, #03100c 100%);
+  box-shadow: inset 0 2px 9px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+.tvfd-inner {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'clock  .      spec   signal'
+    'centre centre centre centre'
+    'strip  strip  strip  strip';
+  gap: clamp(9px, 1.5vh, 18px) clamp(14px, 2cqw, 28px);
+  padding: clamp(11px, 1.7vh, 17px) clamp(14px, 1.8cqw, 22px) 0;
+  /* A filament never sits perfectly still. ±2% over seven seconds. */
+  animation: vfd-flutter 7s ease-in-out infinite;
+}
+
+.tvfd[data-mode='spectrum'] .tvfd-inner {
+  grid-template-areas:
+    'clock  .      .      signal'
+    'centre centre centre centre'
+    'strip  strip  strip  strip';
+}
+
+@keyframes vfd-flutter {
+  0%,
+  100% { opacity: 1; }
+  41% { opacity: 0.978; }
+  73% { opacity: 0.991; }
+}
+
+/* The only light in this skin: one soft diagonal off the smoked glass. */
+.tvfd-reflect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    114deg,
+    transparent 24%,
+    rgba(198, 255, 248, 0.028) 35%,
+    rgba(198, 255, 248, 0.055) 43%,
+    rgba(198, 255, 248, 0.016) 51%,
+    transparent 63%
+  );
+}
+
+/* ── Segment glyphs ────────────────────────────────────────────────────── */
+
+.seg14 {
+  display: block;
+  width: auto;
+  overflow: visible;
+}
+
+/* An unlit bar is a dark grey-green shape you can find if you look for it —
+   roughly a tenth of the lit luminance, and no halo at all. */
+.seg14-off polygon {
+  fill: var(--vfd-seg-off);
+}
+
+.seg14-on {
+  filter: drop-shadow(0 0 2px rgba(120, 255, 235, 0.45)) drop-shadow(0 0 6px rgba(80, 230, 210, 0.16));
+}
+
+.seg14-on polygon,
+.seg14-on circle {
+  fill: var(--vfd-lit);
+}
+
+/* ── Left: the clock ───────────────────────────────────────────────────── */
+
+.tvfd-clock {
+  grid-area: clock;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(8px, 1.4vh, 14px);
+  min-width: 0;
+}
+
+.tvfd-clock-big {
+  height: clamp(34px, 6.6vh, 56px);
+}
+
+.tvfd-clock-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tvfd-clock-small {
+  height: 15px;
+}
+
+.tvfd-clock-dim {
+  opacity: 0.55;
+}
+
+.tvfd-tag {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.45);
+}
+
+.tvfd-tag-dim {
+  color: var(--vfd-dim);
+  text-shadow: none;
+}
+
+/* ── Centre: the programme area ────────────────────────────────────────── */
+
+/* The programme band: its own field, ruled off from the readouts above it.
+   Title at the top of the field, calendar sitting just over the lamp strip —
+   the air between them is the field, not a hole. */
+.tvfd-centre {
+  grid-area: centre;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(12px, 2.6vh, 26px);
+  min-width: 0;
+  min-height: 0;
+  padding-top: clamp(9px, 1.5vh, 16px);
+  border-top: 1px solid rgba(141, 255, 240, 0.1);
+}
+
+/* ── The music calendar ────────────────────────────────────────────────── */
+
+.tvfd-cal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 7px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+}
+
+.tvfd-cal-n {
+  padding: 1px 3px 2px;
+  color: var(--vfd-dim);
+}
+
+/* Already played: the number goes out, the way a disc calendar empties. */
+.tvfd-cal-n[data-state='past'] {
+  color: rgba(141, 255, 240, 0.11);
+}
+
+.tvfd-cal-n[data-state='now'] {
+  color: var(--vfd-lit);
+  text-shadow: 0 0 6px rgba(120, 255, 235, 0.5);
+  box-shadow: inset 0 0 0 1px rgba(141, 255, 240, 0.55);
+}
+
+.tmarq {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tmarq-track {
+  display: flex;
+  /* Must match GAP_PX in TunerMarquee.tsx. */
+  gap: 72px;
+  width: max-content;
+  will-change: transform;
+}
+
+.tmarq-seg {
+  flex: none;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: clamp(16px, 2.4cqw, 26px);
+  line-height: 1.3;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--vfd-lit);
+  text-shadow: var(--vfd-bloom);
+}
+
+/* A still line only loses its trailing copy. It must NOT be clamped to the
+   viewport: the measurement reads this element, and a clamped one can never
+   be seen to overflow again. A real display clips, it does not ellipsise. */
+.tmarq.is-still .tmarq-seg + .tmarq-seg {
+  display: none;
+}
+
+/* ── The analyzer ──────────────────────────────────────────────────────── */
+
+.tvfd-spec {
+  grid-area: spec;
+  display: flex;
+  align-items: center;
+}
+
+.tsp {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--tsp-gap, 3px);
+}
+
+.tsp-band {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tsp-row, 2px);
+}
+
+.tsp-dot {
+  display: block;
+  width: var(--tsp-w, 6px);
+  height: var(--tsp-h, 4px);
+  border-radius: 1px;
+  background: var(--vfd-dot);
+}
+
+.tsp-dot.is-on {
+  background: var(--vfd-lit);
+  box-shadow: 0 0 3px rgba(120, 255, 235, 0.5);
+}
+
+/* The peak that hangs behind the bar and sinks back on its own. */
+.tsp-dot.is-peak {
+  background: var(--vfd-lit);
+  opacity: 0.72;
+  box-shadow: 0 0 4px rgba(120, 255, 235, 0.55);
+}
+
+.tsp-wide {
+  --tsp-w: clamp(5px, 1.05cqw, 12px);
+  --tsp-h: 5px;
+  --tsp-gap: clamp(3px, 0.4cqw, 6px);
+  --tsp-row: 3px;
+  width: 100%;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* ── The signal meter ──────────────────────────────────────────────────── */
+
+.tvfd-signal {
+  grid-area: signal;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.tvfd-signal-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tvfd-signal-bars i {
+  display: block;
+  width: 20px;
+  height: 4px;
+  border-radius: 1px;
+  background: var(--vfd-dot);
+}
+
+.tvfd-signal-bars i.is-on {
+  background: var(--vfd-lit);
+  box-shadow: 0 0 4px rgba(120, 255, 235, 0.45);
+}
+
+.tvfd-signal-mode {
+  display: flex;
+  gap: 7px;
+}
+
+/* ── The lamp strip ────────────────────────────────────────────────────── */
+
+.tvfd-strip {
+  grid-area: strip;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+  margin-top: 10px;
+  padding: 7px 0 9px;
+  border-top: 1px solid rgba(141, 255, 240, 0.12);
+}
+
+.tvfd-source {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: 9px;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.4);
+}
+
+.tvfd-source-dot {
+  width: 3px;
+  height: 3px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+.tvfd-lamps {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 0.95cqw, 14px);
+  flex: none;
+}
+
+/* A lamp is on or off; it does not animate between the two. */
+.tvfd-lamp {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  /* Unlit segments stay faintly visible — that is how you know it is a VFD. */
+  color: var(--vfd-dim);
+}
+
+.tvfd-lamp.is-on[data-tone='cyan'] {
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.5);
+}
+
+.tvfd-lamp.is-on[data-tone='amber'] {
+  color: var(--lamp-amber);
+  text-shadow: 0 0 6px rgba(255, 179, 71, 0.55), 0 0 15px rgba(255, 150, 40, 0.2);
+}
+
+.tvfd-lamp.is-on[data-tone='red'] {
+  color: var(--led-red);
+  text-shadow: 0 0 6px rgba(255, 59, 48, 0.6);
+}
+
+.tvfd-lamp-pair {
+  display: flex;
+  gap: 5px;
+  padding-left: 7px;
+  border-left: 1px solid rgba(141, 255, 240, 0.14);
+}
+
+/* ── IMAGE mode: the cover, redrawn in phosphor ────────────────────────── */
+
+.tvfd-image {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.tvfd-image-frame {
+  position: relative;
+  display: block;
+  height: 100%;
+  max-height: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  /* The lit colour is the ground; the picture multiplies down into it, so a
+     white pixel is full phosphor and a black pixel is dead glass. */
+  background: var(--vfd-lit);
+  isolation: isolate;
+  box-shadow: 0 0 20px rgba(120, 255, 235, 0.16);
+}
+
+.tvfd-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.72) brightness(1.06);
+  mix-blend-mode: multiply;
+}
+
+/* The bitmap: a 3px pitch grid cut out of the picture in glass-black. */
+.tvfd-image-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(3, 16, 12, 0.9) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(3, 16, 12, 0.9) 0 1px, transparent 1px 3px);
+}
+
+.tvfd-image.is-color .tvfd-image-frame {
+  background: #03100c;
+  box-shadow: none;
+}
+
+.tvfd-image.is-color img {
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+.tvfd-image.is-color .tvfd-image-grid {
+  opacity: 0.45;
+}
+
+.tvfd-image-color {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  padding: 3px 7px 4px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vfd-lit);
+  background: rgba(3, 16, 12, 0.82);
+  box-shadow: inset 0 0 0 1px rgba(141, 255, 240, 0.32);
+  opacity: 0;
+  transition: opacity var(--t) var(--ease);
+}
+
+.tvfd-image:hover .tvfd-image-color,
+.tvfd-image-color:focus-visible,
+.tvfd-image-color[aria-pressed='true'] {
+  opacity: 1;
+}
+
+.tvfd-image-none {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--vfd-dim);
+}
+
+/* ── Narrow chassis ────────────────────────────────────────────────────── */
+
+@container (max-width: 700px) {
+  .tuner-legend {
+    display: none;
+  }
+
+  .tvfd-inner {
+    column-gap: 12px;
+  }
+
+  .tvfd-spec {
+    justify-content: flex-end;
+  }
+
+  /* Finer dots, same eighteen rows: the analyzer keeps its resolution and
+     gives back the height instead. */
+  .tvfd-spec .tsp {
+    --tsp-w: 5px;
+    --tsp-h: 3px;
+    --tsp-gap: 2px;
+    --tsp-row: 1.5px;
+  }
+
+  /* The dial takes its own line rather than squeezing the keys. */
+  .tuner-progress {
+    flex-basis: 100%;
+  }
+
+  .tuner-presets-name {
+    display: none;
+  }
+
+  .tuner-controls {
+    row-gap: 26px;
+  }
+}
+
+@container (max-width: 520px) {
+  .tvfd-signal {
+    display: none;
+  }
+
+  .tvfd-cal {
+    max-height: 15px;
+    overflow: hidden;
+  }
+}
+
+/* Short windows: the window gives its height back before anything else. */
+@media (max-height: 740px) {
+  .tuner-face {
+    gap: clamp(8px, 1.4vh, 14px);
+  }
+
+  .tvfd {
+    max-height: 300px;
+  }
+
+  .tvfd-glass {
+    min-height: 196px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tvfd-inner {
+    animation: none;
+  }
+}

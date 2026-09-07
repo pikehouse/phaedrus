@@ -5,7 +5,7 @@ import '../styles/splitflap.css';
     Numeric columns get their own short drum so a 9 -> 0 tick is one flap, not
     a trip through the whole alphabet — which is how real boards are built. */
 const DRUMS = {
-  text: ` ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,:'"!?&-+/()#@$%`,
+  text: ` ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,:'"!?&-+/()#@$%·`,
   digits: ' 0123456789:',
 } as const;
 
@@ -20,6 +20,13 @@ const STEP_MS = 46; // one flap
 const MAX_STEPS = 12; // cap the clatter; a full drum would take four seconds
 const STAGGER_MS = 22; // per cell, left to right
 
+/* A real board every so often re-seats a flap that didn't quite catch: one
+   card turns over and lands on the character it was already showing. Rare
+   enough to read as mechanism rather than noise. Set TIC to false to disable. */
+const TIC = true;
+const TIC_MIN_MS = 40_000;
+const TIC_MAX_MS = 90_000;
+
 type Size = 'xl' | 'lg' | 'md' | 'sm';
 
 interface Props {
@@ -32,6 +39,8 @@ interface Props {
   drum?: DrumId;
   /** Skip the clatter and land immediately. */
   instant?: boolean;
+  /** Let this row occasionally re-seat one of its flaps while it sits idle. */
+  tic?: boolean;
 }
 
 function normalize(text: string, drum: DrumId, cells?: number): string[] {
@@ -85,6 +94,7 @@ export default function SplitFlap({
   className,
   drum = 'text',
   instant,
+  tic,
 }: Props) {
   const target = useMemo(() => normalize(text, drum, cells), [text, drum, cells]);
   const words = useMemo(() => groupWords(target), [target]);
@@ -117,9 +127,19 @@ export default function SplitFlap({
         write(parts, to);
         return;
       }
-      if (instant || reduced) {
+      if (instant) {
         write(parts, to);
         cell.shown = to;
+        return;
+      }
+      if (reduced) {
+        // The information still turns over; the clatter doesn't.
+        flip(parts, cell.shown, to);
+        cell.shown = to;
+        cell.timer = window.setTimeout(() => {
+          write(parts, to);
+          cell.timer = undefined;
+        }, STEP_MS);
         return;
       }
 
@@ -146,6 +166,57 @@ export default function SplitFlap({
 
     state.current.length = target.length; // cells added or removed with the text
   }, [target, drum, instant]);
+
+  useEffect(() => {
+    if (!tic || !TIC) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    let timer: number | undefined;
+
+    const schedule = () => {
+      if (document.hidden) return; // nothing to see, nothing to run
+      timer = window.setTimeout(fire, TIC_MIN_MS + Math.random() * (TIC_MAX_MS - TIC_MIN_MS));
+    };
+
+    const fire = () => {
+      timer = undefined;
+      const row = rowRef.current;
+      if (row && !document.hidden) {
+        // Only cells that are settled on a visible character are candidates.
+        const idle = [...row.querySelectorAll<HTMLSpanElement>('.flap')]
+          .map((el, i) => ({ el, cell: state.current[i] }))
+          .filter((c) => c.cell && c.cell.timer === undefined && c.cell.shown !== ' ');
+        const pick = idle[Math.floor(Math.random() * idle.length)];
+        const parts = pick && read(pick.el);
+        if (pick?.cell && parts) {
+          const c = pick.cell.shown;
+          const cell = pick.cell;
+          flip(parts, c, c); // over and back onto the same character
+          cell.timer = window.setTimeout(() => {
+            write(parts, c);
+            cell.timer = undefined;
+          }, STEP_MS);
+        }
+      }
+      schedule();
+    };
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        clearTimeout(timer);
+        timer = undefined;
+      } else if (timer === undefined) {
+        schedule();
+      }
+    };
+
+    schedule();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [tic]);
 
   // Only on unmount — a re-render must not cancel chains that are still landing.
   useEffect(

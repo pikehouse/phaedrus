@@ -4,6 +4,7 @@ import './styles/fonts.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/skin-board.css';
+import './styles/skin-tuner.css';
 import './store/skin'; // stamps data-skin before the first paint
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';

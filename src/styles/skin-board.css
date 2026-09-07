@@ -999,3 +999,28 @@
 [data-skin='board'] .faders-caption {
   color: var(--ink-mid);
 }
+
+/* ── The clock is the board's heartbeat: one flap a second, so it has to be
+   legible at a glance rather than a row of specks. ─────────────────────── */
+
+[data-skin='board'] .progress-flaps {
+  --flap-w: 14px;
+  --flap-h: 20px;
+  --flap-fs: 13px;
+  --flap-gap: 1.5px;
+  --flap-wght: 700;
+}
+
+/* The elapsed side carries full ink; the total is a reference, not news. */
+[data-skin='board'] .progress .progress-flaps:last-child {
+  --flap-ink: var(--ink-mid);
+  opacity: 0.78;
+}
+
+/* The album is one of the four lines the sub-head rotates through, so the
+   standing album caption would just duplicate it every fourth turn. The
+   rotating line carries it now. (Drop this rule if the album is ever removed
+   from the cycle in NowPlaying.) */
+[data-skin='board'] .stage-board .meta-album {
+  display: none;
+}
