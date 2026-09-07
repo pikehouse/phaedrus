@@ -1,0 +1,107 @@
+.atmo {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9000;
+}
+
+/* ── Vignette: the lamp is in the middle of the room ─────────────────────── */
+
+.atmo-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(115% 88% at 50% 44%, transparent 28%, rgba(12, 6, 4, 0.42) 72%, rgba(8, 4, 3, 0.8) 100%),
+    radial-gradient(64% 48% at 16% 96%, rgba(74, 22, 32, 0.3), transparent 66%),
+    radial-gradient(70% 55% at 22% 6%, rgba(226, 154, 74, 0.06), transparent 62%);
+}
+
+/* ── Light leak: amber bleeding in from the upper right, drifting ────────── */
+
+.atmo-leak {
+  position: absolute;
+  top: -34%;
+  right: -18%;
+  width: 82%;
+  height: 104%;
+  background:
+    radial-gradient(closest-side, rgba(240, 178, 94, 0.42), rgba(226, 154, 74, 0.18) 44%, transparent 74%),
+    radial-gradient(closest-side at 58% 70%, rgba(183, 86, 47, 0.34), transparent 68%);
+  filter: blur(58px);
+  mix-blend-mode: screen;
+  opacity: 0.9;
+  animation: leak-drift 44s ease-in-out infinite alternate;
+}
+
+@keyframes leak-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 0.72;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-6%, 8%, 0) scale(1.18) rotate(-7deg);
+    opacity: 0.8;
+  }
+}
+
+/* ── Film grain: three pre-rendered noise frames, swapped at ~8fps ───────── */
+
+.atmo-grain {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: soft-light;
+}
+
+.grain-frame {
+  position: absolute;
+  inset: -60px; /* let the tile ride past the edges when it nudges */
+  display: block;
+  opacity: 0;
+  background-repeat: repeat;
+  background-size: 190px 190px;
+  animation: grain-flick 372ms linear infinite;
+  will-change: opacity;
+}
+
+.grain-a {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='190'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='190' height='190' filter='url(%23a)'/%3E%3C/svg%3E");
+}
+
+.grain-b {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='190'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='19' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='190' height='190' filter='url(%23b)'/%3E%3C/svg%3E");
+  animation-delay: -124ms;
+}
+
+.grain-c {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='190' height='190'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' seed='71' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='190' height='190' filter='url(%23c)'/%3E%3C/svg%3E");
+  animation-delay: -248ms;
+}
+
+/* One frame lit at a time; the -124ms offsets make it a 3-frame loop. */
+@keyframes grain-flick {
+  0% {
+    opacity: 0.075;
+  }
+  33.32% {
+    opacity: 0.075;
+  }
+  33.34% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-a {
+    opacity: 0.06;
+  }
+  .grain-b,
+  .grain-c {
+    display: none;
+  }
+}

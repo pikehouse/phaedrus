@@ -1,0 +1,125 @@
+.shell {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  background: var(--bg-deep);
+}
+
+/* ── Boot / empty curtains ───────────────────────────────────────────────── */
+
+.curtain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 100%;
+  padding: 40px;
+  text-align: center;
+  background:
+    radial-gradient(80% 60% at 50% 42%, rgba(59, 36, 24, 0.5), transparent 70%),
+    linear-gradient(180deg, #221410, var(--bg) 55%, #150c09);
+}
+
+.curtain .vinyl {
+  --disc: clamp(180px, 26vh, 260px);
+  margin-bottom: 14px;
+  opacity: 0.9;
+}
+
+.curtain-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 90;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 400;
+  color: var(--cream);
+  letter-spacing: -0.01em;
+}
+
+.curtain-sub {
+  letter-spacing: 0.22em;
+  color: var(--cream-faint);
+}
+
+.curtain-btn {
+  margin-top: 10px;
+  font-family: var(--face);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cream);
+  padding: 11px 22px;
+  border-radius: 2px;
+  background: linear-gradient(168deg, var(--walnut-light), var(--walnut));
+  box-shadow:
+    inset 0 1px 0 rgba(242, 228, 201, 0.16),
+    0 4px 14px rgba(6, 3, 2, 0.5);
+  transition: color var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+
+.curtain-btn:hover:not(:disabled) {
+  color: var(--amber-hot);
+  box-shadow:
+    inset 0 1px 0 rgba(242, 228, 201, 0.2),
+    0 4px 18px rgba(6, 3, 2, 0.55),
+    0 0 22px rgba(226, 154, 74, 0.18);
+}
+
+.curtain-btn:disabled {
+  opacity: 0.55;
+}
+
+/* ── Error boundary ──────────────────────────────────────────────────────── */
+
+.boundary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 100%;
+  padding: 40px;
+  text-align: center;
+  background: linear-gradient(180deg, #221410, var(--bg) 55%, #150c09);
+}
+
+.boundary-label {
+  color: var(--rust);
+  letter-spacing: 0.26em;
+}
+
+.boundary-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 90;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 400;
+  color: var(--cream);
+}
+
+.boundary-detail {
+  max-width: 520px;
+  font-family: var(--face);
+  font-size: 11.5px;
+  letter-spacing: 0.05em;
+  color: var(--cream-faint);
+  user-select: text;
+}
+
+.boundary-btn {
+  margin-top: 14px;
+  font-family: var(--face);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cream);
+  padding: 11px 22px;
+  border-radius: 2px;
+  background: linear-gradient(168deg, var(--walnut-light), var(--walnut));
+  box-shadow: inset 0 1px 0 rgba(242, 228, 201, 0.16), 0 4px 14px rgba(6, 3, 2, 0.5);
+}
+
+.boundary-btn:hover {
+  color: var(--amber-hot);
+}

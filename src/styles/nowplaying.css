@@ -1,0 +1,239 @@
+/* ── Stage ───────────────────────────────────────────────────────────────── */
+
+.stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  container-type: inline-size;
+  /* The lamp: one warm pool behind the jacket, falling off into the corners. */
+  background:
+    radial-gradient(70% 58% at 40% 26%, rgba(104, 66, 42, 0.62), transparent 68%),
+    radial-gradient(60% 40% at 90% 100%, rgba(74, 22, 32, 0.28), transparent 70%),
+    linear-gradient(180deg, #23140f 0%, #1c110c 55%, #150c09 100%);
+}
+
+.stage-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(24px, 4.2vh, 44px) clamp(20px, 5.5cqw, 56px) 14px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.stage-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Everything above the faceplate hangs off the jacket's left edge. */
+.stage-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(14px, 2.4vh, 26px);
+  width: calc(clamp(180px, min(36vh, 57cqw), 372px) * 1.6204);
+  max-width: 100%;
+  margin: auto 0;
+}
+
+/* ── Type lockup ─────────────────────────────────────────────────────────── */
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  min-width: 0;
+}
+
+.meta-over {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 6px;
+  font-family: var(--face);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.meta-room {
+  color: var(--amber);
+}
+
+.meta-sep {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--cream-ghost);
+  flex: none;
+}
+
+.meta-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+  font-weight: 500;
+  font-size: clamp(30px, 7.2cqw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.016em;
+  color: var(--cream);
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55);
+}
+
+.meta-title-idle {
+  color: var(--cream-faint);
+  font-style: italic;
+  font-weight: 300;
+}
+
+.meta-artist {
+  margin-top: 4px;
+  font-family: var(--display);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: 'SOFT' 60, 'WONK' 1, 'opsz' 60;
+  font-size: clamp(16px, 2.9cqw, 23px);
+  line-height: 1.25;
+  color: var(--cream-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.meta-album {
+  margin-top: 7px;
+  font-family: var(--face);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Progress and transport share the lockup's width. */
+.stage-body .progress {
+  max-width: none;
+}
+
+.stage-body .transport {
+  max-width: none;
+  justify-content: space-between;
+}
+
+/* ── Faceplate: the amplifier ────────────────────────────────────────────── */
+
+.faceplate {
+  position: relative;
+  z-index: 2;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 4.4cqw, 44px);
+  padding: 16px clamp(20px, 5.5cqw, 56px) 18px;
+  background: linear-gradient(180deg, #2c1b13 0%, #21140f 52%, #1a0f0b 100%);
+  border-top: 1px solid rgba(242, 228, 201, 0.09);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 200, 0.06),
+    0 -22px 44px rgba(6, 3, 2, 0.5);
+}
+
+/* Fine brushed lines across the panel. */
+.faceplate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, rgba(255, 235, 200, 0.014) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+.faceplate-brand {
+  position: absolute;
+  right: 14px;
+  bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--face);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  color: rgba(242, 228, 201, 0.22);
+}
+
+.faceplate-led {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(242, 228, 201, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+  transition: background var(--t-slow) var(--ease), box-shadow var(--t-slow) var(--ease);
+}
+
+.faceplate-led.is-lit {
+  background: var(--amber-hot);
+  box-shadow: 0 0 8px var(--amber-glow), 0 0 2px var(--amber-hot);
+}
+
+/* ── Short windows ───────────────────────────────────────────────────────── */
+
+@media (max-height: 760px) {
+  .stage-scroll {
+    padding-top: clamp(18px, 3vh, 30px);
+  }
+
+  .stage-body {
+    gap: clamp(10px, 1.9vh, 18px);
+  }
+
+  .meta-title {
+    font-size: clamp(26px, 6cqw, 44px);
+  }
+
+  .meta-artist {
+    font-size: clamp(15px, 2.5cqw, 20px);
+  }
+
+  .faceplate {
+    padding-top: 12px;
+    padding-bottom: 14px;
+  }
+
+  .tactile-lg {
+    width: 58px;
+    height: 58px;
+  }
+
+  .tactile-sm {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Narrow stages: the wordmark would collide with the last fader. */
+@container (max-width: 560px) {
+  .faceplate-brand {
+    display: none;
+  }
+}

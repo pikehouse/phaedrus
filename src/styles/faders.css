@@ -1,0 +1,154 @@
+/* One fader per room, stacked like channel strips seen from above. */
+
+.faders {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+  max-width: 420px;
+}
+
+.faders-caption {
+  letter-spacing: 0.26em;
+  font-size: 9px;
+  color: rgba(242, 228, 201, 0.5);
+}
+
+.faders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 128px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.faders-list::-webkit-scrollbar {
+  display: none;
+}
+
+.fader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+}
+
+.fader-mute {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  border-radius: 50%;
+  color: var(--cream-faint);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.fader-mute:hover {
+  color: var(--cream);
+  background: rgba(242, 228, 201, 0.06);
+}
+
+.fader.is-muted .fader-mute {
+  color: var(--rust);
+}
+
+.fader-name {
+  flex: none;
+  width: clamp(64px, 19cqw, 118px);
+  font-family: var(--face);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--cream-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fader-value {
+  flex: none;
+  width: 22px;
+  text-align: right;
+  font-size: 10px;
+  color: var(--cream-faint);
+}
+
+.fader.is-muted .fader-name,
+.fader.is-muted .fader-value {
+  color: var(--cream-ghost);
+}
+
+.fader-rail {
+  position: relative;
+  flex: 1;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+  min-width: 0;
+}
+
+.fader-slot {
+  position: absolute;
+  inset: 9px 0;
+  border-radius: 1.5px;
+  background: rgba(0, 0, 0, 0.48);
+  box-shadow: var(--sink);
+}
+
+.fader-fill {
+  position: absolute;
+  left: 0;
+  top: 9px;
+  height: 2px;
+  border-radius: 1.5px;
+  background: linear-gradient(90deg, rgba(205, 185, 154, 0.3), var(--cream-dim));
+}
+
+.fader.is-muted .fader-fill {
+  background: var(--rust);
+  opacity: 0.4;
+}
+
+/* A cream cap, like a desk fader seen edge-on. */
+.fader-cap {
+  position: absolute;
+  top: 50%;
+  width: 9px;
+  height: 16px;
+  margin-left: -4.5px;
+  border-radius: 2px;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, var(--cream) 0%, #cdb99a 52%, #9d8a6f 100%);
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.65),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+  transition: box-shadow var(--t) var(--ease);
+}
+
+.fader-cap::after {
+  content: '';
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: 50%;
+  height: 1px;
+  background: rgba(58, 36, 24, 0.55);
+}
+
+.fader-rail:hover .fader-cap,
+.fader-rail.is-dragging .fader-cap {
+  box-shadow:
+    0 1px 5px rgba(0, 0, 0, 0.7),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 0 14px rgba(242, 228, 201, 0.32);
+}
+
+.fader.is-muted .fader-cap {
+  opacity: 0.4;
+}

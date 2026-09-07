@@ -1,0 +1,406 @@
+.search-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: flex;
+  justify-content: center;
+  padding: clamp(48px, 9vh, 110px) 24px 40px;
+  background:
+    radial-gradient(78% 58% at 50% 6%, rgba(59, 36, 24, 0.42), transparent 72%),
+    rgba(12, 6, 4, 0.975);
+  animation: scrim-in 320ms var(--ease);
+}
+
+@keyframes scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* An invisible click-catcher behind the panel. */
+.search-dismiss {
+  position: absolute;
+  inset: 0;
+  cursor: default;
+}
+
+.search-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(760px, 100%);
+  min-height: 0;
+  animation: panel-in 380ms var(--ease) both;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Input ───────────────────────────────────────────────────────────────── */
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(242, 228, 201, 0.16);
+  transition: border-color var(--t) var(--ease);
+  flex: none;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+  font-size: clamp(26px, 3.6vw, 42px);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: -0.015em;
+  color: var(--cream);
+  caret-color: var(--amber);
+}
+
+/* The rule under the field is the focus indicator; a box would fight the type. */
+.search-input:focus-visible {
+  outline: none;
+}
+
+.search-bar:focus-within {
+  border-bottom-color: rgba(226, 154, 74, 0.55);
+}
+
+.search-input::placeholder {
+  color: rgba(242, 228, 201, 0.26);
+  font-style: italic;
+}
+
+.search-close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 50%;
+  color: var(--cream-faint);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.search-close:hover {
+  color: var(--cream);
+  background: rgba(242, 228, 201, 0.07);
+}
+
+/* ── Status line ─────────────────────────────────────────────────────────── */
+
+.search-status {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 24px;
+  padding: 7px 2px 0;
+  flex: none;
+}
+
+.search-working {
+  color: var(--cream-faint);
+  letter-spacing: 0.2em;
+  animation: soft-pulse 2.2s var(--ease-soft) infinite;
+}
+
+@keyframes soft-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.42;
+  }
+}
+
+.search-error {
+  font-family: var(--face);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  color: var(--rust);
+  opacity: 0.85;
+}
+
+/* ── Results ─────────────────────────────────────────────────────────────── */
+
+.search-results {
+  flex: 1;
+  min-height: 0;
+  padding: 10px 2px 30px;
+  margin-right: -8px;
+  padding-right: 8px;
+}
+
+.search-prompt {
+  padding: 46px 4px;
+  font-family: var(--display);
+  font-style: italic;
+  font-variation-settings: 'SOFT' 80, 'WONK' 1, 'opsz' 40;
+  font-size: 19px;
+  color: rgba(242, 228, 201, 0.3);
+}
+
+.search-section {
+  margin-bottom: 24px;
+}
+
+.search-section-head {
+  padding: 0 2px 8px;
+  letter-spacing: 0.26em;
+  color: var(--amber);
+  opacity: 0.85;
+}
+
+.search-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sresult {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius);
+  transition: background var(--t) var(--ease);
+}
+
+.sresult:hover {
+  background: rgba(242, 228, 201, 0.05);
+}
+
+.sresult-main {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  padding: 8px 10px;
+}
+
+.sresult-art {
+  width: 44px;
+  height: 44px;
+  flex: none;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--walnut);
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.sresult-art.is-round {
+  border-radius: 50%;
+}
+
+.sresult-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.18) saturate(1.08) contrast(1.03);
+}
+
+.sresult-art-blank {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, var(--walnut-light), var(--wine));
+}
+
+.sresult-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.sresult-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 30, 'WONK' 0, 'opsz' 24;
+  font-size: 16px;
+  line-height: 1.2;
+  color: var(--cream-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--t) var(--ease);
+}
+
+.sresult:hover .sresult-title {
+  color: var(--cream);
+}
+
+.sresult-sub {
+  font-family: var(--face);
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  color: var(--cream-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sresult-badge {
+  flex: none;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: rgba(242, 228, 201, 0.3);
+  transition: opacity var(--t) var(--ease);
+}
+
+.sresult:hover .sresult-badge {
+  opacity: 0;
+}
+
+.sresult-tools {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  gap: 5px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t) var(--ease);
+}
+
+.sresult:hover .sresult-tools,
+.sresult-tools:focus-within {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sresult-tool {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 2px;
+  color: var(--cream-dim);
+  background: rgba(42, 25, 18, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(242, 228, 201, 0.12);
+  transition: background var(--t) var(--ease), color var(--t) var(--ease);
+}
+
+.sresult-tool:hover {
+  background: var(--amber);
+  color: #1b0f08;
+}
+
+/* ── Artist drill-down ───────────────────────────────────────────────────── */
+
+.search-crumb {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 2px 10px;
+  color: var(--cream-faint);
+  transition: color var(--t) var(--ease);
+}
+
+.search-crumb:hover {
+  color: var(--amber);
+}
+
+.search-crumb .label {
+  color: inherit;
+}
+
+.search-drill-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 90;
+  font-size: 30px;
+  font-weight: 400;
+  color: var(--cream);
+  padding: 0 2px 12px;
+}
+
+/* ── Spotify link card ───────────────────────────────────────────────────── */
+
+.linkcard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  background: linear-gradient(100deg, rgba(107, 31, 42, 0.4), rgba(59, 36, 24, 0.55));
+  box-shadow: inset 0 0 0 1px rgba(226, 154, 74, 0.2);
+  flex: none;
+}
+
+.linkcard-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 40, 'WONK' 0, 'opsz' 24;
+  font-size: 15px;
+  color: var(--cream);
+}
+
+.linkcard-sub {
+  margin-top: 2px;
+  font-family: var(--face);
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
+  color: var(--cream-faint);
+}
+
+.linkcard-btn {
+  flex: none;
+  font-family: var(--face);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #1b0f08;
+  background: var(--amber);
+  padding: 9px 15px;
+  border-radius: 2px;
+  transition: background var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+
+.linkcard-btn:hover {
+  background: var(--amber-hot);
+  box-shadow: 0 0 20px var(--amber-glow);
+}
+
+.linkcard-wait {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  flex: none;
+}
+
+.linkcard-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: wait-pulse 1.8s var(--ease-soft) infinite;
+}
+
+@keyframes wait-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 var(--amber-glow);
+  }
+  50% {
+    opacity: 0.4;
+    box-shadow: 0 0 0 9px rgba(226, 154, 74, 0);
+  }
+}

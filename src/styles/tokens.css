@@ -1,0 +1,52 @@
+:root {
+  /* ── Ground: warm umber → espresso. Never neutral, never #000. ───────────── */
+  --bg-deep: #150c09;
+  --bg: #1f120d;
+  --bg-raised: #2a1912;
+  --walnut: #3b2418;
+  --walnut-light: #4d3122;
+
+  /* ── Ink: cream at varying presence. Never #fff. ─────────────────────────── */
+  --cream: #f2e4c9;
+  --cream-dim: #cdb99a;
+  --cream-faint: rgba(242, 228, 201, 0.42);
+  --cream-ghost: rgba(242, 228, 201, 0.14);
+
+  /* ── The lamp. ───────────────────────────────────────────────────────────── */
+  --amber: #e29a4a;
+  --amber-hot: #f0b25e;
+  --amber-glow: rgba(226, 154, 74, 0.35);
+
+  /* ── Sleeve colours. rust is destructive. ────────────────────────────────── */
+  --rust: #b7562f;
+  --burgundy: #6b1f2a;
+  --wine: #4a1620;
+  --olive: #7c7a45;
+  --mustard: #d3a53a;
+
+  /* ── Type ────────────────────────────────────────────────────────────────── */
+  --display: 'Fraunces Variable', 'Hoefler Text', Georgia, serif;
+  --face: 'Karla', 'Helvetica Neue', Helvetica, sans-serif;
+
+  /* Fraunces axis presets */
+  --wonk-big: 'SOFT' 100, 'WONK' 1, 'opsz' 144;
+  --wonk-mid: 'SOFT' 30, 'WONK' 0, 'opsz' 48;
+  --wonk-small: 'SOFT' 10, 'WONK' 0, 'opsz' 20;
+
+  /* ── Rhythm ──────────────────────────────────────────────────────────────── */
+  --rail-left: 250px;
+  --rail-right: 330px;
+  --chrome-top: 44px; /* traffic-light clearance */
+  --radius: 3px;
+
+  /* ── Motion. Slow, eased, never bouncy. ──────────────────────────────────── */
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast: 140ms;
+  --t: 260ms;
+  --t-slow: 620ms;
+
+  /* ── Depth. Shadows are warm, never grey. ────────────────────────────────── */
+  --sink: inset 0 1px 2px rgba(0, 0, 0, 0.55), inset 0 -1px 0 rgba(242, 228, 201, 0.05);
+  --lift: 0 2px 10px rgba(10, 5, 3, 0.55), 0 0 0 0.5px rgba(242, 228, 201, 0.06);
+}

@@ -1,0 +1,75 @@
+.right-rail {
+  width: var(--rail-right);
+  flex: none;
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.24), transparent 200px),
+    linear-gradient(270deg, #110907, #150c09);
+  box-shadow: inset 1px 0 0 rgba(242, 228, 201, 0.055), -12px 0 34px rgba(0, 0, 0, 0.42);
+  position: relative;
+  z-index: 2;
+}
+
+.right-drag {
+  height: var(--chrome-top);
+  flex: none;
+}
+
+.right-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 12px 14px 16px;
+  flex: none;
+}
+
+.right-tabs-set {
+  display: flex;
+  gap: 4px;
+}
+
+.right-tab {
+  position: relative;
+  padding: 5px 9px 7px;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--cream-ghost);
+  border-radius: var(--radius);
+  transition: color var(--t) var(--ease);
+}
+
+.right-tab:hover {
+  color: var(--cream-dim);
+}
+
+.right-tab.is-active {
+  color: var(--cream);
+}
+
+/* A lit filament under the live tab. */
+.right-tab.is-active::after {
+  content: '';
+  position: absolute;
+  left: 9px;
+  right: 9px;
+  bottom: 0;
+  height: 1.5px;
+  border-radius: 1px;
+  background: var(--amber);
+  box-shadow: 0 0 10px var(--amber-glow);
+}
+
+.right-search {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--cream-faint);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.right-search:hover {
+  color: var(--amber);
+  background: rgba(242, 228, 201, 0.05);
+}

@@ -1,0 +1,196 @@
+/* ── Sleeve + disc ───────────────────────────────────────────────────────────
+   Geometry is driven by --sleeve (the jacket's side) and --peek (how much of
+   the disc shows past the jacket's open edge). The disc sits behind the jacket,
+   so what you see is the label and the right-hand crescent turning. */
+
+.hero {
+  --sleeve: clamp(180px, min(36vh, 57cqw), 372px);
+  --disc: calc(var(--sleeve) * 0.94);
+  --peek: 0.66;
+  position: relative;
+  width: calc(var(--sleeve) + var(--disc) * 0.66);
+  height: var(--sleeve);
+  flex: none;
+}
+
+.hero.is-in {
+  --peek: 0.2;
+}
+
+/* Colour the record throws onto the shelf behind it. */
+.hero-ambient {
+  position: absolute;
+  left: -14%;
+  right: -10%;
+  top: -22%;
+  bottom: -26%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side at 46% 50%, var(--amber-glow), transparent 72%);
+  filter: blur(42px);
+  opacity: 0.5;
+  transition: background 1.6s var(--ease), opacity 1.6s var(--ease);
+  z-index: 0;
+}
+
+.hero-ambient.is-sampled {
+  background: radial-gradient(closest-side at 46% 50%, var(--glow), transparent 70%);
+  opacity: 0.36;
+}
+
+.hero-disc {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--sleeve) - var(--disc) * (1 - var(--peek)));
+  width: var(--disc);
+  height: var(--disc);
+  transform: translateY(-50%);
+  transition: left 1.7s var(--ease);
+  z-index: 1;
+}
+
+.hero-disc .vinyl {
+  --disc: 100%;
+}
+
+/* The jacket's shadow falling across the disc where it emerges. */
+.hero-mouth {
+  position: absolute;
+  top: 1%;
+  bottom: 1%;
+  left: calc(var(--sleeve) - 1px);
+  width: 15%;
+  z-index: 2;
+  background: linear-gradient(90deg, rgba(6, 3, 2, 0.66), rgba(6, 3, 2, 0.28) 42%, transparent);
+  pointer-events: none;
+}
+
+/* ── The jacket ──────────────────────────────────────────────────────────── */
+
+.sleeve {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--sleeve);
+  height: var(--sleeve);
+  z-index: 3;
+  border-radius: 1.5px;
+  overflow: hidden;
+  background: var(--walnut);
+  box-shadow:
+    0 34px 64px -12px rgba(4, 2, 1, 0.8),
+    0 10px 22px rgba(4, 2, 1, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+.sleeve-art {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Kodachrome grade */
+  filter: sepia(0.16) saturate(1.06) contrast(1.02);
+}
+
+/* Paper tooth. */
+.sleeve-paper {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='23' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23p)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+/* Ring wear: the pale circle a record presses into a jacket over the years. */
+.sleeve-ring {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at 51% 50%,
+    transparent 40.5%,
+    rgba(255, 240, 215, 0.06) 42%,
+    rgba(255, 240, 215, 0.11) 44.6%,
+    rgba(255, 240, 215, 0.05) 46.8%,
+    transparent 48.6%
+  );
+  filter: blur(1.1px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* Worn edges, a lit top edge, a soft gloss from the lamp. */
+.sleeve-edge {
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 200, 0.07),
+    inset 0 0 26px rgba(0, 0, 0, 0.38),
+    inset -12px 0 22px -12px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.sleeve-edge::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(255, 235, 200, 0.4), rgba(255, 235, 200, 0.14) 60%, transparent);
+}
+
+.sleeve-edge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(118deg, rgba(255, 240, 215, 0.11), transparent 46%);
+  mix-blend-mode: soft-light;
+}
+
+.sleeve-spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3.4%;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.16) 58%, transparent);
+  pointer-events: none;
+}
+
+/* ── Printed jacket, for when there is no artwork ─────────────────────────── */
+
+.sleeve-print {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 8% 9%;
+  background:
+    radial-gradient(90% 70% at 20% 10%, rgba(226, 154, 74, 0.28), transparent 60%),
+    linear-gradient(160deg, #56362a, #2c1911 70%);
+}
+
+.sleeve-print-mark {
+  font-family: var(--face);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(242, 228, 201, 0.5);
+}
+
+.sleeve-print-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 96;
+  font-weight: 500;
+  font-size: clamp(20px, 9cqw, 30px);
+  line-height: 1.05;
+  letter-spacing: -0.012em;
+  color: var(--cream);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

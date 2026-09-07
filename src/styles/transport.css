@@ -1,0 +1,140 @@
+.transport {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.transport-main {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.transport-mods {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.transport-mods-left {
+  justify-content: flex-end;
+}
+
+.transport-mods-right {
+  justify-content: flex-start;
+}
+
+/* ── Tactile buttons: brushed metal seated in walnut ─────────────────────── */
+
+.tactile {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--cream-dim);
+  background:
+    linear-gradient(180deg, rgba(242, 228, 201, 0.11), transparent 46%),
+    linear-gradient(168deg, var(--walnut-light), var(--walnut) 58%, #2b1a11 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(242, 228, 201, 0.16),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 3px 9px rgba(8, 4, 2, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
+  transition:
+    color var(--t) var(--ease),
+    transform 120ms var(--ease),
+    box-shadow var(--t) var(--ease);
+}
+
+.tactile-sm {
+  width: 46px;
+  height: 46px;
+}
+
+.tactile-lg {
+  width: 68px;
+  height: 68px;
+  color: var(--cream);
+}
+
+.tactile:hover:not(:disabled) {
+  color: var(--cream);
+}
+
+.tactile-lg:hover:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 rgba(242, 228, 201, 0.2),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5),
+    0 3px 14px rgba(8, 4, 2, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 0 22px rgba(226, 154, 74, 0.16);
+}
+
+.tactile:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 0 rgba(242, 228, 201, 0.08),
+    0 1px 3px rgba(8, 4, 2, 0.5);
+}
+
+.tactile:disabled {
+  color: var(--cream-ghost);
+  box-shadow:
+    inset 0 1px 0 rgba(242, 228, 201, 0.06),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.4),
+    0 2px 6px rgba(8, 4, 2, 0.35);
+}
+
+/* The play triangle sits optically left of centre unless nudged. */
+.glyph-play {
+  margin-left: 3px;
+}
+
+.tactile-lg.is-playing {
+  color: var(--amber-hot);
+}
+
+/* ── Modifier toggles: small silkscreened switches ───────────────────────── */
+
+.mod {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius);
+  color: rgba(242, 228, 201, 0.24);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.mod:hover:not(:disabled) {
+  color: var(--cream-dim);
+  background: rgba(242, 228, 201, 0.05);
+}
+
+.mod.is-on {
+  color: var(--amber);
+  text-shadow: 0 0 12px var(--amber-glow);
+}
+
+.mod.is-on::after {
+  content: '';
+  position: absolute;
+  margin-top: 26px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber-glow);
+}
+
+.mod {
+  position: relative;
+}
+
+.mod:disabled {
+  color: rgba(242, 228, 201, 0.09);
+}

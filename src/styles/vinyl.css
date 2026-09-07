@@ -1,0 +1,151 @@
+/* The disc. Sized by --disc; fills its box when --disc is 100%. */
+
+.vinyl {
+  --disc: 260px;
+  position: relative;
+  width: var(--disc);
+  height: var(--disc);
+  flex: none;
+}
+
+.vinyl-disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, #1a100b 0 19%, transparent 19.2%),
+    radial-gradient(circle at 38% 30%, rgba(255, 226, 180, 0.05), transparent 58%),
+    radial-gradient(circle at 50% 50%, #17110c 0%, #100a07 55%, #0a0504 84%, #140c08 100%);
+  box-shadow:
+    0 22px 50px rgba(4, 2, 1, 0.7),
+    0 0 0 1px rgba(242, 228, 201, 0.06),
+    inset 0 0 44px rgba(0, 0, 0, 0.62);
+  will-change: transform;
+}
+
+/* Grooves: a fine pitch for the playing surface, a coarse one for the bands. */
+.vinyl-grooves {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(242, 228, 201, 0.07) 0px,
+      rgba(242, 228, 201, 0.07) 0.5px,
+      rgba(0, 0, 0, 0.36) 1.1px,
+      rgba(0, 0, 0, 0.36) 2.6px
+    ),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 214, 160, 0.055) 0px,
+      rgba(255, 214, 160, 0.055) 1px,
+      transparent 1px,
+      transparent 11px
+    );
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 19.5%, #000 20.5% 96.5%, transparent 98%);
+  mask-image: radial-gradient(circle at 50% 50%, transparent 0 19.5%, #000 20.5% 96.5%, transparent 98%);
+  opacity: 0.88;
+}
+
+/* Label */
+.vinyl-label {
+  position: absolute;
+  left: 31%;
+  top: 31%;
+  width: 38%;
+  height: 38%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--walnut);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.vinyl-label img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.18) saturate(1.08) contrast(1.03);
+}
+
+.vinyl-label-blank {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 62%, rgba(0, 0, 0, 0.18) 63% 66%, transparent 67%),
+    radial-gradient(circle at 42% 34%, #e0a052, #b7562f 72%, #8f3f24 100%);
+}
+
+.vinyl-label-blank span {
+  font-family: var(--face);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  color: rgba(30, 14, 8, 0.78);
+  transform: translateY(-38%);
+}
+
+.vinyl-label-blank i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 60%;
+  height: 1px;
+  transform: translate(-50%, 90%);
+  background: rgba(30, 14, 8, 0.35);
+}
+
+/* A pressed rim where paper meets vinyl. */
+.vinyl-label-ring {
+  position: absolute;
+  left: 30.4%;
+  top: 30.4%;
+  width: 39.2%;
+  height: 39.2%;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(242, 228, 201, 0.08),
+    0 2px 8px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+/* Specular sheen. Fixed in the room, not on the record — the lamp doesn't spin. */
+.vinyl-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 196deg at 58% 38%,
+    transparent 0deg,
+    rgba(255, 232, 190, 0.09) 26deg,
+    rgba(255, 214, 160, 0.17) 46deg,
+    rgba(255, 232, 190, 0.055) 74deg,
+    transparent 116deg,
+    transparent 214deg,
+    rgba(226, 154, 74, 0.08) 250deg,
+    rgba(255, 226, 180, 0.12) 272deg,
+    transparent 316deg
+  );
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.vinyl-spindle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3.4%;
+  height: 3.4%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #47301f, #0a0605 78%);
+  box-shadow:
+    inset 0 1px 1px rgba(242, 228, 201, 0.22),
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}

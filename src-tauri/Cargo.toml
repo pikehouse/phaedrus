@@ -1,0 +1,38 @@
+[package]
+name = "phaedrus"
+version = "0.1.0"
+description = "Phaedrus — a warm, analog Sonos controller for the Mac"
+authors = ["JR Tipton"]
+edition = "2021"
+
+[lib]
+name = "phaedrus_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "gzip"] }
+roxmltree = "0.20"
+if-addrs = "0.13"
+thiserror = "2"
+futures = "0.3"
+percent-encoding = "2"
+url = "2"
+uuid = { version = "1", features = ["v4"] }
+chrono = "0.4"
+log = "0.4"
+env_logger = "0.11"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true

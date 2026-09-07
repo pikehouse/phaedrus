@@ -1,0 +1,7 @@
+/* Fraunces "full" variants carry all four axes (opsz, wght, SOFT, WONK) —
+   the plain index.css only ships wght, which kills the wonky 70s look. */
+@import '@fontsource-variable/fraunces/full.css';
+@import '@fontsource-variable/fraunces/full-italic.css';
+@import '@fontsource/karla/400.css';
+@import '@fontsource/karla/500.css';
+@import '@fontsource/karla/700.css';

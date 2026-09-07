@@ -1,0 +1,110 @@
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 560px;
+}
+
+.progress-time {
+  font-size: 11px;
+  color: var(--cream-faint);
+  letter-spacing: 0.08em;
+  min-width: 38px;
+}
+
+.progress-total {
+  text-align: right;
+}
+
+.progress-track {
+  position: relative;
+  flex: 1;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* The unplayed run: fine dark grooves, like the outer band of a record. */
+.progress-groove {
+  position: absolute;
+  inset: 9px 0;
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(242, 228, 201, 0.13) 0 1px,
+      transparent 1px 4px
+    ),
+    rgba(0, 0, 0, 0.42);
+  box-shadow: var(--sink);
+}
+
+.progress-played {
+  position: absolute;
+  left: 0;
+  top: 9px;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, rgba(226, 154, 74, 0.42), var(--amber));
+  box-shadow: 0 0 10px var(--amber-glow);
+}
+
+.progress-cap {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 15px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--amber-hot);
+  transform: translateY(-50%);
+  box-shadow: 0 0 12px rgba(240, 178, 94, 0.75), 0 1px 2px rgba(0, 0, 0, 0.6);
+  transition: height var(--t-fast) var(--ease), width var(--t-fast) var(--ease);
+}
+
+.progress-track:hover .progress-cap,
+.progress-track.is-scrubbing .progress-cap {
+  height: 19px;
+  width: 4px;
+}
+
+/* ── Radio ───────────────────────────────────────────────────────────────── */
+
+.progress-live {
+  gap: 10px;
+}
+
+.progress-live .label {
+  color: var(--amber);
+  letter-spacing: 0.24em;
+}
+
+.live-pip {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--amber-hot);
+  box-shadow: 0 0 10px var(--amber-glow);
+  animation: live-breathe 2.6s var(--ease-soft) infinite;
+}
+
+@keyframes live-breathe {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+
+.progress-live-rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cream-ghost), transparent);
+}

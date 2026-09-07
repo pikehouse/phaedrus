@@ -1,0 +1,224 @@
+/* ── Shared panel chrome for QUEUE and CRATE ─────────────────────────────── */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 16px 9px;
+  flex: none;
+  min-height: 18px;
+}
+
+.panel-head .label {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  color: var(--cream-dim);
+}
+
+.panel-count {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+}
+
+.panel-action {
+  font-family: var(--face);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--cream-faint);
+  padding: 2px 5px;
+  border-radius: var(--radius);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.panel-action:hover {
+  color: var(--cream);
+  background: rgba(242, 228, 201, 0.06);
+}
+
+.panel-action.is-armed {
+  color: var(--rust);
+  background: rgba(183, 86, 47, 0.14);
+}
+
+.panel-empty {
+  padding: 28px 18px;
+}
+
+.panel-empty-line {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 60, 'WONK' 1, 'opsz' 30;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--cream-faint);
+}
+
+.panel-empty-sub {
+  margin-top: 4px;
+  font-family: var(--face);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--cream-ghost);
+}
+
+/* ── Queue rows ──────────────────────────────────────────────────────────── */
+
+.queue {
+  flex: 1;
+  min-height: 0;
+  padding: 0 8px 14px;
+}
+
+.qrow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius);
+  transition: background var(--t) var(--ease);
+}
+
+.qrow:hover {
+  background: rgba(242, 228, 201, 0.045);
+}
+
+.qrow.is-current {
+  background: linear-gradient(90deg, rgba(59, 36, 24, 0.85), rgba(59, 36, 24, 0.2));
+}
+
+.qrow-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  padding: 7px 8px 7px 10px;
+}
+
+.qrow-marker {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: transparent;
+}
+
+.qrow.is-current .qrow-marker {
+  background: var(--amber);
+  box-shadow: 0 0 10px var(--amber-glow);
+}
+
+.qrow-art {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--walnut);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.qrow-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.18) saturate(1.08) contrast(1.03);
+}
+
+.qrow-art-blank {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, var(--walnut-light), var(--wine));
+}
+
+.qrow-art-glow {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 0 1px rgba(226, 154, 74, 0.6);
+  border-radius: 2px;
+}
+
+.qrow-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.qrow-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 20, 'WONK' 0, 'opsz' 18;
+  font-size: 14px;
+  line-height: 1.25;
+  color: var(--cream-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--t) var(--ease);
+}
+
+.qrow:hover .qrow-title {
+  color: var(--cream);
+}
+
+.qrow.is-current .qrow-title {
+  color: var(--cream);
+}
+
+.qrow-artist {
+  font-family: var(--face);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--cream-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.qrow-time {
+  font-size: 10px;
+  color: var(--cream-faint);
+  flex: none;
+  transition: opacity var(--t) var(--ease);
+}
+
+.qrow:hover .qrow-time {
+  opacity: 0;
+}
+
+.qrow-remove {
+  position: absolute;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: var(--rust);
+  opacity: 0;
+  transition: opacity var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.qrow:hover .qrow-remove,
+.qrow-remove:focus-visible {
+  opacity: 1;
+}
+
+.qrow-remove:hover {
+  background: rgba(183, 86, 47, 0.18);
+}

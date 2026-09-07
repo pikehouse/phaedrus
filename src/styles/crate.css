@@ -1,0 +1,198 @@
+.crate {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 16px 12px;
+  padding: 2px 16px 18px;
+  align-content: start;
+}
+
+.crate-empty {
+  grid-column: 1 / -1;
+  padding: 20px 2px;
+}
+
+.sleeve {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.sleeve-face {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 1px;
+  overflow: hidden;
+  background: var(--walnut);
+  box-shadow:
+    0 3px 10px rgba(6, 3, 2, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.45);
+  transition: transform var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+
+.sleeve-face img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.18) saturate(1.08) contrast(1.03);
+  transition: filter var(--t) var(--ease);
+}
+
+.sleeve:hover .sleeve-face:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 20px rgba(6, 3, 2, 0.68),
+    0 0 0 1px rgba(242, 228, 201, 0.1),
+    0 0 24px rgba(226, 154, 74, 0.12);
+}
+
+.sleeve:hover .sleeve-face img {
+  filter: sepia(0.1) saturate(1.16) contrast(1.05) brightness(1.06);
+}
+
+/* Paper tooth plus the darkened, worn edge of a sleeve that's been pulled a lot. */
+.sleeve-wear {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' seed='11' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23p)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  mix-blend-mode: overlay;
+  opacity: 0.16;
+  box-shadow:
+    inset 0 0 14px rgba(0, 0, 0, 0.5),
+    inset 0 0 0 1px rgba(242, 228, 201, 0.07);
+}
+
+/* ── Typographic sleeve (no artwork) ─────────────────────────────────────── */
+
+.sleeve-print {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  height: 100%;
+  padding: 11px 10px 9px;
+  text-align: left;
+}
+
+.sleeve-print-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 60;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: -0.015em;
+  color: var(--cream);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sleeve-print-mark {
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  color: rgba(242, 228, 201, 0.5);
+}
+
+.ground-walnut {
+  background: linear-gradient(152deg, var(--walnut-light), #291710);
+}
+
+.ground-burgundy {
+  background: linear-gradient(152deg, var(--burgundy), #2c0c13);
+}
+
+.ground-olive {
+  background: linear-gradient(152deg, var(--olive), #2f2e17);
+}
+
+.ground-mustard {
+  background: linear-gradient(152deg, var(--mustard), #6a4d13);
+}
+
+.ground-mustard .sleeve-print-title {
+  color: #241505;
+}
+
+.ground-mustard .sleeve-print-mark {
+  color: rgba(36, 21, 5, 0.6);
+}
+
+.ground-wine {
+  background: linear-gradient(152deg, var(--wine), #1e070c);
+}
+
+/* ── Hover tools ─────────────────────────────────────────────────────────── */
+
+.sleeve-tools {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity var(--t) var(--ease), transform var(--t) var(--ease);
+}
+
+.sleeve:hover .sleeve-tools,
+.sleeve-tools:focus-within {
+  opacity: 1;
+  transform: none;
+}
+
+.sleeve-tool {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+  color: var(--cream);
+  background: rgba(21, 12, 9, 0.78);
+  box-shadow: inset 0 0 0 1px rgba(242, 228, 201, 0.14);
+  transition: background var(--t) var(--ease), color var(--t) var(--ease);
+}
+
+.sleeve-tool:hover {
+  background: rgba(226, 154, 74, 0.85);
+  color: #1b0f08;
+}
+
+/* ── Caption ─────────────────────────────────────────────────────────────── */
+
+.sleeve-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 30, 'WONK' 0, 'opsz' 18;
+  font-size: 12.5px;
+  line-height: 1.2;
+  color: var(--cream-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sleeve-sub {
+  font-family: var(--face);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  color: var(--cream-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sleeve.is-dim {
+  opacity: 0.42;
+}
+
+.sleeve.is-dim .sleeve-face {
+  cursor: default;
+}
