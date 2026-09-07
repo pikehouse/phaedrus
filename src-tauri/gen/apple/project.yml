@@ -12,6 +12,7 @@ settingGroups:
     base:
       PRODUCT_NAME: Phaedrus
       PRODUCT_BUNDLE_IDENTIFIER: com.phaedrus.app
+      CODE_SIGN_STYLE: Automatic
 targetTemplates:
   app:
     type: application
