@@ -84,9 +84,41 @@ Playback URIs are built to match what Sonos itself writes. Account slots
 Local state (known IPs, learned account slots, Spotify token) lives in
 `~/Library/Application Support/com.phaedrus.app/phaedrus.json`.
 
-## Phones
+## iPhone
 
-The frontend is plain web. The plan for phones is for the Mac app to serve the
-same interface over the LAN so any phone in the house can open it, with no App
-Store or developer program involved. Tauri can also build the same code as a
-native iOS app if that ever becomes worth the signing hassle.
+The same code builds as a native iOS app. The Xcode project lives in
+`src-tauri/gen/apple/` (committed), and the Rust core compiles for the
+`aarch64-apple-ios` target as is. On the phone, discovery uses the subnet
+sweep (multicast needs an Apple-approved entitlement); it finds the household
+the same way it does on a mesh network.
+
+One-time setup on the Mac:
+
+```bash
+rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+brew install cocoapods
+```
+
+Then, in Xcode ▸ Settings ▸ Accounts, sign in with your Apple ID. A free
+account is enough to install on your own phone: Xcode creates a "Personal
+Team" and the app runs for seven days before it needs re-installing from
+Xcode. The paid developer program removes that limit and adds TestFlight.
+
+Run on a plugged-in iPhone:
+
+```bash
+pnpm tauri ios dev --open      # opens Xcode; pick your Team under Signing, press Run
+```
+
+On first launch iOS asks to allow local network access; say yes. If the app
+is "untrusted", approve it under Settings ▸ General ▸ VPN & Device
+Management.
+
+A release build for the device:
+
+```bash
+pnpm tauri ios build
+```
+
+The phone layout is a stacked shell (Now Playing, Queue, Crate, Rooms in a
+bottom tab bar) that reuses every component and all six skins.
