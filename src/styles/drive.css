@@ -304,7 +304,9 @@
 /* The tritone: highlights take the sunset's colours, warmest on the sun's
    side; mids fall through magenta into violet. */
 .drive-cover-face.is-art::before {
-  background: linear-gradient(150deg, #a86dff 0%, #ff4fae 52%, #ffa66a 100%);
+  /* More of the surface goes warm: sodium orange owns the highlights from the
+     middle out, so the cover reads as lit by the sunset band, not dipped in pink. */
+  background: linear-gradient(150deg, #a86dff 0%, #ff4fae 36%, #ff9a5c 70%, #ffc27a 100%);
   mix-blend-mode: multiply;
 }
 
@@ -312,7 +314,7 @@
    the sun catches a little sodium. */
 .drive-cover-face.is-art::after {
   background:
-    radial-gradient(64% 64% at 100% 100%, rgba(255, 138, 61, 0.24), transparent 70%),
+    radial-gradient(82% 78% at 100% 96%, rgba(255, 150, 70, 0.34), transparent 72%),
     #120c2c;
   mix-blend-mode: screen;
 }
