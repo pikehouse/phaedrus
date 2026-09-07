@@ -221,41 +221,7 @@
 
 /* ── Skin picker ───────────────────────────────────────────────────────── */
 
-.skinpick {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  padding: 0 18px 12px;
-  flex: none;
-}
-
-.skinpick-btn {
-  flex: 1;
-  padding: 6px 4px 7px;
-  font-family: var(--face);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--cream-faint);
-  border-radius: var(--radius);
-  box-shadow: inset 0 0 0 1px var(--cream-ghost);
-  transition: color var(--t) var(--ease), background var(--t) var(--ease);
-}
-
-.skinpick-btn + .skinpick-btn {
-  margin-left: -1px;
-}
-
-.skinpick-btn:hover {
-  color: var(--cream);
-}
-
-.skinpick-btn.is-on {
-  color: var(--bg);
-  background: var(--amber);
-  box-shadow: inset 0 0 0 1px var(--amber);
-}
+/* Base picker layout lives in rooms.css; only the board colours are here. */
 
 [data-skin='board'] .skinpick-btn.is-on {
   color: var(--paper);

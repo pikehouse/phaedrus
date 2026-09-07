@@ -1,0 +1,1110 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   DECK SKIN — a DJ controller, seen from the booth.
+
+   Matte black anodised panels, rubber-grip knobs ringed in orange LED, long-
+   throw faders on lit tick scales, pink cue pads, and two strips of smoked
+   glass carrying coral waveforms, with a chrome wordmark on the corner.
+   Dark, expensive, warm-orange light, red signal. Keyed off
+   [data-skin='deck'] on <html>.
+
+   The first block re-points the hi-fi tokens so anything that only speaks in
+   tokens restyles for free; the rest is the work tokens cannot do — chamfers,
+   brushing, rubber, chrome, and light.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin='deck'] {
+  /* ── The controller's own vocabulary ───────────────────────────────────── */
+  --panel: #0b0c0e;
+  --panel-raised: #15171b;
+  --panel-well: #07080a;
+  --chamfer-hi: rgba(255, 255, 255, 0.07);
+  --chamfer-lo: rgba(0, 0, 0, 0.8);
+
+  --silk: #eef0f3;
+  --silk-dim: #8a8f99;
+
+  /* Orange LED. Unlit is still there, at about a tenth of the lit luminance. */
+  --led: #ff9f1c;
+  --led-hot: #ffb648;
+  --led-off: rgba(255, 159, 28, 0.12);
+  --led-bloom: 0 0 6px rgba(255, 159, 28, 0.6), 0 0 16px rgba(255, 159, 28, 0.25);
+
+  /* Coral: the signal. */
+  --coral: #ff4d5a;
+  --coral-hot: #ff7a82;
+  --coral-dim: rgba(255, 77, 90, 0.3);
+  --coral-bloom: 0 0 6px rgba(255, 77, 90, 0.55), 0 0 16px rgba(255, 77, 90, 0.22);
+
+  /* One pink, for the pads only. */
+  --pad: #ff3c78;
+
+  /* Chrome is a gradient, never a colour: it only reads as metal clipped to type. */
+  --chrome: linear-gradient(180deg, #f8f9fb 0%, #c7ccd4 36%, #6e7580 50%, #e7eaee 58%, #868d98 100%);
+
+  /* ── Hi-fi tokens, re-pointed ──────────────────────────────────────────── */
+  --bg-deep: var(--panel-well);
+  --bg: var(--panel);
+  --bg-raised: var(--panel-raised);
+  --walnut: #1a1c21;
+  --walnut-light: #25282e;
+
+  --cream: var(--silk);
+  --cream-dim: #b6bac2;
+  --cream-faint: rgba(238, 240, 243, 0.46);
+  --cream-ghost: rgba(238, 240, 243, 0.14);
+
+  /* "Active" is an LED coming on. */
+  --amber: var(--led);
+  --amber-hot: var(--led-hot);
+  --amber-glow: rgba(255, 159, 28, 0.35);
+
+  --rust: var(--coral);
+  --burgundy: #22252b;
+  --wine: #131519;
+  --olive: #262a31;
+  --mustard: var(--led);
+
+  /* One family, two widths: condensed for silkscreen, extended for the mark. */
+  --display: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+  --face: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+
+  --radius: 6px;
+
+  --sink: inset 0 1px 2px rgba(0, 0, 0, 0.9), inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  --lift: inset 0 1px 0 var(--chamfer-hi), 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='deck'] body {
+  background: var(--panel-well);
+}
+
+/* Archivo carries wdth and wght, not Fraunces's SOFT/WONK/opsz — restate the
+   axes it does have or the hi-fi display rules leave everything at default. */
+[data-skin='deck'] .meta-title,
+[data-skin='deck'] .meta-artist,
+[data-skin='deck'] .room-name,
+[data-skin='deck'] .arrange-name,
+[data-skin='deck'] .qrow-title,
+[data-skin='deck'] .crate-caption,
+[data-skin='deck'] .crate-bill-title,
+[data-skin='deck'] .sresult-title,
+[data-skin='deck'] .search-input,
+[data-skin='deck'] .search-drill-title,
+[data-skin='deck'] .curtain-title,
+[data-skin='deck'] .boundary-title,
+[data-skin='deck'] .panel-empty-line,
+[data-skin='deck'] .search-prompt,
+[data-skin='deck'] .linkcard-title {
+  font-variation-settings: 'wdth' 82, 'wght' 600;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+/* ── Shell and rails ───────────────────────────────────────────────────── */
+
+[data-skin='deck'] .shell {
+  background: var(--panel-well);
+}
+
+[data-skin='deck'] .stage {
+  background: var(--panel-well);
+}
+
+[data-skin='deck'] .rooms,
+[data-skin='deck'] .right-rail {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0 1px, rgba(0, 0, 0, 0.03) 1px 2px),
+    linear-gradient(180deg, #0f1114 0%, #0a0b0d 100%);
+}
+
+[data-skin='deck'] .rooms {
+  box-shadow: inset -1px 0 0 var(--chamfer-hi), 10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='deck'] .right-rail {
+  box-shadow: inset 1px 0 0 var(--chamfer-hi), -10px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ── The light: one key from the upper left, falling off to the lower right.
+      No grain, no leak — this is a product shot, not a room. ─────────────── */
+
+[data-skin='deck'] .atmo-grain,
+[data-skin='deck'] .atmo-leak {
+  display: none;
+}
+
+[data-skin='deck'] .atmo-vignette {
+  background:
+    radial-gradient(75% 65% at 10% 6%, rgba(255, 255, 255, 0.045), transparent 62%),
+    radial-gradient(95% 85% at 100% 104%, rgba(0, 0, 0, 0.58), transparent 60%),
+    radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.28) 100%);
+}
+
+/* ── Silkscreen ────────────────────────────────────────────────────────── */
+
+[data-skin='deck'] .label {
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--silk-dim);
+}
+
+/* ── Rooms rail: channel strips, one LED and a number per row ──────────── */
+
+[data-skin='deck'] .rooms-head {
+  margin: 0 10px 6px;
+  padding: 10px 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-skin='deck'] .rooms-head .label {
+  letter-spacing: 0.26em;
+}
+
+[data-skin='deck'] .rooms-list {
+  counter-reset: ch;
+}
+
+[data-skin='deck'] .room {
+  padding: 8px 10px 9px 26px;
+  gap: 9px;
+  border-radius: 3px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.035);
+}
+
+[data-skin='deck'] .room::before {
+  counter-increment: ch;
+  content: 'CH ' counter(ch, decimal-leading-zero);
+  flex: none;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: rgba(238, 240, 243, 0.34);
+}
+
+[data-skin='deck'] .room:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+[data-skin='deck'] .room.is-selected {
+  background: rgba(255, 159, 28, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 159, 28, 0.13);
+}
+
+[data-skin='deck'] .room.is-selected::before {
+  color: var(--led);
+}
+
+[data-skin='deck'] .room-marker {
+  left: 9px;
+  top: 50%;
+  bottom: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  background: #0e0f12;
+  box-shadow: inset 0 0 0 1px rgba(255, 159, 28, 0.16), inset 0 1px 1px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='deck'] .room.is-selected .room-marker {
+  background: var(--led-hot);
+  box-shadow: var(--led-bloom), 0 0 2px #ffe0b0;
+}
+
+[data-skin='deck'] .room-name {
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-skin='deck'] .room-with,
+[data-skin='deck'] .qrow-artist,
+[data-skin='deck'] .sresult-sub,
+[data-skin='deck'] .crate-caption-sub {
+  font-variation-settings: 'wdth' 78, 'wght' 500;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-skin='deck'] .bars i {
+  width: 2px;
+  border-radius: 0;
+  background: var(--led);
+  box-shadow: 0 0 4px rgba(255, 159, 28, 0.6);
+}
+
+[data-skin='deck'] .rooms-foot {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-skin='deck'] .arrange-name {
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+[data-skin='deck'] .switch {
+  border-radius: 3px;
+  background: #050607;
+  box-shadow: var(--sink), 0 0 0 1px rgba(0, 0, 0, 0.8);
+}
+
+[data-skin='deck'] .switch-thumb {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #3a3e45, #1b1e22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='deck'] .switch.is-on {
+  background: rgba(255, 159, 28, 0.14);
+  box-shadow: var(--sink), 0 0 0 1px rgba(255, 159, 28, 0.25), 0 0 10px rgba(255, 159, 28, 0.16);
+}
+
+[data-skin='deck'] .switch.is-on .switch-thumb {
+  background: linear-gradient(180deg, #ffd08a, #e07f10);
+  box-shadow: 0 0 8px rgba(255, 159, 28, 0.6);
+}
+
+/* ── Skin picker: colours only — the layout is the rail's own ──────────── */
+
+[data-skin='deck'] .skinpick-btn {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09);
+}
+
+[data-skin='deck'] .skinpick-btn.is-on {
+  color: #0b0c0e;
+  background: var(--led);
+  box-shadow: inset 0 0 0 1px var(--led), 0 0 12px rgba(255, 159, 28, 0.3);
+}
+
+/* ── Transport: rubber keys with LEDs, silkscreen under each ───────────── */
+
+/* The deck lays the keys and the toggles out as one row; letting Transport's
+   own box dissolve makes that possible without forking the component. */
+[data-skin='deck'] .deck-transport .transport {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: clamp(10px, 1.6cqw, 22px);
+  max-width: none;
+}
+
+[data-skin='deck'] .deck-transport .transport-main {
+  order: 1;
+  gap: clamp(10px, 1.6cqw, 18px);
+}
+
+[data-skin='deck'] .deck-transport .transport-mods-left {
+  order: 2;
+  flex: none;
+  gap: 8px;
+  margin-left: clamp(6px, 1.2cqw, 16px);
+}
+
+[data-skin='deck'] .deck-transport .transport-mods-right {
+  order: 3;
+  flex: none;
+  gap: 8px;
+}
+
+[data-skin='deck'] .tactile {
+  position: relative;
+  border-radius: 50%;
+  color: var(--silk);
+  background:
+    repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.035) 0deg 1.5deg, transparent 1.5deg 4deg),
+    radial-gradient(circle at 40% 30%, #2b2e34 0%, #181a1e 58%, #0d0e11 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.7),
+    0 4px 9px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='deck'] .tactile-sm {
+  width: 46px;
+  height: 46px;
+}
+
+[data-skin='deck'] .tactile-lg {
+  width: 66px;
+  height: 66px;
+  color: #ffffff;
+}
+
+/* The LED ring around PLAY. */
+[data-skin='deck'] .tactile-lg::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  border: 2px solid var(--led-off);
+  pointer-events: none;
+}
+
+[data-skin='deck'] .tactile-lg.is-playing {
+  color: #ffffff;
+}
+
+[data-skin='deck'] .tactile-lg.is-playing::after {
+  border-color: var(--led);
+  box-shadow: var(--led-bloom), inset 0 0 6px rgba(255, 159, 28, 0.35);
+}
+
+[data-skin='deck'] .tactile:hover:not(:disabled),
+[data-skin='deck'] .tactile-lg:hover:not(:disabled) {
+  color: #ffffff;
+  background:
+    repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.04) 0deg 1.5deg, transparent 1.5deg 4deg),
+    radial-gradient(circle at 40% 30%, #33373d 0%, #1c1f24 58%, #0f1013 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.7),
+    0 4px 9px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='deck'] .tactile:active:not(:disabled) {
+  transform: translateY(1px);
+  background: radial-gradient(circle at 40% 30%, #15171b 0%, #1c1f24 60%, #22252b 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.75),
+    0 1px 3px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='deck'] .tactile:disabled {
+  color: rgba(238, 240, 243, 0.16);
+  background: radial-gradient(circle at 40% 30%, #202329 0%, #15171b 60%, #0d0e11 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.5),
+    0 2px 5px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='deck'] .mod {
+  width: 38px;
+  height: 27px;
+  border-radius: 4px;
+  color: rgba(238, 240, 243, 0.42);
+  background: linear-gradient(180deg, #25282d 0%, #181a1e 56%, #111317 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.85);
+}
+
+[data-skin='deck'] .mod:hover:not(:disabled) {
+  color: var(--silk);
+  background: linear-gradient(180deg, #2c3036 0%, #1c1f24 56%, #14161a 100%);
+}
+
+/* The tiny LED in the corner of every toggle: dark until it is on. */
+[data-skin='deck'] .mod::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 4px;
+  height: 4px;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--led-off);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.55);
+}
+
+[data-skin='deck'] .mod.is-on {
+  color: var(--silk);
+  text-shadow: none;
+}
+
+[data-skin='deck'] .mod.is-on::after {
+  margin: 0;
+  width: 4px;
+  height: 4px;
+  background: var(--led-hot);
+  box-shadow: var(--led-bloom);
+}
+
+[data-skin='deck'] .mod:disabled {
+  color: rgba(238, 240, 243, 0.12);
+}
+
+[data-skin='deck'] .mod:disabled::after {
+  background: rgba(255, 159, 28, 0.06);
+}
+
+[data-skin='deck'] .transport-main .tactile::before,
+[data-skin='deck'] .transport-mods .mod::before {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 7.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+[data-skin='deck'] .transport-main .tactile:nth-child(1)::before { content: 'Cue'; }
+[data-skin='deck'] .transport-main .tactile:nth-child(2)::before { content: 'Play / Pause'; }
+[data-skin='deck'] .transport-main .tactile:nth-child(3)::before { content: 'Next'; }
+[data-skin='deck'] .transport-mods-left .mod::before { content: 'Shuffle'; }
+[data-skin='deck'] .transport-mods-right .mod:nth-child(1)::before { content: 'Loop'; }
+[data-skin='deck'] .transport-mods-right .mod:nth-child(2)::before { content: 'X-Fade'; }
+
+/* ── Segment digits, in orange ─────────────────────────────────────────── */
+
+[data-skin='deck'] .seg14-off polygon {
+  fill: var(--led-off);
+}
+
+[data-skin='deck'] .seg14-on {
+  filter: drop-shadow(0 0 2px rgba(255, 159, 28, 0.55)) drop-shadow(0 0 6px rgba(255, 159, 28, 0.2));
+}
+
+[data-skin='deck'] .seg14-on polygon,
+[data-skin='deck'] .seg14-on circle {
+  fill: var(--led);
+}
+
+/* ── The mixer: the faceplate under the deck ───────────────────────────── */
+
+[data-skin='deck'] .faceplate {
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0 1px, rgba(0, 0, 0, 0.03) 1px 2px),
+    linear-gradient(180deg, #131518 0%, #0e1013 55%, #0a0b0d 100%);
+  border-top: 1px solid var(--chamfer-hi);
+  box-shadow: inset 0 -1px 0 var(--chamfer-lo), 0 -16px 32px rgba(0, 0, 0, 0.55);
+}
+
+[data-skin='deck'] .faceplate::before {
+  background: none;
+}
+
+[data-skin='deck'] .faceplate-brand {
+  font-variation-settings: 'wdth' 125, 'wght' 700;
+  letter-spacing: 0.3em;
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 0.6;
+}
+
+[data-skin='deck'] .faceplate-led {
+  background: #0e0f12;
+  box-shadow: inset 0 0 0 1px rgba(255, 159, 28, 0.16);
+}
+
+[data-skin='deck'] .faceplate-led.is-lit {
+  background: var(--led-hot);
+  box-shadow: var(--led-bloom);
+}
+
+/* The master knob: rubber grip, white index line, orange arc of level. */
+[data-skin='deck'] .knob {
+  width: 108px;
+  height: 108px;
+}
+
+[data-skin='deck'] .knob-caption,
+[data-skin='deck'] .faders-caption {
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  color: var(--silk-dim);
+}
+
+[data-skin='deck'] .knob-body {
+  inset: 13px;
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.06), transparent 44%),
+    radial-gradient(circle at 38% 28%, #2c2f35, #16181c 58%, #0a0b0d 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -9px 16px rgba(0, 0, 0, 0.75),
+    0 9px 20px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+/* The grip: fine rubber ridges around the rim, not across the cap. */
+[data-skin='deck'] .knob-body::before {
+  background: repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.07) 0deg 2deg, transparent 2deg 5deg);
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 66%, #000 69% 100%);
+  mask-image: radial-gradient(circle closest-side, transparent 0 66%, #000 69% 100%);
+}
+
+[data-skin='deck'] .knob:hover .knob-body,
+[data-skin='deck'] .knob.is-dragging .knob-body {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -9px 16px rgba(0, 0, 0, 0.75),
+    0 9px 22px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(0, 0, 0, 0.9),
+    0 0 22px rgba(255, 159, 28, 0.14);
+}
+
+[data-skin='deck'] .knob-pointer {
+  top: 8px;
+  width: 3px;
+  height: 16px;
+  margin-left: -1.5px;
+  border-radius: 1px;
+  background: #f6f7f9;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.35), 0 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+[data-skin='deck'] .knob-value {
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+  font-size: 17px;
+  color: var(--led);
+  text-shadow: 0 0 6px rgba(255, 159, 28, 0.5), 0 0 14px rgba(255, 159, 28, 0.2);
+}
+
+[data-skin='deck'] .knob-scale {
+  filter: drop-shadow(0 0 3px rgba(255, 159, 28, 0.45));
+}
+
+[data-skin='deck'] .knob-tick {
+  stroke: var(--led-off);
+  stroke-width: 2.2;
+  stroke-linecap: butt;
+}
+
+[data-skin='deck'] .knob-tick.is-major {
+  stroke: rgba(255, 159, 28, 0.2);
+  stroke-width: 2.2;
+}
+
+[data-skin='deck'] .knob-tick.is-lit,
+[data-skin='deck'] .knob-tick.is-major.is-lit {
+  stroke: var(--led);
+}
+
+/* Faders: long-throw, a black cap with a white line on a recessed slot, an
+   LED ladder above it and a tick scale below. */
+[data-skin='deck'] .faders-list {
+  counter-reset: fch;
+}
+
+[data-skin='deck'] .fader {
+  min-height: 34px;
+  gap: 10px;
+}
+
+[data-skin='deck'] .fader-name {
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--silk-dim);
+}
+
+/* The channel number the meter bridge above refers to. */
+[data-skin='deck'] .fader-name::before {
+  counter-increment: fch;
+  content: counter(fch) '\00a0\00a0';
+  color: var(--led);
+}
+
+[data-skin='deck'] .fader.is-muted .fader-name::before {
+  color: var(--coral);
+}
+
+/* The channel meter: twelve LEDs between the fader and its number, the top
+   two coral. DeckMeters writes --lvl (lit count) and --pk (peak segment)
+   onto the row at ~30fps; the strip is painted from those. A segment is a
+   5px bar on a 7px pitch, so a count is a width. */
+[data-skin='deck'] .fader {
+  --lvl: 0;
+  --pk: -1;
+  /* One LED is --seg wide on a --pitch grid; the strip is twelve of them. */
+  --seg: 5px;
+  --pitch: 7px;
+  --strip: calc(var(--pitch) * 12 - (var(--pitch) - var(--seg)));
+}
+
+[data-skin='deck'] .fader-value {
+  position: relative;
+  width: auto;
+  min-width: 22px;
+  padding-left: calc(var(--strip) + 12px);
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+  color: var(--led);
+  text-shadow: 0 0 5px rgba(255, 159, 28, 0.4);
+}
+
+[data-skin='deck'] .fader-value::before,
+[data-skin='deck'] .fader-value::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: var(--strip);
+  height: 6px;
+  margin-top: -3px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+
+/* Unlit: ten orange sockets, two coral. */
+[data-skin='deck'] .fader-value::before {
+  background-image:
+    repeating-linear-gradient(90deg, var(--led-off) 0 var(--seg), transparent var(--seg) var(--pitch)),
+    repeating-linear-gradient(90deg, var(--coral-dim) 0 var(--seg), transparent var(--seg) var(--pitch));
+  background-size:
+    calc(var(--pitch) * 10) 100%,
+    calc(var(--pitch) * 2) 100%;
+  background-position:
+    0 0,
+    calc(var(--pitch) * 10) 0;
+}
+
+/* Lit: the orange run, the coral run, and the peak hanging above them. */
+[data-skin='deck'] .fader-value::after {
+  background-image:
+    repeating-linear-gradient(90deg, var(--led) 0 var(--seg), transparent var(--seg) var(--pitch)),
+    repeating-linear-gradient(90deg, var(--coral) 0 var(--seg), transparent var(--seg) var(--pitch)),
+    linear-gradient(var(--led-hot), var(--led-hot)),
+    linear-gradient(var(--coral-hot), var(--coral-hot));
+  background-size:
+    calc(min(var(--lvl), 10) * var(--pitch)) 100%,
+    calc(max(var(--lvl) - 10, 0) * var(--pitch)) 100%,
+    calc(clamp(0, 10 - var(--pk), 1) * var(--seg)) 100%,
+    calc(clamp(0, var(--pk) - 9, 1) * var(--seg)) 100%;
+  background-position:
+    0 0,
+    calc(var(--pitch) * 10) 0,
+    calc(var(--pk) * var(--pitch)) 0,
+    calc(var(--pk) * var(--pitch)) 0;
+  filter: drop-shadow(0 0 3px rgba(255, 159, 28, 0.4));
+}
+
+/* A narrow mixer keeps its long throw: the LEDs and the name give way first. */
+@container (max-width: 640px) {
+  [data-skin='deck'] .fader {
+    --seg: 3px;
+    --pitch: 4px;
+    gap: 8px;
+  }
+
+  [data-skin='deck'] .fader-value {
+    padding-left: calc(var(--strip) + 8px);
+  }
+
+  [data-skin='deck'] .fader-name {
+    width: clamp(52px, 13cqw, 118px);
+  }
+}
+
+[data-skin='deck'] .fader.is-muted .fader-value::after {
+  opacity: 0.5;
+}
+
+[data-skin='deck'] .fader-rail {
+  height: 28px;
+}
+
+/* The unlit ladder. Same pitch as the lit one, both hung from the left edge. */
+[data-skin='deck'] .fader-rail::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4px;
+  height: 3px;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, var(--led-off) 0 3px, transparent 3px 9px);
+}
+
+/* The scale: minor ticks every tenth, majors at 0, 50 and 100. */
+[data-skin='deck'] .fader-rail::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(238, 240, 243, 0.5), rgba(238, 240, 243, 0.5)),
+    linear-gradient(rgba(238, 240, 243, 0.5), rgba(238, 240, 243, 0.5)),
+    linear-gradient(rgba(238, 240, 243, 0.5), rgba(238, 240, 243, 0.5)),
+    repeating-linear-gradient(90deg, rgba(238, 240, 243, 0.2) 0 1px, transparent 1px 10%);
+  background-size: 1px 6px, 1px 6px, 1px 6px, 100% 3px;
+  background-position: 0 100%, 50% 100%, 100% 100%, 0 100%;
+  background-repeat: no-repeat;
+}
+
+[data-skin='deck'] .fader-slot {
+  inset: 12px 0 11px;
+  border-radius: 1px;
+  background: #030405;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.95),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.9),
+    0 1px 0 var(--chamfer-hi);
+}
+
+[data-skin='deck'] .fader-fill {
+  top: 4px;
+  height: 3px;
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--led) 0 3px, transparent 3px 9px);
+  box-shadow: 0 0 6px rgba(255, 159, 28, 0.35);
+}
+
+[data-skin='deck'] .fader.is-muted .fader-fill {
+  background: repeating-linear-gradient(90deg, var(--coral) 0 3px, transparent 3px 9px);
+  opacity: 0.5;
+}
+
+[data-skin='deck'] .fader.is-muted .fader-mute {
+  color: var(--coral);
+}
+
+[data-skin='deck'] .fader-cap {
+  width: 14px;
+  height: 24px;
+  margin-left: -7px;
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #34373d 0%, #1d2025 50%, #0f1114 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+    0 3px 6px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='deck'] .fader-cap::after {
+  left: 50%;
+  right: auto;
+  top: 3px;
+  bottom: 3px;
+  height: auto;
+  width: 1.5px;
+  margin-left: -0.75px;
+  background: #f6f7f9;
+}
+
+[data-skin='deck'] .fader-rail:hover .fader-cap,
+[data-skin='deck'] .fader-rail.is-dragging .fader-cap {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.8),
+    0 3px 7px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(0, 0, 0, 0.9),
+    0 0 12px rgba(255, 159, 28, 0.22);
+}
+
+[data-skin='deck'] .fader.is-muted .fader-cap {
+  opacity: 0.7;
+}
+
+[data-skin='deck'] .fader-mute:hover {
+  color: var(--silk);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ── Right rail: tabs, queue, crate ────────────────────────────────────── */
+
+[data-skin='deck'] .right-tab {
+  border-radius: 3px;
+  letter-spacing: 0.22em;
+}
+
+[data-skin='deck'] .right-tab.is-active::after {
+  height: 2px;
+  background: var(--led);
+  box-shadow: var(--led-bloom);
+}
+
+[data-skin='deck'] .panel-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 0 16px 6px;
+  padding: 0 0 8px;
+}
+
+[data-skin='deck'] .qrow {
+  border-radius: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.032);
+}
+
+[data-skin='deck'] .qrow-main {
+  gap: 9px;
+  padding: 5px 8px 5px 12px;
+}
+
+[data-skin='deck'] .qrow:hover {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+[data-skin='deck'] .qrow.is-current {
+  background: linear-gradient(90deg, rgba(255, 77, 90, 0.1), rgba(255, 77, 90, 0.02));
+}
+
+/* The signal marks the record that is on. */
+[data-skin='deck'] .qrow.is-current .qrow-marker {
+  width: 3px;
+  background: var(--coral);
+  box-shadow: var(--coral-bloom);
+}
+
+[data-skin='deck'] .qrow.is-current .qrow-title {
+  color: var(--silk);
+}
+
+[data-skin='deck'] .qrow-title {
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+}
+
+[data-skin='deck'] .qrow-time {
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+  color: var(--led);
+  text-shadow: 0 0 5px rgba(255, 159, 28, 0.35);
+}
+
+[data-skin='deck'] .qrow-art,
+[data-skin='deck'] .sresult-art {
+  width: 32px;
+  height: 32px;
+  border-radius: 2px;
+  background: #0d0f11;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.9), 0 1px 0 var(--chamfer-hi);
+}
+
+[data-skin='deck'] .qrow-art img,
+[data-skin='deck'] .sresult-art img,
+[data-skin='deck'] .crate-face img {
+  filter: saturate(0.92) contrast(1.08) brightness(0.94);
+}
+
+[data-skin='deck'] .qrow-art-glow {
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(255, 77, 90, 0.7);
+}
+
+[data-skin='deck'] .qrow-remove:hover {
+  background: rgba(255, 77, 90, 0.16);
+}
+
+[data-skin='deck'] .panel-empty-line {
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+}
+
+[data-skin='deck'] .panel-action.is-armed {
+  color: var(--coral);
+  background: rgba(255, 77, 90, 0.14);
+}
+
+/* Sleeves in chamfered black frames. */
+[data-skin='deck'] .crate-face {
+  border-radius: 3px;
+  border: 3px solid #121417;
+  background: #0d0f11;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.9),
+    0 1px 0 var(--chamfer-hi),
+    0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .crate-item:hover .crate-face:not(:disabled) {
+  border-color: #1a1d21;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 0 1px rgba(255, 159, 28, 0.35),
+    0 8px 20px rgba(0, 0, 0, 0.7),
+    0 0 18px rgba(255, 159, 28, 0.12);
+}
+
+[data-skin='deck'] .crate-item:hover .crate-face img {
+  filter: saturate(1) contrast(1.06) brightness(1.02);
+}
+
+[data-skin='deck'] .crate-wear {
+  background-image: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+[data-skin='deck'] .crate-bill-title {
+  font-size: 14px;
+  line-height: 1.12;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+[data-skin='deck'] .ground-walnut { background: linear-gradient(152deg, #2b2f35, #131518); }
+[data-skin='deck'] .ground-burgundy { background: linear-gradient(152deg, #2a2e34, #111316); }
+[data-skin='deck'] .ground-olive { background: linear-gradient(152deg, #262c31, #0f1215); }
+[data-skin='deck'] .ground-wine { background: linear-gradient(152deg, #212429, #0d0f11); }
+
+[data-skin='deck'] .ground-mustard {
+  background: linear-gradient(152deg, #2f3339, #141619);
+}
+
+[data-skin='deck'] .ground-mustard .crate-bill-title {
+  color: var(--led);
+}
+
+[data-skin='deck'] .ground-mustard .crate-bill-mark {
+  color: rgba(255, 159, 28, 0.55);
+}
+
+[data-skin='deck'] .crate-tool,
+[data-skin='deck'] .sresult-tool {
+  border-radius: 2px;
+  background: rgba(11, 12, 14, 0.9);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+[data-skin='deck'] .crate-tool:hover,
+[data-skin='deck'] .sresult-tool:hover {
+  background: var(--led);
+  color: #0b0c0e;
+}
+
+/* ── Search ────────────────────────────────────────────────────────────── */
+
+[data-skin='deck'] .search-scrim {
+  background: rgba(7, 8, 10, 0.96);
+}
+
+[data-skin='deck'] .search-bar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+[data-skin='deck'] .search-bar:focus-within {
+  border-bottom-color: var(--led);
+  box-shadow: 0 1px 0 rgba(255, 159, 28, 0.3), 0 6px 18px -8px rgba(255, 159, 28, 0.35);
+}
+
+[data-skin='deck'] .search-input {
+  caret-color: var(--led);
+}
+
+[data-skin='deck'] .search-input::placeholder {
+  font-style: normal;
+  color: var(--cream-ghost);
+}
+
+[data-skin='deck'] .search-prompt,
+[data-skin='deck'] .panel-empty-line {
+  font-style: normal;
+}
+
+[data-skin='deck'] .search-section-head {
+  letter-spacing: 0.24em;
+  color: var(--led);
+  opacity: 0.9;
+}
+
+[data-skin='deck'] .sresult {
+  border-radius: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.032);
+}
+
+[data-skin='deck'] .linkcard {
+  border-radius: 4px;
+  background: var(--panel-raised);
+  box-shadow: inset 0 1px 0 var(--chamfer-hi), 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .linkcard-btn {
+  border-radius: 3px;
+  background: var(--led);
+  color: #0b0c0e;
+}
+
+[data-skin='deck'] .linkcard-btn:hover {
+  background: var(--led-hot);
+}
+
+[data-skin='deck'] .linkcard-dot {
+  background: var(--led);
+}
+
+/* ── Status, curtains, boundary ────────────────────────────────────────── */
+
+[data-skin='deck'] .status-pill {
+  border-radius: 3px;
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  background: rgba(11, 12, 14, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09), 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .status-pill.is-bad {
+  color: var(--coral-hot);
+  box-shadow: inset 0 0 0 1px rgba(255, 77, 90, 0.45), 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .curtain,
+[data-skin='deck'] .boundary {
+  background: linear-gradient(180deg, #16181c, #0b0c0e);
+}
+
+[data-skin='deck'] .curtain-title,
+[data-skin='deck'] .boundary-title {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+[data-skin='deck'] .curtain-btn,
+[data-skin='deck'] .boundary-btn {
+  border-radius: 4px;
+  background: linear-gradient(180deg, #2b2e34, #15171b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.11), 0 2px 6px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.85);
+}
+
+[data-skin='deck'] .curtain-btn:hover:not(:disabled),
+[data-skin='deck'] .boundary-btn:hover {
+  color: var(--led);
+}
+
+[data-skin='deck'] .boundary-label {
+  color: var(--coral);
+}
+
+/* ── Scrollbars, selection, focus ──────────────────────────────────────── */
+
+[data-skin='deck'] .scroll {
+  scrollbar-color: rgba(238, 240, 243, 0.16) transparent;
+}
+
+[data-skin='deck'] .scroll::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+  background: rgba(238, 240, 243, 0.14);
+  background-clip: padding-box;
+}
+
+[data-skin='deck'] .scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 159, 28, 0.45);
+  background-clip: padding-box;
+}
+
+[data-skin='deck'] ::selection {
+  background: rgba(255, 159, 28, 0.32);
+  color: var(--silk);
+}
+
+[data-skin='deck'] :focus-visible {
+  outline: 1px solid var(--led);
+  outline-offset: 2px;
+}

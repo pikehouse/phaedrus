@@ -1,0 +1,749 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   DECK — the controller surface and the things that only exist on it.
+
+   Shared components are re-pointed in skin-deck.css; this file owns the new
+   structure: the panel, the two display strips, the jog wheel, the pads and
+   the meter bridge. Every colour here comes from the [data-skin='deck']
+   block, which is the only place these classes are ever rendered.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The stage becomes one slab ────────────────────────────────────────── */
+
+.stage-deck .stage-scroll {
+  align-items: stretch;
+  padding: 0;
+}
+
+.stage-deck .stage-body {
+  width: 100%;
+  max-width: none;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── The panel ─────────────────────────────────────────────────────────── */
+
+.deck {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: safe center;
+  gap: clamp(8px, 1.7vh, 20px);
+  padding: clamp(10px, 1.9vh, 24px) clamp(16px, 3cqw, 42px) clamp(8px, 1.5vh, 20px);
+  /* Anodised black, brushed at a 1px pitch with almost no contrast, a hair
+     lighter at the top where the key light lands. */
+  background:
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0 1px, rgba(0, 0, 0, 0.04) 1px 2px),
+    linear-gradient(180deg, #16181c 0%, #101215 44%, #0b0c0e 100%);
+  box-shadow:
+    inset 0 1px 0 var(--chamfer-hi),
+    inset 0 -1px 0 var(--chamfer-lo);
+}
+
+/* Silkscreen: condensed caps, letterspaced, printed white or grey. */
+.deck-silk {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  white-space: nowrap;
+}
+
+.deck-silk b {
+  font-weight: inherit;
+  color: var(--silk);
+}
+
+/* ── Badge row ─────────────────────────────────────────────────────────── */
+
+.deck-head {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-height: 20px;
+  padding: 0 2px;
+  flex: none;
+}
+
+.deck-model {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deck-model b {
+  font-variation-settings: 'wdth' 80, 'wght' 800;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.deck-model-legend {
+  font-variation-settings: 'wdth' 78, 'wght' 500;
+  letter-spacing: 0.16em;
+  color: rgba(238, 240, 243, 0.34);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deck-lamps {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+  flex: none;
+}
+
+.deck-lamp {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+}
+
+.deck-lamp i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--led-off);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.deck-lamp.is-on i {
+  background: var(--led-hot);
+  box-shadow: var(--led-bloom);
+}
+
+/* Brushed chrome, clipped to extended type — the mark on the top corner. */
+.deck-brand {
+  flex: none;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 125, 'wght' 700;
+  font-size: 15px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.85));
+}
+
+/* ── Display strips ────────────────────────────────────────────────────── */
+
+.deck-strips {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: none;
+}
+
+/* The bezel: a raised black frame with a chamfer, the glass sunk into it. */
+.dwave {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 3px;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #24272d 0%, #14161a 55%, #0c0d10 100%);
+  box-shadow:
+    inset 0 1px 0 var(--chamfer-hi),
+    inset 0 -1px 0 var(--chamfer-lo),
+    0 3px 10px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(0, 0, 0, 0.8);
+}
+
+.dwave-glass {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 3px;
+  background: radial-gradient(130% 150% at 18% -30%, #15171b 0%, #0a0b0d 46%, #050607 100%);
+  box-shadow:
+    inset 0 2px 9px rgba(0, 0, 0, 0.9),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.95);
+}
+
+.dwave-a .dwave-glass {
+  height: clamp(60px, 10vh, 92px);
+}
+
+.dwave-b .dwave-glass {
+  height: clamp(46px, 7.6vh, 70px);
+}
+
+/* Deck B is loaded, not playing: everything on it sits back. */
+.dwave-b .dwave-head,
+.dwave-b .dwave-body {
+  opacity: 0.62;
+}
+
+/* One soft diagonal off the smoked glass. */
+.dwave-reflect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    112deg,
+    transparent 22%,
+    rgba(255, 255, 255, 0.028) 34%,
+    rgba(255, 255, 255, 0.05) 42%,
+    rgba(255, 255, 255, 0.014) 50%,
+    transparent 62%
+  );
+}
+
+.dwave-head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 18px;
+  padding: 5px 10px 0;
+  flex: none;
+}
+
+.dwave-badge {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 2px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 90, 'wght' 800;
+  font-size: 8.5px;
+  color: #0b0c0e;
+  background: var(--led);
+  box-shadow: var(--led-bloom);
+}
+
+.dwave-b .dwave-badge,
+.is-empty .dwave-badge {
+  color: var(--silk-dim);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.dwave-title {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--silk);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.dwave-artist {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 500;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dwave-tag {
+  margin-left: auto;
+  flex: none;
+  font-family: var(--face);
+  font-variant-numeric: tabular-nums;
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--led);
+  text-shadow: 0 0 5px rgba(255, 159, 28, 0.45);
+}
+
+.dwave-tag.is-live {
+  padding: 1px 5px 2px;
+  border-radius: 2px;
+  color: #0b0c0e;
+  background: var(--led);
+  box-shadow: var(--led-bloom);
+  text-shadow: none;
+  animation: dwave-live 2.6s var(--ease-soft) infinite;
+}
+
+@keyframes dwave-live {
+  0%,
+  100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.dwave-body {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  flex: 1;
+  min-height: 0;
+  padding: 3px 10px 6px;
+}
+
+/* The clocks at the ends. Fixed width, so a digit change never moves the wave. */
+.dwave-readout {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: none;
+  width: 52px;
+}
+
+.dwave-readout-end {
+  justify-content: flex-end;
+  width: 60px;
+}
+
+.dwave-seg {
+  height: 13px;
+}
+
+/* The wave field. Two copies of one path: dim behind, lit clipped in front. */
+.dwave-field {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  touch-action: none;
+}
+
+.dwave-field[role='slider'] {
+  cursor: pointer;
+}
+
+.dwave-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.dwave-dim path {
+  fill: var(--coral-dim);
+}
+
+.dwave-lit path {
+  fill: var(--coral);
+}
+
+.dwave-lit {
+  filter: drop-shadow(0 0 2px rgba(255, 77, 90, 0.6)) drop-shadow(0 0 7px rgba(255, 77, 90, 0.22));
+}
+
+.dwave-centre {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(255, 77, 90, 0.16);
+  pointer-events: none;
+}
+
+.dwave-playhead {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 1px;
+  margin-left: -0.5px;
+  background: #ffffff;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.75), 0 0 1px #fff;
+  pointer-events: none;
+}
+
+.is-scrubbing .dwave-playhead {
+  width: 2px;
+  margin-left: -1px;
+}
+
+/* A stream has no programme, only a bed that breathes. */
+.is-live .dwave-dim path {
+  fill: rgba(255, 77, 90, 0.66);
+}
+
+.is-live .dwave-dim {
+  transform-origin: 50% 50%;
+  animation: dwave-breathe 4.4s ease-in-out infinite;
+}
+
+@keyframes dwave-breathe {
+  0%,
+  100% { transform: scaleY(0.82); opacity: 0.8; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+/* Dark glass, nothing on it. */
+.dwave-none {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  padding: 0 10px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(238, 240, 243, 0.3);
+}
+
+/* ── The controls row ──────────────────────────────────────────────────── */
+
+.deck-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 3cqw, 38px);
+  flex: none;
+  padding: 0 2px;
+}
+
+.deck-controls {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 18px);
+}
+
+/* The silkscreen hangs below each key; the box has to own that space. */
+.deck-transport {
+  padding-bottom: 14px;
+}
+
+/* ── The jog wheel ─────────────────────────────────────────────────────── */
+
+.jog {
+  --jog: clamp(200px, min(38vh, 42cqw), 350px);
+  position: relative;
+  width: var(--jog);
+  height: var(--jog);
+  flex: none;
+  border-radius: 50%;
+}
+
+/* The rim: black rubber with a fine radial grip, lit from the upper left. */
+.jog-rubber {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.045) 0deg 1deg, transparent 1deg 3deg),
+    radial-gradient(circle at 36% 28%, #2b2e34 0%, #191b1f 48%, #0d0e11 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -4px 10px rgba(0, 0, 0, 0.75),
+    0 14px 32px rgba(0, 0, 0, 0.72),
+    0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+/* The machined step between the rim and the LED ring. */
+.jog-rubber::after {
+  content: '';
+  position: absolute;
+  inset: 9.5%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 30%, #131519, #08090b 70%);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.jog-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 2px rgba(255, 159, 28, 0.5));
+}
+
+.jog-led {
+  stroke: var(--led-off);
+  stroke-width: 3;
+  stroke-linecap: butt;
+}
+
+.jog-led.is-lit {
+  stroke: var(--led);
+}
+
+.jog-arm {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+  pointer-events: none;
+}
+
+/* The marker rides on the ring at twelve o'clock and the arm turns it. */
+.jog-marker {
+  position: absolute;
+  left: 50%;
+  top: 7%;
+  width: 3.4%;
+  height: 4%;
+  margin-left: -1.7%;
+  border-radius: 1px;
+  background: rgba(255, 159, 28, 0.18);
+}
+
+/* Lit whenever a record is loaded — it turns while playing and coasts to a
+   stop when paused, and you can only see it coast if it stays on. */
+.jog:not(.is-idle) .jog-marker {
+  background: #fff1d6;
+  box-shadow:
+    0 0 3px #ffb648,
+    0 0 9px rgba(255, 159, 28, 0.9),
+    0 0 20px rgba(255, 159, 28, 0.45);
+}
+
+/* The centre display: the cover, round, behind a glass with one highlight. */
+.jog-centre {
+  position: absolute;
+  inset: 19.5%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(circle at 40% 30%, #17191d, #08090b 72%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.9),
+    inset 0 3px 12px rgba(0, 0, 0, 0.8),
+    0 0 0 2px #0a0b0d,
+    0 0 0 3px rgba(255, 255, 255, 0.07),
+    0 0 18px rgba(0, 0, 0, 0.8);
+}
+
+.jog-centre img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.jog-glass {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    linear-gradient(148deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04) 36%, transparent 52%),
+    radial-gradient(circle at 50% 50%, transparent 78%, rgba(0, 0, 0, 0.45) 100%);
+  pointer-events: none;
+}
+
+.jog-brand {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 125, 'wght' 700;
+  font-size: clamp(8px, 3.4cqw, 10px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  padding-left: 0.3em;
+}
+
+/* ── Hot cue pads ──────────────────────────────────────────────────────── */
+
+.pads {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pads-row {
+  display: flex;
+  gap: clamp(6px, 1.1cqw, 11px);
+  padding-bottom: 14px;
+}
+
+/* A rubber pad: a little taller than it is wide, as the real ones are deep. */
+.pad {
+  position: relative;
+  width: clamp(38px, 5.5cqw, 58px);
+  aspect-ratio: 1 / 1.14;
+  flex: none;
+  border-radius: 5px;
+  background: linear-gradient(180deg, #25282d 0%, #17191d 58%, #101216 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.65),
+    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.85);
+  transition: transform 90ms var(--ease);
+}
+
+.pad:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Lit: pink rubber, the LED under it blooming through. */
+.pad.is-loaded {
+  background: radial-gradient(circle at 50% 34%, #ff7aa6 0%, var(--pad) 52%, #b8215a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 5px rgba(110, 0, 44, 0.65),
+    0 0 8px rgba(255, 60, 120, 0.55),
+    0 0 20px rgba(255, 60, 120, 0.22),
+    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.85);
+}
+
+.pad.is-loaded:hover {
+  background: radial-gradient(circle at 50% 34%, #ff8fb4 0%, #ff4f88 52%, #c42863 100%);
+}
+
+.pad.is-current {
+  background: radial-gradient(circle at 50% 34%, #ffb0c9 0%, #ff5c92 48%, #d02a68 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -3px 5px rgba(110, 0, 44, 0.5),
+    0 0 12px rgba(255, 60, 120, 0.85),
+    0 0 30px rgba(255, 60, 120, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.85);
+  animation: pad-breathe 4s ease-in-out infinite;
+}
+
+@keyframes pad-breathe {
+  0%,
+  100% { filter: brightness(1); }
+  50% { filter: brightness(0.82); }
+}
+
+.pad-n {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  text-align: center;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--silk-dim);
+  pointer-events: none;
+}
+
+.pad.is-current .pad-n {
+  color: var(--silk);
+}
+
+.pads-foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pads-queue {
+  font-variant-numeric: tabular-nums;
+}
+
+.pads-queue b {
+  color: var(--led);
+  text-shadow: 0 0 5px rgba(255, 159, 28, 0.45);
+}
+
+/* ── Narrow stages: the transport drops under the jog ──────────────────── */
+
+@container (max-width: 640px) {
+  .deck-model-legend {
+    display: none;
+  }
+
+  .deck-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    row-gap: clamp(8px, 1.6vh, 16px);
+  }
+
+  /* The column dissolves: the pads sit beside the jog, the transport takes
+     the full width of the next line. */
+  .deck-controls {
+    display: contents;
+  }
+
+  .pads {
+    flex: 1;
+    min-width: 0;
+    order: 2;
+    align-self: center;
+  }
+
+  .deck-transport {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .pads-row {
+    flex-wrap: wrap;
+  }
+
+  /* Six pads, two rows of three. */
+  .pad:nth-child(n + 7) {
+    display: none;
+  }
+
+  .dwave-a .dwave-glass {
+    height: clamp(54px, 8.6vh, 78px);
+  }
+
+  .dwave-b .dwave-glass {
+    height: clamp(40px, 6.4vh, 60px);
+  }
+
+  .dwave-readout {
+    width: 48px;
+  }
+
+  .dwave-readout-end {
+    width: 56px;
+  }
+}
+
+/* Short windows: the strips give up their height before anything else. */
+@media (max-height: 740px) {
+  .deck {
+    gap: clamp(7px, 1.4vh, 14px);
+  }
+
+  .dwave-a .dwave-glass {
+    height: clamp(52px, 8.4vh, 76px);
+  }
+
+  .dwave-b .dwave-glass {
+    height: clamp(38px, 6.2vh, 58px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pad.is-current,
+  .is-live .dwave-dim,
+  .dwave-tag.is-live {
+    animation: none;
+  }
+}
