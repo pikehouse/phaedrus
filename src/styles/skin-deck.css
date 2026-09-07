@@ -27,13 +27,13 @@
   --led: #ff9f1c;
   --led-hot: #ffb648;
   --led-off: rgba(255, 159, 28, 0.12);
-  --led-bloom: 0 0 6px rgba(255, 159, 28, 0.6), 0 0 16px rgba(255, 159, 28, 0.25);
+  --led-bloom: 0 0 4px rgba(255, 159, 28, 0.34), 0 0 12px rgba(255, 159, 28, 0.12);
 
   /* Coral: the signal. */
   --coral: #ff4d5a;
   --coral-hot: #ff7a82;
   --coral-dim: rgba(255, 77, 90, 0.3);
-  --coral-bloom: 0 0 6px rgba(255, 77, 90, 0.55), 0 0 16px rgba(255, 77, 90, 0.22);
+  --coral-bloom: 0 0 4px rgba(255, 77, 90, 0.3), 0 0 12px rgba(255, 77, 90, 0.1);
 
   /* One pink, for the pads only. */
   --pad: #ff3c78;
@@ -671,11 +671,30 @@
     calc(var(--pitch) * 10) 0;
 }
 
-/* Lit: the orange run, the coral run, and the peak hanging above them. */
+/* The meter's level and peak are numbers the driver writes onto each row;
+   registering them lets the strip glide between steps instead of snapping. */
+@property --lvl {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --pk {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+[data-skin='deck'] .faceplate .fader {
+  transition: --lvl 220ms ease-out, --pk 500ms ease-out;
+}
+
+/* Lit: the orange run, the coral run, and the peak hanging above them.
+   Warmer than the panel LEDs — this is light through smoked plastic. */
 [data-skin='deck'] .fader-value::after {
   background-image:
-    repeating-linear-gradient(90deg, var(--led) 0 var(--seg), transparent var(--seg) var(--pitch)),
-    repeating-linear-gradient(90deg, var(--coral) 0 var(--seg), transparent var(--seg) var(--pitch)),
+    repeating-linear-gradient(90deg, #ffb658 0 var(--seg), transparent var(--seg) var(--pitch)),
+    repeating-linear-gradient(90deg, #ff7676 0 var(--seg), transparent var(--seg) var(--pitch)),
     linear-gradient(var(--led-hot), var(--led-hot)),
     linear-gradient(var(--coral-hot), var(--coral-hot));
   background-size:

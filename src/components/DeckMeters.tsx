@@ -22,7 +22,7 @@ const ROWS = 12;
 const FRAME_MS = 33;
 const ATTACK_S = 0.35;
 const RELEASE_S = 0.9;
-const PEAK_FALL = 0.6; // units of full scale per second
+const PEAK_FALL = 0.28; // units of full scale per second — a slow trickle
 
 const NONE: MemberVolume[] = [];
 
@@ -95,14 +95,16 @@ export default function DeckMeters() {
       t += dt;
       gain = play.current ? Math.min(1, gain + dt / ATTACK_S) : Math.max(0, gain - dt / RELEASE_S);
       const env = 0.72 + 0.28 * Math.sin(t * swell + 0.7);
-      const kick = Math.exp(-((t % beat) / beat) * 7);
+      const kick = Math.exp(-((t % beat) / beat) * 4);
       for (let c = 0; c < n; c++) {
         const v = voice[c];
-        noise[c] = noise[c] * 0.86 + (Math.random() - 0.5) * 0.26;
+        noise[c] = noise[c] * 0.93 + (Math.random() - 0.5) * 0.14;
         const tone = 0.5 + Math.sin(t * v.w1 + v.p1) * 0.26 + Math.sin(t * v.w2 + v.p2) * 0.14 + noise[c] * 0.45;
-        const target = Math.max(0, Math.min(1, (tone * env * 0.78 + kick * 0.36) * gain * (gains.current[c] ?? 0)));
+        const target = Math.max(0, Math.min(1, (tone * env * 0.8 + kick * 0.2) * gain * (gains.current[c] ?? 0)));
         // Snaps up, sags down — LED meter ballistics.
-        level[c] = target > level[c] ? target : level[c] + (target - level[c]) * Math.min(1, dt * 8);
+        // Gentle both ways: a soft rise, and a slow trickle back down.
+        const rate = target > level[c] ? 5 : 2.2;
+        level[c] += (target - level[c]) * Math.min(1, dt * rate);
         peak[c] = level[c] > peak[c] ? level[c] : Math.max(0, peak[c] - dt * PEAK_FALL);
       }
     };

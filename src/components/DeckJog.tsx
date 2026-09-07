@@ -6,9 +6,11 @@ import '../styles/deck.css';
 const SEGMENTS = 60;
 // 33⅓ rpm is one turn every 1.8s — the real speed, since this is a jog wheel
 // and not a record you watch from across the room.
-const DEG_PER_SEC = 200;
-const TAU_UP = 0.6; // ≈2s to reach speed
-const TAU_DOWN = 0.9; // ≈3s to coast to rest — heavier than it starts
+// Real 33⅓ was too fast to look at on a marker this bright; this is a
+// lazy turn every ~6s, matching the hi-fi record's pace.
+const DEG_PER_SEC = 60;
+const TAU_UP = 0.8; // ≈2.5s to reach speed
+const TAU_DOWN = 1.1; // ≈3.5s to coast to rest — heavier than it starts
 
 /** Sixty radial LED bars, the first one centred just past twelve o'clock. */
 const RING = Array.from({ length: SEGMENTS }, (_, i) => {
