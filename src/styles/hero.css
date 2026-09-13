@@ -4,7 +4,7 @@
    so what you see is the label and the right-hand crescent turning. */
 
 .hero {
-  --sleeve: clamp(180px, min(36vh, 57cqw), 372px);
+  --sleeve: var(--hifi-sleeve, clamp(180px, min(36vh, 57cqw), 372px));
   --disc: calc(var(--sleeve) * 0.94);
   --peek: 0.66;
   position: relative;

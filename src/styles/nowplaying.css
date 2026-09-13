@@ -37,7 +37,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: clamp(14px, 2.4vh, 26px);
-  width: calc(clamp(180px, min(36vh, 57cqw), 372px) * 1.6204);
+  width: calc(var(--hifi-sleeve, clamp(180px, min(36vh, 57cqw), 372px)) * 1.6204);
   max-width: 100%;
   margin: auto 0;
 }
@@ -241,5 +241,20 @@
 @container (max-width: 560px) {
   .faceplate-brand {
     display: none;
+  }
+}
+
+/* ── Hi-Fi on desktop: size the jacket from the height the stage really has,
+   so the lockup, progress and transport always sit above the faceplate however
+   many rooms it holds. The scroll area becomes a size container; the ~430px is
+   the overline, a two-line title, artist, album, progress, transport and gaps. */
+html[data-skin='hifi']:not([data-shell='phone']) .stage > .stage-scroll {
+  container-type: size;
+  --hifi-sleeve: clamp(150px, min(36vh, 57cqw, calc(100cqh - 430px)), 372px);
+}
+
+@media (max-height: 760px) {
+  html[data-skin='hifi']:not([data-shell='phone']) .stage > .stage-scroll {
+    --hifi-sleeve: clamp(140px, min(36vh, 57cqw, calc(100cqh - 360px)), 372px);
   }
 }
