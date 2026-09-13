@@ -2,7 +2,7 @@
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Phaedrus",
   "version": "0.1.0",
-  "identifier": "com.phaedrus.app",
+  "identifier": "com.jrtipton.phaedrus",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -23,7 +23,9 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' art: http://art.localhost data: blob:; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost art: http://art.localhost",
+      "devCsp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' art: http://art.localhost data: blob:; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost art: http://art.localhost ws://localhost:1420 ws://[::1]:1420 http://localhost:1420 ws:",
+      "dangerousDisableAssetCspModification": ["style-src"]
     }
   },
   "bundle": {
@@ -37,7 +39,10 @@
       "icons/icon.ico"
     ],
     "macOS": {
-      "minimumSystemVersion": "12.0"
+      "minimumSystemVersion": "13.3"
+    },
+    "iOS": {
+      "minimumSystemVersion": "16.4"
     }
   }
 }

@@ -1,8 +1,8 @@
 name: phaedrus
 options:
-  bundleIdPrefix: com.phaedrus.app
+  bundleIdPrefix: com.jrtipton.phaedrus
   deploymentTarget:
-    iOS: 14.0
+    iOS: "16.4"
 fileGroups: [../../src]
 configs:
   debug: debug
@@ -11,7 +11,7 @@ settingGroups:
   app:
     base:
       PRODUCT_NAME: Phaedrus
-      PRODUCT_BUNDLE_IDENTIFIER: com.phaedrus.app
+      PRODUCT_BUNDLE_IDENTIFIER: com.jrtipton.phaedrus
       CODE_SIGN_STYLE: Automatic
 targetTemplates:
   app:
@@ -45,8 +45,6 @@ targets:
         UIRequiredDeviceCapabilities: [arm64, metal]
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationLandscapeLeft
-          - UIInterfaceOrientationLandscapeRight
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationPortraitUpsideDown
