@@ -44,6 +44,38 @@ export default function DeckWave({ deck, title, artist, seed, position, duration
     !live && pos !== undefined && duration > 0 ? Math.max(0, Math.min(1, pos / duration)) : undefined;
   const seekable = !!onSeek && !live && duration > 0;
 
+  // The strip re-renders at ~10fps for the playhead; the segment clocks and
+  // the waveform only change once a second (or once a track), so hold them.
+  const whole = pos === undefined ? undefined : Math.floor(pos);
+  const elapsedClock = useMemo(
+    () =>
+      whole === undefined ? null : (
+        <TunerSegment14 text={clock(whole)} className="dwave-seg" label={`${mmss(whole)} elapsed`} />
+      ),
+    [whole],
+  );
+  const remainingClock = useMemo(
+    () =>
+      whole === undefined || played === undefined ? null : (
+        <TunerSegment14
+          text={`-${clock(Math.max(0, duration - whole))}`}
+          className="dwave-seg"
+          label={`${mmss(Math.max(0, duration - whole))} remaining`}
+        />
+      ),
+    // `played` only matters for whether the end clock exists at all.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [whole, duration, played === undefined],
+  );
+  const dimWave = useMemo(
+    () => (
+      <svg className="dwave-svg dwave-dim" viewBox={`0 0 ${BARS} 64`} preserveAspectRatio="none" aria-hidden="true">
+        <path d={path} />
+      </svg>
+    ),
+    [path],
+  );
+
   const secsAt = useCallback(
     (clientX: number) => {
       const el = field.current;
@@ -105,9 +137,7 @@ export default function DeckWave({ deck, title, artist, seed, position, duration
 
             <div className="dwave-body">
               {pos !== undefined && (
-                <span className="dwave-readout">
-                  <TunerSegment14 text={clock(pos)} className="dwave-seg" label={`${mmss(pos)} elapsed`} />
-                </span>
+                <span className="dwave-readout">{elapsedClock}</span>
               )}
 
               <div
@@ -133,14 +163,7 @@ export default function DeckWave({ deck, title, artist, seed, position, duration
                     }
                   : { 'aria-hidden': true })}
               >
-                <svg
-                  className="dwave-svg dwave-dim"
-                  viewBox={`0 0 ${BARS} 64`}
-                  preserveAspectRatio="none"
-                  aria-hidden="true"
-                >
-                  <path d={path} />
-                </svg>
+                {dimWave}
                 {played !== undefined && (
                   <svg
                     className="dwave-svg dwave-lit"
@@ -159,13 +182,7 @@ export default function DeckWave({ deck, title, artist, seed, position, duration
               </div>
 
               {played !== undefined && pos !== undefined && (
-                <span className="dwave-readout dwave-readout-end">
-                  <TunerSegment14
-                    text={`-${clock(Math.max(0, duration - pos))}`}
-                    className="dwave-seg"
-                    label={`${mmss(Math.max(0, duration - pos))} remaining`}
-                  />
-                </span>
+                <span className="dwave-readout dwave-readout-end">{remainingClock}</span>
               )}
             </div>
           </>
