@@ -5,6 +5,7 @@ use serde_json::Value;
 
 use super::error::{Error, Result};
 use super::model::{ItemKind, MediaItem, ServiceId};
+use super::soap::is_digits;
 
 const BASE: &str = "https://itunes.apple.com";
 
@@ -76,7 +77,8 @@ async fn get_json(http: &reqwest::Client, url: &str) -> Result<Value> {
         return Err(Error::other("Apple's catalog is rate-limiting us — try again in a moment"));
     }
     if !status.is_success() {
-        return Err(Error::Status(status.as_u16()));
+        let text = resp.text().await.unwrap_or_default();
+        return Err(Error::status(status.as_u16(), &text));
     }
     let text = resp.text().await?;
     Ok(serde_json::from_str(&text)?)
@@ -110,6 +112,9 @@ pub async fn search(http: &reqwest::Client, term: &str, country: &str) -> Result
 }
 
 pub async fn artist_albums(http: &reqwest::Client, artist_id: &str, country: &str) -> Result<Vec<MediaItem>> {
+    if !is_digits(artist_id) {
+        return Err(Error::other("not an Apple Music artist id"));
+    }
     let v = get_json(http, &format!("{BASE}/lookup?id={artist_id}&entity=album&limit=80&country={country}")).await?;
     // The lookup also returns compilations the artist merely appears on; keep their own.
     let mut albums: Vec<MediaItem> = results(&v)

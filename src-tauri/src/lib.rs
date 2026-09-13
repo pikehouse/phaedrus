@@ -12,12 +12,48 @@ use art::ArtCache;
 use sonos::system::SonosSystem;
 use store::Store;
 
+/// Lock a std mutex, shrugging off poisoning: a panic in one command shouldn't
+/// take every later command down with it, and no critical section here leaves
+/// its data half-updated.
+pub(crate) fn lock<T>(m: &std::sync::Mutex<T>) -> std::sync::MutexGuard<'_, T> {
+    m.lock().unwrap_or_else(|e| e.into_inner())
+}
+
+/// The bundle identifier used to be com.phaedrus.app. Bring the settings file
+/// along once; the old art cache is only a cache, so just remove it.
+#[cfg(target_os = "macos")]
+fn migrate_from_old_identifier<R: tauri::Runtime>(paths: &tauri::path::PathResolver<R>) {
+    const OLD_ID: &str = "com.phaedrus.app";
+    if let (Ok(data), Ok(new_dir)) = (paths.data_dir(), paths.app_data_dir()) {
+        let old_dir = data.join(OLD_ID);
+        let (old, new) = (old_dir.join("phaedrus.json"), new_dir.join("phaedrus.json"));
+        if old_dir != new_dir && !new.exists() && old.exists() {
+            match std::fs::create_dir_all(&new_dir).and_then(|_| std::fs::rename(&old, &new)) {
+                Ok(()) => {
+                    log::info!("moved settings from {} to {}", old.display(), new.display());
+                    let _ = std::fs::remove_dir(&old_dir); // only succeeds if now empty
+                }
+                Err(e) => log::warn!("couldn't move settings from {}: {e}", old.display()),
+            }
+        }
+    }
+    if let (Ok(cache), Ok(new_cache)) = (paths.cache_dir(), paths.app_cache_dir()) {
+        let old_cache = cache.join(OLD_ID);
+        if old_cache != new_cache && old_cache.join("art").exists() {
+            let _ = std::fs::remove_dir_all(old_cache.join("art"));
+            let _ = std::fs::remove_dir(&old_cache);
+        }
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let _ = env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("phaedrus=info")).try_init();
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
+            #[cfg(target_os = "macos")]
+            migrate_from_old_identifier(app.path());
             let path = app.path().app_data_dir().ok().map(|d| d.join("phaedrus.json"));
             let system = Arc::new(SonosSystem::new(Store::load(path)));
             app.manage(system);
@@ -37,11 +73,22 @@ pub fn run() {
                 let target = url::Url::parse(&uri)
                     .ok()
                     .and_then(|u| u.query_pairs().find(|(k, _)| k == "u").map(|(_, v)| v.into_owned()))
-                    .filter(|u| u.starts_with("http://") || u.starts_with("https://"));
+                    .and_then(|u| url::Url::parse(&u).ok());
                 let Some(target) = target else {
                     responder.respond(Response::builder().status(StatusCode::BAD_REQUEST).body(Vec::new()).unwrap());
                     return;
                 };
+                if !art::allowed(&target) {
+                    log::debug!("art: refusing {target}");
+                    responder.respond(
+                        Response::builder()
+                            .status(StatusCode::FORBIDDEN)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .body(Vec::new())
+                            .unwrap(),
+                    );
+                    return;
+                }
                 let cache = app.state::<Arc<ArtCache>>();
                 match cache.get(&target).await {
                     Ok(bytes) => {

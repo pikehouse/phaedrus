@@ -10,19 +10,46 @@ pub struct BrowseResult {
     pub total: u32,
 }
 
+/// Sonos returns at most this many items per Browse.
+const PAGE: u32 = 100;
+
+/// Next (StartingIndex, RequestedCount) when `got` of `want` items starting at
+/// `start` have arrived and the speaker reported `total` matches; None when done.
+fn next_page(start: u32, want: u32, got: u32, total: Option<u32>) -> Option<(u32, u32)> {
+    if got >= want {
+        return None;
+    }
+    let index = start.checked_add(got)?;
+    if total.is_some_and(|t| index >= t) {
+        return None;
+    }
+    Some((index, (want - got).min(PAGE)))
+}
+
+/// Up to `count` children of `object_id` from `start`, fetched in pages.
 pub async fn browse(soap: &SoapClient, ip: &str, object_id: &str, start: u32, count: u32) -> Result<BrowseResult> {
-    let (s, c) = (start.to_string(), count.to_string());
-    let r = soap
-        .call(
-            ip,
-            Service::ContentDirectory,
-            "Browse",
-            &[("ObjectID", object_id), ("BrowseFlag", "BrowseDirectChildren"), ("Filter", "*"), ("StartingIndex", &s), ("RequestedCount", &c), ("SortCriteria", "")],
-        )
-        .await?;
-    let items = didl::parse_items(r.get_or_empty("Result"));
-    let total = r.get_u32("TotalMatches").unwrap_or(items.len() as u32);
-    Ok(BrowseResult { items, total })
+    let mut items = Vec::new();
+    let mut total = None;
+    while let Some((index, requested)) = next_page(start, count, items.len() as u32, total) {
+        let (s, c) = (index.to_string(), requested.to_string());
+        let r = soap
+            .call(
+                ip,
+                Service::ContentDirectory,
+                "Browse",
+                &[("ObjectID", object_id), ("BrowseFlag", "BrowseDirectChildren"), ("Filter", "*"), ("StartingIndex", &s), ("RequestedCount", &c), ("SortCriteria", "")],
+            )
+            .await?;
+        let page = didl::parse_items(r.get_or_empty("Result"));
+        let n = page.len() as u32;
+        // No TotalMatches: assume this reply held everything that's left.
+        total = Some(r.get_u32("TotalMatches").unwrap_or(index.saturating_add(n)));
+        items.extend(page);
+        if n == 0 {
+            break;
+        }
+    }
+    Ok(BrowseResult { items, total: total.unwrap_or(0) })
 }
 
 pub async fn queue(soap: &SoapClient, ip: &str, start: u32, count: u32) -> Result<QueuePage> {
@@ -84,4 +111,22 @@ pub async fn favorites(soap: &SoapClient, ip: &str) -> Result<Vec<Favorite>> {
         .collect();
     out.sort_by_key(|f| f.title.to_lowercase());
     Ok(out)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::next_page;
+
+    #[test]
+    fn paging_asks_in_hundreds_until_count_or_total() {
+        assert_eq!(next_page(0, 200, 0, None), Some((0, 100)));
+        assert_eq!(next_page(0, 200, 100, Some(250)), Some((100, 100)));
+        assert_eq!(next_page(0, 200, 200, Some(250)), None, "count reached");
+        assert_eq!(next_page(0, 500, 200, Some(250)), Some((200, 100)));
+        assert_eq!(next_page(0, 500, 250, Some(250)), None, "total exhausted");
+        assert_eq!(next_page(10, 30, 0, None), Some((10, 30)));
+        assert_eq!(next_page(0, 200, 40, Some(40)), None);
+        assert_eq!(next_page(0, 0, 0, None), None);
+        assert_eq!(next_page(u32::MAX, 10, 1, None), None, "no overflow");
+    }
 }

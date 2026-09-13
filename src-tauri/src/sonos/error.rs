@@ -4,8 +4,8 @@ use thiserror::Error;
 pub enum Error {
     #[error("network: {0}")]
     Http(#[from] reqwest::Error),
-    #[error("speaker returned HTTP {0}")]
-    Status(u16),
+    #[error("speaker returned HTTP {code}")]
+    Status { code: u16, body: String },
     #[error("UPnP error {code} during {action}")]
     Upnp { code: u32, action: String },
     #[error("unexpected response from speaker: {0}")]
@@ -30,6 +30,15 @@ impl Error {
     }
     pub fn parse(msg: impl Into<String>) -> Self {
         Error::Parse(msg.into())
+    }
+    /// Non-2xx reply. Keeps (and logs) the start of the body, which is usually
+    /// the only clue to what went wrong.
+    pub fn status(code: u16, body: &str) -> Self {
+        let body: String = body.chars().take(300).collect();
+        if !body.trim().is_empty() {
+            log::warn!("HTTP {code}: {body}");
+        }
+        Error::Status { code, body }
     }
 }
 

@@ -1,6 +1,7 @@
 //! Minimal UPnP SOAP client for Sonos ZonePlayers.
 
 use std::collections::HashMap;
+use std::net::Ipv4Addr;
 use std::time::Duration;
 
 use super::error::{Error, Result};
@@ -109,6 +110,7 @@ impl SoapClient {
             urn = service.urn(),
             body = body
         );
+        let ip = check_ip(ip)?;
         let url = format!("http://{}:1400{}", ip, service.path());
         let resp = self
             .http
@@ -124,10 +126,26 @@ impl SoapClient {
             if let Some(code) = extract_upnp_error(&text) {
                 return Err(Error::Upnp { code, action: action.to_string() });
             }
-            return Err(Error::Status(status.as_u16()));
+            return Err(Error::status(status.as_u16(), &text));
         }
         parse_response(&text, action)
     }
+}
+
+/// Speaker addresses come from the webview; only a plain IPv4 address may be
+/// pasted into a URL.
+pub fn check_ip(ip: &str) -> Result<Ipv4Addr> {
+    ip.parse().map_err(|_| Error::other(format!("not a speaker address: {ip:?}")))
+}
+
+/// Catalog ids pasted into URIs and URLs (Apple Music track/album/artist ids).
+pub fn is_digits(s: &str) -> bool {
+    !s.is_empty() && s.bytes().all(|b| b.is_ascii_digit())
+}
+
+/// TuneIn station ids ("s10001").
+pub fn is_alnum(s: &str) -> bool {
+    !s.is_empty() && s.bytes().all(|b| b.is_ascii_alphanumeric())
 }
 
 fn extract_upnp_error(text: &str) -> Option<u32> {
@@ -159,7 +177,7 @@ pub fn parse_hms(s: &str) -> Option<u32> {
         // handle "0:03:40.500"
         let whole = part.split('.').next().unwrap_or("0");
         let n: u32 = whole.trim().parse().ok()?;
-        total = total * 60 + n;
+        total = total.checked_mul(60)?.checked_add(n)?;
     }
     Some(total)
 }

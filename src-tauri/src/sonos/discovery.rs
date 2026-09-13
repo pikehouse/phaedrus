@@ -29,7 +29,7 @@ pub fn local_interfaces() -> Vec<Iface> {
     let mut out = Vec::new();
     if let Ok(addrs) = if_addrs::get_if_addrs() {
         for a in addrs {
-            if a.is_loopback() {
+            if a.is_loopback() || is_virtual_iface(&a.name) {
                 continue;
             }
             if let if_addrs::IfAddr::V4(v4) = a.addr {
@@ -41,6 +41,13 @@ pub fn local_interfaces() -> Vec<Iface> {
         }
     }
     out
+}
+
+/// VPN tunnels, VM/container bridges, AirDrop and the like: sweeping them is
+/// slow and never finds a speaker.
+fn is_virtual_iface(name: &str) -> bool {
+    const PREFIXES: [&str; 7] = ["utun", "bridge", "vmnet", "docker", "llw", "awdl", "anpi"];
+    name == "ap1" || PREFIXES.iter().any(|p| name.starts_with(p))
 }
 
 fn prefix_len(mask: Ipv4Addr) -> u32 {
@@ -149,7 +156,8 @@ pub async fn sweep(tx: mpsc::Sender<Ipv4Addr>, per_host_timeout: Duration) {
     }
     log::info!("sweeping {} hosts on port 1400", hosts.len());
     futures::stream::iter(hosts)
-        .for_each_concurrent(256, |ip| {
+        // Stays under macOS's default 256 open-file soft limit.
+        .for_each_concurrent(128, |ip| {
             let tx = tx.clone();
             async move {
                 let addr = SocketAddrV4::new(ip, 1400);
@@ -185,9 +193,12 @@ pub async fn find_household(soap: &SoapClient, hints: &[String], overall: Durati
     let deadline = tokio::time::Instant::now() + overall;
     let mut tried = HashSet::new();
     let mut in_flight = futures::stream::FuturesUnordered::new();
+    // Once every producer is gone recv() is instantly ready with None; stop
+    // selecting on it or the loop spins while lookups are in flight.
+    let mut closed = false;
     let result = loop {
         tokio::select! {
-            maybe_ip = rx.recv() => {
+            maybe_ip = rx.recv(), if !closed => {
                 match maybe_ip {
                     Some(ip) => {
                         if tried.insert(ip) {
@@ -201,6 +212,7 @@ pub async fn find_household(soap: &SoapClient, hints: &[String], overall: Durati
                     }
                     None => {
                         // producers done; drain in-flight
+                        closed = true;
                         if in_flight.is_empty() { break Err(Error::NotFound); }
                     }
                 }
@@ -212,6 +224,9 @@ pub async fn find_household(soap: &SoapClient, hints: &[String], overall: Durati
                             break Ok((ip, xml.to_string()));
                         }
                     }
+                }
+                if closed && in_flight.is_empty() {
+                    break Err(Error::NotFound);
                 }
             }
             _ = tokio::time::sleep_until(deadline) => {

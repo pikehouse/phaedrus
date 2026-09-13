@@ -14,9 +14,10 @@ use super::items::{self, Accounts};
 use super::model::*;
 use super::rendering;
 use super::smapi::{Creds, ServiceDesc, SmapiClient};
-use super::soap::{Service, SoapClient};
+use super::soap::{check_ip, Service, SoapClient};
 use super::topology;
 use super::transport;
+use crate::lock;
 use crate::store::{SpotifyToken, Store};
 
 #[derive(Default)]
@@ -24,8 +25,11 @@ struct Runtime {
     household: Option<String>,
     known_ips: Vec<String>,
     models: HashMap<String, String>,
+    /// Cleared whenever the household changes, as are the learned accounts.
     services: Option<Vec<ServiceDesc>>,
     accounts_learned_at: u64,
+    /// ip → uuid for every player in the last topology.
+    uuids: HashMap<String, String>,
 }
 
 pub struct SonosSystem {
@@ -50,17 +54,17 @@ impl SonosSystem {
     }
 
     fn household(&self) -> Option<String> {
-        self.rt.lock().unwrap().household.clone()
+        lock(&self.rt).household.clone()
     }
 
     pub fn any_ip(&self) -> Option<String> {
-        self.rt.lock().unwrap().known_ips.first().cloned()
+        lock(&self.rt).known_ips.first().cloned()
     }
 
     // ── Discovery ────────────────────────────────────────────────────────────
 
     pub async fn discover(&self) -> Result<Topology> {
-        let mut hints = self.rt.lock().unwrap().known_ips.clone();
+        let mut hints = lock(&self.rt).known_ips.clone();
         for ip in self.store.all_known_ips() {
             if !hints.contains(&ip) {
                 hints.push(ip);
@@ -71,7 +75,7 @@ impl SonosSystem {
     }
 
     pub async fn topology(&self) -> Result<Topology> {
-        let known = self.rt.lock().unwrap().known_ips.clone();
+        let known = lock(&self.rt).known_ips.clone();
         if known.is_empty() {
             return self.discover().await;
         }
@@ -95,17 +99,21 @@ impl SonosSystem {
             }
         }
         // Known speakers vanished (new network?) — full discovery.
-        self.rt.lock().unwrap().known_ips.clear();
+        lock(&self.rt).known_ips.clear();
         self.discover().await
     }
 
     async fn finish_topology(&self, ip: &str, zgs: &str, fetch_models: bool) -> Result<Topology> {
-        let household = match self.soap.call(ip, Service::DeviceProperties, "GetHouseholdID", &[]).await {
-            Ok(r) => r.get("CurrentHouseholdID").map(|s| s.to_string()).filter(|s| !s.is_empty()),
-            Err(_) => None,
-        }
-        .or_else(|| self.household())
-        .unwrap_or_else(|| "unknown".to_string());
+        let (household, certain) = match self.household_id(ip).await {
+            Some(h) => (h, true),
+            None => match self.household() {
+                Some(prev) => {
+                    log::warn!("couldn't read household id from {ip}; assuming {prev} for this session");
+                    (prev, false)
+                }
+                None => return Err(Error::other("Couldn't identify this Sonos household. Try again.")),
+            },
+        };
 
         let members = topology::all_member_ips(zgs);
         let ips: Vec<String> = {
@@ -120,13 +128,14 @@ impl SonosSystem {
 
         if fetch_models {
             let need: Vec<(String, String)> = {
-                let rt = self.rt.lock().unwrap();
+                let rt = lock(&self.rt);
                 members.iter().filter(|(u, _)| !rt.models.contains_key(u)).cloned().collect()
             };
             let fetched = futures::future::join_all(need.into_iter().map(|(uuid, mip)| {
                 let http = self.soap.http().clone();
                 async move {
-                    let url = format!("http://{}:1400/xml/device_description.xml", mip);
+                    let Ok(addr) = check_ip(&mip) else { return (uuid, None) };
+                    let url = format!("http://{}:1400/xml/device_description.xml", addr);
                     let model = match tokio::time::timeout(Duration::from_millis(2500), http.get(&url).send()).await {
                         Ok(Ok(resp)) => resp.text().await.ok().and_then(|t| extract_tag(&t, "modelName")),
                         _ => None,
@@ -135,7 +144,7 @@ impl SonosSystem {
                 }
             }))
             .await;
-            let mut rt = self.rt.lock().unwrap();
+            let mut rt = lock(&self.rt);
             for (uuid, model) in fetched {
                 if let Some(m) = model {
                     rt.models.insert(uuid, m);
@@ -144,19 +153,56 @@ impl SonosSystem {
         }
 
         let groups = {
-            let rt = self.rt.lock().unwrap();
+            let rt = lock(&self.rt);
             topology::parse_groups(zgs, &rt.models)?
         };
         {
-            let mut rt = self.rt.lock().unwrap();
+            let mut rt = lock(&self.rt);
+            if rt.household.as_deref() != Some(household.as_str()) {
+                rt.services = None;
+                rt.accounts_learned_at = 0;
+            }
             rt.household = Some(household.clone());
             rt.known_ips = ips.clone();
+            rt.uuids = members.iter().map(|(uuid, mip)| (mip.clone(), uuid.clone())).collect();
         }
-        self.store.update(&household, |h| {
-            h.known_ips = ips;
-            h.last_seen = now_ms();
-        });
+        // A guessed household id mustn't overwrite some other household's IPs.
+        if certain {
+            self.store.update(&household, |h| {
+                h.known_ips = ips;
+                h.last_seen = now_ms();
+            });
+        }
         Ok(Topology { household_id: household, groups, discovered_at: now_ms() })
+    }
+
+    /// GetHouseholdID, retried once: a blip here would file the speakers under
+    /// the wrong household.
+    async fn household_id(&self, ip: &str) -> Option<String> {
+        for attempt in 1..=2 {
+            match self.soap.call(ip, Service::DeviceProperties, "GetHouseholdID", &[]).await {
+                Ok(r) => {
+                    if let Some(h) = r.get("CurrentHouseholdID").filter(|s| !s.is_empty()) {
+                        return Some(h.to_string());
+                    }
+                    log::warn!("GetHouseholdID on {ip} returned no id (attempt {attempt})");
+                }
+                Err(e) => log::warn!("GetHouseholdID on {ip} failed (attempt {attempt}): {e}"),
+            }
+        }
+        None
+    }
+
+    /// A player's uuid, from the last topology or else its device description.
+    async fn uuid_for(&self, ip: &str) -> Result<String> {
+        if let Some(u) = lock(&self.rt).uuids.get(ip).cloned() {
+            return Ok(u);
+        }
+        let addr = check_ip(ip)?;
+        let text = self.soap.http().get(format!("http://{}:1400/xml/device_description.xml", addr)).send().await?.text().await?;
+        extract_tag(&text, "UDN")
+            .and_then(|u| u.strip_prefix("uuid:").map(str::to_string))
+            .ok_or_else(|| Error::parse("device description has no UDN"))
     }
 
     // ── Playback passthroughs ────────────────────────────────────────────────
@@ -171,6 +217,9 @@ impl SonosSystem {
     pub async fn previous(&self, ip: &str) -> Result<()> { transport::previous(&self.soap, ip).await }
     pub async fn seek(&self, ip: &str, secs: u32) -> Result<()> { transport::seek_time(&self.soap, ip, secs).await }
     pub async fn play_queue_index(&self, ip: &str, index: u32) -> Result<()> {
+        // Seeking by track number only works while the queue is the source.
+        let uuid = self.uuid_for(ip).await?;
+        items::ensure_queue_is_source(&self.soap, ip, &uuid).await?;
         transport::seek_track(&self.soap, ip, index).await?;
         transport::play(&self.soap, ip).await
     }
@@ -203,11 +252,13 @@ impl SonosSystem {
 
     /// Learn account slots by looking at what the household already plays.
     async fn accounts(&self, ip: &str) -> Accounts {
-        let hh = self.household().unwrap_or_default();
-        let stale = now_ms().saturating_sub(self.rt.lock().unwrap().accounts_learned_at) > 10 * 60 * 1000;
+        // Before discovery there's no household to learn into.
+        let Some(hh) = self.household() else { return Accounts::default() };
+        let stale = now_ms().saturating_sub(lock(&self.rt).accounts_learned_at) > 10 * 60 * 1000;
         if stale {
             let mut learned: HashMap<u32, u32> = HashMap::new();
             let (fav, q) = futures::join!(content::browse(&self.soap, ip, "FV:2", 0, 200), content::browse(&self.soap, ip, "Q:0", 0, 200));
+            let any_ok = fav.is_ok() || q.is_ok();
             for br in [fav, q].into_iter().flatten() {
                 for it in br.items {
                     if let Some(uri) = it.res_uri.as_deref() {
@@ -224,7 +275,9 @@ impl SonosSystem {
                     }
                 });
             }
-            self.rt.lock().unwrap().accounts_learned_at = now_ms();
+            if any_ok {
+                lock(&self.rt).accounts_learned_at = now_ms();
+            }
         }
         let prefs = self.store.household(&hh);
         let mut acc = Accounts::default();
@@ -244,11 +297,11 @@ impl SonosSystem {
     // ── Music services ───────────────────────────────────────────────────────
 
     async fn service_descs(&self, ip: &str) -> Result<Vec<ServiceDesc>> {
-        if let Some(s) = self.rt.lock().unwrap().services.clone() {
+        if let Some(s) = lock(&self.rt).services.clone() {
             return Ok(s);
         }
         let descs = super::smapi::list_available_services(&self.soap, ip).await?;
-        self.rt.lock().unwrap().services = Some(descs.clone());
+        lock(&self.rt).services = Some(descs.clone());
         Ok(descs)
     }
 
@@ -269,7 +322,7 @@ impl SonosSystem {
 
     fn spotify_token(&self) -> Option<SpotifyToken> {
         let hh = self.household()?;
-        self.store.household(&hh).spotify
+        self.store.spotify_token(&hh)
     }
 
     pub async fn services(&self, ip: &str) -> Result<Vec<MusicService>> {
@@ -291,22 +344,29 @@ impl SonosSystem {
 
     fn store_spotify_token(&self, token: String, key: String) {
         if let Some(hh) = self.household() {
-            self.store.update(&hh, |h| h.spotify = Some(SpotifyToken { token, key }));
+            self.store.set_spotify_token(&hh, Some(SpotifyToken { token, key }));
+        }
+    }
+
+    /// Run a Spotify SMAPI call. When the service answers with a refreshed
+    /// token in its fault, keep the new token and try once more.
+    async fn with_spotify_creds<T, F, Fut>(&self, call: F) -> Result<T>
+    where
+        F: Fn(Creds) -> Fut,
+        Fut: std::future::Future<Output = Result<T>>,
+    {
+        match call(self.spotify_creds().await?).await {
+            Err(Error::Smapi { refresh: Some((t, k)), .. }) => {
+                self.store_spotify_token(t, k);
+                call(self.spotify_creds().await?).await
+            }
+            r => r,
         }
     }
 
     async fn spotify_search(&self, ip: &str, category: &str, term: &str, count: u32) -> Result<Vec<super::smapi::SmapiItem>> {
-        let svc = self.service_desc(ip, ServiceId::Spotify).await?;
-        let creds = self.spotify_creds().await?;
-        match self.smapi.search(&svc, &creds, category, term, 0, count).await {
-            Ok((items, _)) => Ok(items),
-            Err(Error::Smapi { refresh: Some((t, k)), .. }) => {
-                self.store_spotify_token(t.clone(), k.clone());
-                let creds = self.spotify_creds().await?;
-                Ok(self.smapi.search(&svc, &creds, category, term, 0, count).await?.0)
-            }
-            Err(e) => Err(e),
-        }
+        let svc = &self.service_desc(ip, ServiceId::Spotify).await?;
+        self.with_spotify_creds(|creds| async move { self.smapi.search(svc, &creds, category, term, 0, count).await.map(|r| r.0) }).await
     }
 
     fn spotify_item(it: &super::smapi::SmapiItem) -> Option<MediaItem> {
@@ -419,14 +479,19 @@ impl SonosSystem {
         match item.service {
             ServiceId::Apple => apple::artist_albums(&self.http, &item.id, &self.country).await,
             ServiceId::Spotify => {
-                let svc = self.service_desc(ip, ServiceId::Spotify).await?;
-                let creds = self.spotify_creds().await?;
+                let svc = &self.service_desc(ip, ServiceId::Spotify).await?;
+                let metadata = |id: String, count: u32| {
+                    self.with_spotify_creds(move |creds| {
+                        let id = id.clone();
+                        async move { self.smapi.get_metadata(svc, &creds, &id, 0, count).await.map(|r| r.0) }
+                    })
+                };
                 // Artist node → sub-containers (Top Tracks, Albums, …). Prefer "Albums".
-                let (children, _) = self.smapi.get_metadata(&svc, &creds, &item.id, 0, 50).await?;
-                let albums_node = children.iter().find(|c| c.title.eq_ignore_ascii_case("albums") || c.id.contains("artistAlbums"));
-                let (items, _) = match albums_node {
-                    Some(n) => self.smapi.get_metadata(&svc, &creds, &n.id, 0, 60).await?,
-                    None => (children, 0),
+                let children = metadata(item.id.clone(), 50).await?;
+                let albums_node = children.iter().find(|c| c.title.eq_ignore_ascii_case("albums") || c.id.contains("artistAlbums")).map(|n| n.id.clone());
+                let items = match albums_node {
+                    Some(id) => metadata(id, 60).await?,
+                    None => children,
                 };
                 Ok(items.iter().filter(|i| i.id.contains(":album:")).filter_map(Self::spotify_item).collect())
             }
@@ -458,9 +523,15 @@ impl SonosSystem {
                 Ok(LinkStatus::Linked)
             }
             Ok(None) => Ok(LinkStatus::Pending),
-            Err(e) => {
-                log::warn!("link poll failed: {e}");
+            // The service said no (NOT_LINKED_RETRY already became Ok(None)).
+            Err(e @ Error::Smapi { .. }) => {
+                log::warn!("link failed: {e}");
                 Ok(LinkStatus::Failed)
+            }
+            // Timeouts and network blips: keep polling.
+            Err(e) => {
+                log::warn!("link poll didn't complete, will retry: {e}");
+                Ok(LinkStatus::Pending)
             }
         }
     }
@@ -468,7 +539,7 @@ impl SonosSystem {
     pub fn unlink(&self, service: ServiceId) {
         if service == ServiceId::Spotify {
             if let Some(hh) = self.household() {
-                self.store.update(&hh, |h| h.spotify = None);
+                self.store.set_spotify_token(&hh, None);
             }
         }
     }

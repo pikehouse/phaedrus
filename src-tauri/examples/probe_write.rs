@@ -23,10 +23,10 @@ async fn main() {
     println!("SET_PLAY_MODE ok ({})", st.play_mode);
 
     let before = sys.queue(&ip, 0, 500).await.expect("queue").total;
-    let items_to_try = vec![
-        MediaItem { service: ServiceId::Apple, kind: ItemKind::Track, id: "1650885304".into(), title: "Reelin' In The Years".into(), subtitle: None, art: None, duration_secs: None, explicit: None, year: None, track_count: None },
-        MediaItem { service: ServiceId::Spotify, kind: ItemKind::Track, id: "spotify:track:04boE4u1AupbrGlI62WvoO".into(), title: "White Noise 3 Hour Long".into(), subtitle: None, art: None, duration_secs: None, explicit: None, year: None, track_count: None },
-    ];
+    // Real catalog ids come from a live search rather than anyone's library.
+    let found = sys.search(&ip, "steely dan").await.expect("search");
+    let items_to_try: Vec<MediaItem> =
+        [ServiceId::Apple, ServiceId::Spotify].into_iter().filter_map(|svc| found.tracks.iter().find(|t| t.service == svc).cloned()).collect();
     for item in items_to_try {
         match sys.play_item(&ip, &uuid, &item, PlayAction::Later).await {
             Ok(()) => {
@@ -43,11 +43,11 @@ async fn main() {
         }
     }
     // Just print what we'd send for a station and an album (no play).
-    let acc = items::Accounts { spotify_sid: 12, spotify_sn: 3, apple_sn: 1 };
-    let station = MediaItem { service: ServiceId::Tunein, kind: ItemKind::Station, id: "s32537".into(), title: "KEXP".into(), subtitle: None, art: None, duration_secs: None, explicit: None, year: None, track_count: None };
-    let p = items::build(&station, &acc).unwrap();
-    println!("STATION uri={} meta={}", p.uri, p.metadata);
-    let album = MediaItem { service: ServiceId::Spotify, kind: ItemKind::Album, id: "spotify:album:6QuJH3SudxdgzH8Bl4b7o8".into(), title: "Dylan's Gospel".into(), subtitle: None, art: None, duration_secs: None, explicit: None, year: None, track_count: None };
-    let p = items::build(&album, &acc).unwrap();
-    println!("ALBUM uri={} meta={}", p.uri, p.metadata);
+    let acc = items::Accounts::default();
+    for it in [found.stations.first(), found.albums.first()].into_iter().flatten() {
+        match items::build(it, &acc) {
+            Ok(p) => println!("{:?} uri={} meta={}", it.kind, p.uri, p.metadata),
+            Err(e) => println!("{:?} build failed: {e}", it.kind),
+        }
+    }
 }

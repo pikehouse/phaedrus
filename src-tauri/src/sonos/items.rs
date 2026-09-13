@@ -4,7 +4,7 @@
 use super::didl::build_metadata;
 use super::error::{Error, Result};
 use super::model::{Favorite, ItemKind, MediaItem, PlayAction, ServiceId};
-use super::soap::SoapClient;
+use super::soap::{is_alnum, is_digits, SoapClient};
 use super::transport;
 
 /// Which account slots this household uses for each service.
@@ -89,6 +89,14 @@ pub fn build(item: &MediaItem, acc: &Accounts) -> Result<Playable> {
             let sn = acc.apple_sn;
             let desc = token(204 * 256 + 7);
             let id = item.id.as_str();
+            // Catalog ids are numeric; playlist ids look like "pl.u-AbC123".
+            let valid = match kind {
+                ItemKind::Playlist => !id.is_empty() && id.bytes().all(|b| b.is_ascii_alphanumeric() || b"._-".contains(&b)),
+                _ => is_digits(id),
+            };
+            if !valid {
+                return Err(Error::other("not an Apple Music id"));
+            }
             match kind {
                 ItemKind::Track => Ok(Playable {
                     uri: format!("x-sonos-http:song%3a{}.mp4?sid=204&flags=8232&sn={}", id, sn),
@@ -114,6 +122,9 @@ pub fn build(item: &MediaItem, acc: &Accounts) -> Result<Playable> {
         }
         (ServiceId::Tunein, ItemKind::Station) => {
             let id = item.id.as_str();
+            if !is_alnum(id) {
+                return Err(Error::other("not a TuneIn station id"));
+            }
             Ok(Playable {
                 uri: format!("x-sonosapi-stream:{}?sid=254&flags=8224&sn=0", id),
                 metadata: build_metadata(&format!("F00092020{}", id), "L", &title, "object.item.audioItem.audioBroadcast", "SA_RINCON65031_"),
@@ -144,7 +155,7 @@ pub fn from_favorite(fav: &Favorite) -> Result<Playable> {
     })
 }
 
-async fn ensure_queue_is_source(soap: &SoapClient, ip: &str, coordinator_uuid: &str) -> Result<()> {
+pub(crate) async fn ensure_queue_is_source(soap: &SoapClient, ip: &str, coordinator_uuid: &str) -> Result<()> {
     let cur = transport::current_uri(soap, ip).await.unwrap_or_default();
     if !cur.starts_with("x-rincon-queue:") {
         transport::set_av_transport_uri(soap, ip, &format!("x-rincon-queue:{}#0", coordinator_uuid), "").await?;

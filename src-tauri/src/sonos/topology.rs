@@ -28,7 +28,10 @@ pub fn parse_groups(zgs: &str, models: &HashMap<String, String>) -> Result<Vec<G
             let ip = xml::attr(m, "Location").and_then(|l| ip_from_location(&l)).unwrap_or_default();
             let invisible = xml::attr(m, "Invisible").as_deref() == Some("1");
             if uuid == coordinator {
-                coordinator_ip = Some(ip.clone());
+                // A coordinator without a usable Location falls back to the first visible member.
+                if !ip.is_empty() {
+                    coordinator_ip = Some(ip.clone());
+                }
                 coordinator_name = Some(name.clone());
             }
             if ip.is_empty() || uuid.is_empty() {

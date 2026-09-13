@@ -157,9 +157,18 @@ pub async fn group_state(soap: &SoapClient, coordinator_ip: &str, members: &[Mem
     let crossfade = soap.call(ip, AVT, "GetCrossfadeMode", &[("InstanceID", "0")]);
     let gvol = rendering::group_volume(soap, ip);
     let gmute = rendering::group_mute(soap, ip);
+    // A member whose reads fail is left out rather than shown at volume 0, which
+    // a fader drag would then turn into a real jump.
     let member_vols = futures::future::join_all(members.iter().map(|m| async move {
-        let (v, mu) = futures::join!(rendering::volume(soap, &m.ip), rendering::mute(soap, &m.ip));
-        MemberVolume { uuid: m.uuid.clone(), name: m.name.clone(), ip: m.ip.clone(), volume: v.unwrap_or(0), muted: mu.unwrap_or(false) }
+        match futures::join!(rendering::volume(soap, &m.ip), rendering::mute(soap, &m.ip)) {
+            (Ok(volume), Ok(muted)) => Some(MemberVolume { uuid: m.uuid.clone(), name: m.name.clone(), ip: m.ip.clone(), volume, muted }),
+            (v, mu) => {
+                if let Some(e) = v.err().or(mu.err()) {
+                    log::warn!("volume read failed for {}: {e}", m.name);
+                }
+                None
+            }
+        }
     }));
 
     let (transport, position, media, settings, crossfade, gvol, gmute, member_vols) =
@@ -167,6 +176,9 @@ pub async fn group_state(soap: &SoapClient, coordinator_ip: &str, members: &[Mem
 
     let transport = transport?;
     let position = position?;
+    // Same reasoning as members: no snapshot beats a made-up group volume.
+    let volume = gvol?;
+    let muted = gmute?;
     let media = media.unwrap_or_default();
     let settings = settings.unwrap_or_default();
 
@@ -226,9 +238,9 @@ pub async fn group_state(soap: &SoapClient, coordinator_ip: &str, members: &[Mem
         is_radio,
         station_name,
         source: source.to_string(),
-        volume: gvol.unwrap_or(0),
-        muted: gmute.unwrap_or(false),
-        members: member_vols,
+        volume,
+        muted,
+        members: member_vols.into_iter().flatten().collect(),
         fetched_at: now_ms(),
     })
 }

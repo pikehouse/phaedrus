@@ -132,7 +132,7 @@ impl SmapiClient {
             return Err(err);
         }
         if !status.is_success() {
-            return Err(Error::Status(status.as_u16()));
+            return Err(Error::status(status.as_u16(), &text));
         }
         Ok(text)
     }
