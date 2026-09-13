@@ -12,7 +12,8 @@ export function toPlayMode(shuffle: boolean, repeat: Repeat): PlayMode {
   return TABLE[shuffle ? 'on' : 'off'][repeat];
 }
 
-export function fromPlayMode(mode: PlayMode): { shuffle: boolean; repeat: Repeat } {
+/** Takes any string: a mode we don't know reads as plain, never a crash. */
+export function fromPlayMode(mode: string): { shuffle: boolean; repeat: Repeat } {
   switch (mode) {
     case 'NORMAL':
       return { shuffle: false, repeat: 'off' };
@@ -27,6 +28,8 @@ export function fromPlayMode(mode: PlayMode): { shuffle: boolean; repeat: Repeat
       return { shuffle: true, repeat: 'all' };
     case 'SHUFFLE_REPEAT_ONE':
       return { shuffle: true, repeat: 'one' };
+    default:
+      return { shuffle: false, repeat: 'off' };
   }
 }
 

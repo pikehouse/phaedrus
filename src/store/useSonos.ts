@@ -9,6 +9,7 @@ import type {
   PlayMode,
   QueueItem,
   Topology,
+  Zone,
 } from '../api/types';
 import { clampVol } from '../lib/format';
 
@@ -18,6 +19,16 @@ import { clampVol } from '../lib/format';
 
 const OPTIMISM_MS = 1500;
 type Overrides = Record<string, { value: unknown; until: number }>;
+
+/**
+ * Where a held position has got to by now. The needle kept moving after the
+ * seek, so re-stamping the bare target on every poll would drag it backwards.
+ */
+function heldPosition(ov: Overrides['positionSecs'], next: GroupState, now = Date.now()): number {
+  const since = ov.until - OPTIMISM_MS;
+  const drift = next.state === 'PLAYING' ? Math.max(0, now - since) / 1000 : 0;
+  return Math.min((ov.value as number) + drift, next.durationSecs || Infinity);
+}
 
 function applyOverrides(next: GroupState, ov: Overrides): GroupState {
   const now = Date.now();
@@ -31,9 +42,13 @@ function applyOverrides(next: GroupState, ov: Overrides): GroupState {
     } else if (key.startsWith('mute:')) {
       const m = out.members.find((x) => x.uuid === key.slice(5));
       if (m) m.muted = value as boolean;
-    } else {
+    } else if (key !== 'positionSecs') {
       (out as unknown as Record<string, unknown>)[key] = value;
     }
+  }
+  // Last, so it advances against the transport state we are about to show.
+  if (ov.positionSecs && ov.positionSecs.until > now) {
+    out.positionSecs = heldPosition(ov.positionSecs, out, now);
   }
   return out;
 }
@@ -42,6 +57,112 @@ function pruneOverrides(ov: Overrides): Overrides {
   const now = Date.now();
   const out: Overrides = {};
   for (const [k, v] of Object.entries(ov)) if (v.until > now) out[k] = v;
+  return out;
+}
+
+// ─── One request at a time ───────────────────────────────────────────────────
+// A poll never overlaps itself. Asking while one is out books a single re-run
+// for when it lands, so follow-ups after an action still see fresh data.
+
+interface Flight {
+  run: () => Promise<void>;
+  busy: () => boolean;
+}
+
+function flight(task: () => Promise<void>): Flight {
+  let current: Promise<void> | null = null;
+  let queued: Promise<void> | null = null;
+  const run = (): Promise<void> => {
+    if (!current) {
+      current = task().finally(() => {
+        current = null;
+      });
+      return current;
+    }
+    if (!queued) {
+      queued = current
+        .catch(() => {})
+        .then(() => {
+          queued = null;
+          return run();
+        });
+    }
+    return queued;
+  };
+  return { run, busy: () => current !== null };
+}
+
+// Request sequence numbers: a reply older than the last one applied is dropped.
+let stateSeq = 0;
+let stateApplied = 0;
+let topoSeq = 0;
+let topoApplied = 0;
+let queueSeq = 0;
+
+// Consecutive failed state polls, for a quiet "still trying" at most every 10s.
+const FAIL_TOAST_MS = 10000;
+let stateFailingSince = 0;
+let stateFailToastAt = 0;
+
+// What the queue looked like at the last poll, to notice edits made elsewhere.
+const QUEUE_STALE_MS = 15000;
+let queueSig: { groupId: string; sig: string } | null = null;
+let queueFetchedAt = 0;
+
+let stateFlight: Flight;
+let topoFlight: Flight;
+
+// ─── Expected grouping ───────────────────────────────────────────────────────
+// Speakers take a moment to publish a new grouping. Until they do (or ~3s
+// pass), topology polls are shown with the join/leave the user asked for.
+
+const GROUPING_MS = 3000;
+
+interface Expectation {
+  zone: Zone;
+  /** The coordinator it should follow, or null to stand alone. */
+  coordinatorUuid: string | null;
+  until: number;
+}
+
+const expected = new Map<string, Expectation>();
+
+function homeOf(topo: Topology, uuid: string) {
+  return topo.groups.find((g) => g.members.some((m) => m.uuid === uuid));
+}
+
+function regroup(topo: Topology, e: Expectation): Topology {
+  let groups = topo.groups
+    .map((g) => ({ ...g, members: g.members.filter((m) => m.uuid !== e.zone.uuid) }))
+    .filter((g) => g.members.length > 0);
+  if (e.coordinatorUuid) {
+    groups = groups.map((g) =>
+      g.coordinatorUuid === e.coordinatorUuid ? { ...g, members: [...g.members, e.zone] } : g,
+    );
+  } else {
+    groups.push({
+      id: `${e.zone.uuid}:expected`,
+      coordinatorUuid: e.zone.uuid,
+      coordinatorIp: e.zone.ip,
+      name: e.zone.name,
+      members: [e.zone],
+    });
+  }
+  return { ...topo, groups };
+}
+
+function withExpectedGrouping(topo: Topology): Topology {
+  const now = Date.now();
+  let out = topo;
+  for (const [uuid, e] of expected) {
+    const home = homeOf(topo, uuid);
+    const agrees = home?.coordinatorUuid === (e.coordinatorUuid ?? uuid);
+    if (e.until <= now || agrees) {
+      expected.delete(uuid);
+      continue;
+    }
+    out = regroup(out, e);
+  }
   return out;
 }
 
@@ -90,6 +211,14 @@ function resolveSelection(topo: Topology, previous: Group | null): Group | null 
   return topo.groups[0];
 }
 
+/** Nothing of the old group's may linger once the selection moves. */
+const freshGroup = (): Pick<SonosStore, 'state' | 'overrides' | 'queue' | 'queueTotal'> => ({
+  state: null,
+  overrides: {},
+  queue: [],
+  queueTotal: 0,
+});
+
 // ─── Store ───────────────────────────────────────────────────────────────────
 
 export type Phase = 'booting' | 'ready' | 'nothing';
@@ -111,6 +240,8 @@ interface SonosStore {
   queueTotal: number;
   favorites: Favorite[];
   overrides: Overrides;
+  /** Why the last boot/rediscover found nothing, when the backend said. */
+  discoveryError: string | null;
   toast: Toast | null;
   searchOpen: boolean;
   arranging: boolean;
@@ -184,13 +315,140 @@ export const useSonos = create<SonosStore>((set, get) => {
     }
   };
 
-  const guard = async (label: string, fn: () => Promise<void>) => {
+  /** Run an action; on failure say so. Resolves true only when it went through. */
+  const guard = async (label: string, fn: () => Promise<void>): Promise<boolean> => {
     try {
       await fn();
+      return true;
     } catch (e) {
       get().say(`${label} failed — ${errText(e)}`, 'bad');
+      return false;
     }
   };
+
+  // ─── Queue edits, one after another ──────────────────────────────────────
+  // Rows are renumbered locally the moment an edit is asked for, so the next
+  // click already names the right position. The speaker calls then go out in
+  // order, and the list is only re-read once the last of them has landed.
+
+  let queueChain: Promise<unknown> = Promise.resolve();
+  let queueOps = 0;
+  let queueEpoch = 0;
+
+  const queueAction = (label: string, fn: () => Promise<void>, edits = true): Promise<boolean> => {
+    queueOps++;
+    queueSeq++; // a re-read already out predates this edit
+    const epoch = queueEpoch;
+    const run = queueChain.then(async () => {
+      // An earlier edit failed, so the positions this one was given may be wrong.
+      if (epoch !== queueEpoch) return false;
+      const ok = await guard(label, fn);
+      if (!ok && edits) queueEpoch++;
+      return ok;
+    });
+    queueChain = run;
+    return run.finally(() => {
+      if (--queueOps === 0) void get().refreshQueue();
+    });
+  };
+
+  /** Adopt a topology: re-resolve the selection and start over if it moved. */
+  const adoptTopology = (topo: Topology) => {
+    const { group: prev, phase } = get();
+    const group = resolveSelection(topo, prev);
+    // Sonos renames a group when a room joins or leaves; that is the same
+    // music, so keep the state. Only a different coordinator starts over.
+    const moved = group?.coordinatorUuid !== prev?.coordinatorUuid;
+    set({
+      topology: topo,
+      group,
+      phase: topo.groups.length ? 'ready' : 'nothing',
+      ...(moved ? freshGroup() : {}),
+      ...(topo.groups.length ? { discoveryError: null } : {}),
+    });
+    if (group && group.id !== prev?.id) rememberGroup(topo.householdId, group.id);
+    if (group && moved) {
+      void get().pollState();
+      void get().refreshQueue();
+    }
+    // Recovered on our own after a failed boot: the crate was never filled.
+    if (phase !== 'ready' && topo.groups.length) void get().refreshFavorites();
+  };
+
+  const expectGrouping = (zone: Zone | undefined, coordinatorUuid: string | null) => {
+    if (!zone) return;
+    const e: Expectation = { zone, coordinatorUuid, until: Date.now() + GROUPING_MS };
+    expected.set(zone.uuid, e);
+    const topo = get().topology;
+    if (topo) adoptTopology(regroup(topo, e));
+  };
+
+  const settleGrouping = (zone: Zone | undefined, ok: boolean) => {
+    if (!ok) {
+      if (zone) expected.delete(zone.uuid);
+      void get().refreshTopology();
+      return;
+    }
+    const e = zone && expected.get(zone.uuid);
+    if (e) e.until = Date.now() + GROUPING_MS;
+    setTimeout(() => void get().refreshTopology(), 800);
+    setTimeout(() => void get().refreshTopology(), 2500);
+    void get().pollState();
+  };
+
+  const zoneByIp = (ip: string) =>
+    get().topology?.groups.flatMap((g) => g.members).find((z) => z.ip === ip);
+
+  stateFlight = flight(async () => {
+    const group = get().group;
+    if (!group) return;
+    const seq = ++stateSeq;
+    try {
+      const fresh = await api.getGroupState(group);
+      // Selection may have moved while the request was in flight.
+      if (get().group?.id !== group.id) return;
+      if (seq < stateApplied) return;
+      stateApplied = seq;
+      stateFailingSince = 0;
+      stateFailToastAt = 0;
+
+      const ov = pruneOverrides(get().overrides);
+      // Once the speaker has caught up with a seek, stop holding the needle.
+      if (ov.positionSecs && Math.abs(fresh.positionSecs - heldPosition(ov.positionSecs, fresh)) <= 2) {
+        delete ov.positionSecs;
+      }
+      set({ state: applyOverrides(fresh, ov), receivedAt: Date.now(), overrides: ov });
+
+      // Edits from the Sonos app show up as a new length or a new current track.
+      const sig = `${fresh.queueLength ?? ''}|${fresh.track?.uri ?? ''}`;
+      const moved = queueSig?.groupId === group.id && queueSig.sig !== sig;
+      queueSig = { groupId: group.id, sig };
+      if (moved || (!document.hidden && Date.now() - queueFetchedAt >= QUEUE_STALE_MS)) {
+        void get().refreshQueue();
+      }
+    } catch {
+      // Keep the last good state; a transient LAN blip is not worth shouting about.
+      if (get().group?.id !== group.id) return;
+      const now = Date.now();
+      if (!stateFailingSince) stateFailingSince = now;
+      if (now - stateFailingSince >= FAIL_TOAST_MS && now - stateFailToastAt >= FAIL_TOAST_MS) {
+        stateFailToastAt = now;
+        get().say(`Can't reach ${group.name} — still trying`, 'bad');
+      }
+    }
+  });
+
+  topoFlight = flight(async () => {
+    const seq = ++topoSeq;
+    try {
+      const topo = withExpectedGrouping(await api.getTopology());
+      if (seq < topoApplied) return;
+      topoApplied = seq;
+      adoptTopology(topo);
+    } catch {
+      /* one missed topology poll is not worth shouting about */
+    }
+  });
 
   return {
     phase: 'booting',
@@ -202,6 +460,7 @@ export const useSonos = create<SonosStore>((set, get) => {
     queueTotal: 0,
     favorites: [],
     overrides: {},
+    discoveryError: null,
     toast: null,
     searchOpen: false,
     arranging: false,
@@ -214,9 +473,10 @@ export const useSonos = create<SonosStore>((set, get) => {
     },
 
     async boot() {
-      set({ phase: 'booting' });
+      set({ phase: 'booting', discoveryError: null });
       try {
         const topo = await api.getTopology();
+        topoApplied = ++topoSeq;
         if (topo.groups.length === 0) {
           set({ topology: topo, phase: 'nothing' });
           return;
@@ -225,8 +485,8 @@ export const useSonos = create<SonosStore>((set, get) => {
         set({ topology: topo, group, phase: 'ready' });
         if (group) rememberGroup(topo.householdId, group.id);
         await Promise.all([get().pollState(), get().refreshQueue(), get().refreshFavorites()]);
-      } catch {
-        set({ phase: 'nothing' });
+      } catch (e) {
+        set({ phase: 'nothing', discoveryError: errText(e) });
       }
     },
 
@@ -234,57 +494,44 @@ export const useSonos = create<SonosStore>((set, get) => {
       set({ busy: true });
       get().say('Listening for speakers…');
       try {
-        const topo = await api.discover();
+        const topo = withExpectedGrouping(await api.discover());
+        topoApplied = ++topoSeq;
+        set({ discoveryError: null });
         if (topo.groups.length === 0) {
           set({ topology: topo, phase: 'nothing', busy: false });
           return;
         }
-        const group = resolveSelection(topo, get().group);
-        set({ topology: topo, group, phase: 'ready', busy: false });
+        const prev = get().group;
+        const group = resolveSelection(topo, prev);
+        set({
+          topology: topo,
+          group,
+          phase: 'ready',
+          busy: false,
+          ...(group?.coordinatorUuid !== prev?.coordinatorUuid ? freshGroup() : {}),
+        });
         if (group) rememberGroup(topo.householdId, group.id);
         get().say(`Found ${topo.groups.reduce((n, g) => n + g.members.length, 0)} rooms`);
         await Promise.all([get().pollState(), get().refreshQueue(), get().refreshFavorites()]);
       } catch (e) {
-        set({ busy: false, phase: get().topology ? 'ready' : 'nothing' });
+        set({ busy: false, phase: get().topology ? 'ready' : 'nothing', discoveryError: errText(e) });
         get().say(`Could not find speakers — ${errText(e)}`, 'bad');
       }
     },
 
-    async refreshTopology() {
-      try {
-        const topo = await api.getTopology();
-        const prev = get().group;
-        const group = resolveSelection(topo, prev);
-        const changed = group?.id !== prev?.id;
-        set({ topology: topo, group, phase: topo.groups.length ? 'ready' : 'nothing' });
-        if (group && changed) {
-          rememberGroup(topo.householdId, group.id);
-          void get().refreshQueue();
-        }
-      } catch {
-        /* one missed topology poll is not worth shouting about */
-      }
-    },
+    refreshTopology: () => topoFlight.run(),
 
-    async pollState() {
-      const group = get().group;
-      if (!group) return;
-      try {
-        const fresh = await api.getGroupState(group);
-        // Selection may have moved while the request was in flight.
-        if (get().group?.id !== group.id) return;
-        const ov = pruneOverrides(get().overrides);
-        set({ state: applyOverrides(fresh, ov), receivedAt: Date.now(), overrides: ov });
-      } catch {
-        /* transient LAN blip; the next tick will catch up */
-      }
-    },
+    pollState: () => stateFlight.run(),
 
     async refreshQueue() {
       const group = get().group;
-      if (!group) return;
+      // Mid-edit the local list is ahead of the speaker; re-read once edits land.
+      if (!group || queueOps > 0) return;
+      const seq = ++queueSeq;
+      queueFetchedAt = Date.now();
       try {
-        const page = await api.getQueue(group.coordinatorIp, 0, 300);
+        const page = await api.getQueue(group.coordinatorIp, 0, 1000);
+        if (get().group?.id !== group.id || seq !== queueSeq || queueOps > 0) return;
         set({ queue: page.items, queueTotal: page.total });
       } catch {
         /* leave the last good queue on screen */
@@ -304,7 +551,7 @@ export const useSonos = create<SonosStore>((set, get) => {
     selectGroup(g) {
       const topo = get().topology;
       if (topo) rememberGroup(topo.householdId, g.id);
-      set({ group: g, state: null, overrides: {}, queue: [], arranging: false });
+      set({ group: g, ...freshGroup(), arranging: false });
       void get().pollState();
       void get().refreshQueue();
     },
@@ -320,7 +567,8 @@ export const useSonos = create<SonosStore>((set, get) => {
     async toggle() {
       const { group, state } = get();
       if (!group || !state) return;
-      const playing = state.state === 'PLAYING';
+      // TRANSITIONING is on its way to playing — the button shows Pause, so send Pause.
+      const playing = state.state === 'PLAYING' || state.state === 'TRANSITIONING';
       optimistic({ state: playing ? 'PAUSED_PLAYBACK' : 'PLAYING' }, ['state']);
       await guard(playing ? 'Pause' : 'Play', async () => {
         if (playing) await api.pause(group.coordinatorIp);
@@ -367,7 +615,7 @@ export const useSonos = create<SonosStore>((set, get) => {
       optimistic({ volume: target }, ['volume']);
       // Members track the group knob so the faders don't jump on the next poll.
       state.members.forEach((m) => optimisticMember(m.uuid, { volume: clampVol(m.volume + shift) }));
-      await sendVolume(group.coordinatorIp, target, final, () => api.setGroupVolume(group.coordinatorIp, target));
+      await sendVolume(`group:${group.coordinatorIp}`, final, () => api.setGroupVolume(group.coordinatorIp, target));
     },
 
     async bumpVolume(delta) {
@@ -382,7 +630,7 @@ export const useSonos = create<SonosStore>((set, get) => {
       if (!member) return;
       const target = clampVol(v);
       optimisticMember(uuid, { volume: target });
-      await sendVolume(member.ip, target, final, () => api.setVolume(member.ip, target));
+      await sendVolume(`zone:${member.ip}`, final, () => api.setVolume(member.ip, target));
     },
 
     async setMemberMute(uuid, muted) {
@@ -414,31 +662,42 @@ export const useSonos = create<SonosStore>((set, get) => {
         'positionSecs',
         'state',
       ]);
-      await guard('Play', () => api.playQueueIndex(group.coordinatorIp, index));
+      // Waits its turn behind any removal, whose renumbering it was clicked against.
+      await queueAction('Play', () => api.playQueueIndex(group.coordinatorIp, index), false);
       void get().pollState();
     },
 
     async removeFromQueue(index) {
-      const { group } = get();
+      const { group, queue, queueTotal, state } = get();
       if (!group) return;
-      set({ queue: get().queue.filter((q) => q.index !== index) });
-      await guard('Remove', () => api.removeFromQueue(group.coordinatorIp, index));
-      await get().refreshQueue();
+      set({
+        queue: queue
+          .filter((q) => q.index !== index)
+          .map((q) => (q.index > index ? { ...q, index: q.index - 1 } : q)),
+        queueTotal: Math.max(0, queueTotal - 1),
+        // The current track slides up with everything after it.
+        state:
+          state?.queueIndex && state.queueIndex > index
+            ? { ...state, queueIndex: state.queueIndex - 1 }
+            : state,
+      });
+      await queueAction('Remove', () => api.removeFromQueue(group.coordinatorIp, index));
     },
 
     async clearQueue() {
       const { group } = get();
       if (!group) return;
       set({ queue: [], queueTotal: 0 });
-      await guard('Clear queue', () => api.clearQueue(group.coordinatorIp));
-      get().say('Queue cleared');
-      await get().refreshQueue();
+      if (await queueAction('Clear queue', () => api.clearQueue(group.coordinatorIp))) {
+        get().say('Queue cleared');
+      }
     },
 
     async playFavorite(f, action) {
       const { group } = get();
       if (!group) return;
-      await guard('Play', () => api.playFavorite(group.coordinatorIp, group.coordinatorUuid, f, action));
+      const ok = await guard('Play', () => api.playFavorite(group.coordinatorIp, group.coordinatorUuid, f, action));
+      if (!ok) return;
       get().say(actionWord(action, f.title, group.name));
       await Promise.all([get().pollState(), get().refreshQueue()]);
     },
@@ -446,7 +705,8 @@ export const useSonos = create<SonosStore>((set, get) => {
     async playItem(item, action) {
       const { group } = get();
       if (!group) return;
-      await guard('Play', () => api.playItem(group.coordinatorIp, group.coordinatorUuid, item, action));
+      const ok = await guard('Play', () => api.playItem(group.coordinatorIp, group.coordinatorUuid, item, action));
+      if (!ok) return;
       get().say(actionWord(action, item.title, group.name));
       await Promise.all([get().pollState(), get().refreshQueue()]);
     },
@@ -454,17 +714,22 @@ export const useSonos = create<SonosStore>((set, get) => {
     async everywhere() {
       const { topology, group } = get();
       if (!topology || !group) return;
-      const others = topology.groups.filter((g) => g.id !== group.id);
-      if (others.length === 0) {
+      // Members don't follow their coordinator, so every room is asked on its own.
+      const zones = topology.groups
+        .filter((g) => g.id !== group.id)
+        .flatMap((g) => g.members)
+        .filter((z) => !z.invisible);
+      if (zones.length === 0) {
         get().say('Already playing everywhere');
         return;
       }
       set({ busy: true });
-      await guard('Group rooms', async () => {
-        for (const g of others) await api.joinGroup(g.coordinatorIp, group.coordinatorUuid);
+      const ok = await guard('Group rooms', async () => {
+        for (const z of zones) await api.joinGroup(z.ip, group.coordinatorUuid);
       });
       set({ busy: false });
-      get().say(`Everywhere · ${group.name}`);
+      if (ok) get().say(`Everywhere · ${group.name}`);
+      // Even a partial run moved some rooms; show where they landed.
       await get().refreshTopology();
       void get().pollState();
     },
@@ -472,43 +737,65 @@ export const useSonos = create<SonosStore>((set, get) => {
     async joinRoom(zoneIp) {
       const { group } = get();
       if (!group) return;
-      await guard('Add room', () => api.joinGroup(zoneIp, group.coordinatorUuid));
-      await get().refreshTopology();
-      void get().pollState();
+      const zone = zoneByIp(zoneIp);
+      expectGrouping(zone, group.coordinatorUuid);
+      const ok = await guard('Add room', () => api.joinGroup(zoneIp, group.coordinatorUuid));
+      settleGrouping(zone, ok);
     },
 
     async leaveRoom(zoneIp) {
-      await guard('Remove room', () => api.leaveGroup(zoneIp));
-      await get().refreshTopology();
-      void get().pollState();
+      const zone = zoneByIp(zoneIp);
+      expectGrouping(zone, null);
+      const ok = await guard('Remove room', () => api.leaveGroup(zoneIp));
+      settleGrouping(zone, ok);
     },
   };
 });
 
 // ─── Volume send throttle ────────────────────────────────────────────────────
 // Drag events fire far faster than a speaker can answer. Send at most every
-// ~60ms while dragging, and always send the value the user let go on.
+// ~60ms while dragging, and always send the value the user let go on. Only one
+// send per target is ever out; a newer value waits for it, and only the newest
+// waits, so the last value asked for is always the last to land.
 
-const throttles = new Map<string, { last: number; timer?: ReturnType<typeof setTimeout> }>();
+interface VolumeLane {
+  last: number;
+  timer?: ReturnType<typeof setTimeout>;
+  inFlight: boolean;
+  waiting?: () => Promise<void>;
+}
 
-async function sendVolume(key: string, _target: number, final: boolean, send: () => Promise<void>) {
-  const entry = throttles.get(key) ?? { last: 0 };
-  throttles.set(key, entry);
-  clearTimeout(entry.timer);
-  const now = Date.now();
-  if (final || now - entry.last >= 60) {
-    entry.last = now;
+const throttles = new Map<string, VolumeLane>();
+
+async function sendVolume(key: string, final: boolean, send: () => Promise<void>) {
+  const lane = throttles.get(key) ?? { last: 0, inFlight: false };
+  throttles.set(key, lane);
+  clearTimeout(lane.timer);
+  if (final || Date.now() - lane.last >= 60) {
+    await dispatchVolume(lane, send);
+    return;
+  }
+  lane.timer = setTimeout(() => void dispatchVolume(lane, send), 60);
+}
+
+async function dispatchVolume(lane: VolumeLane, send: () => Promise<void>) {
+  lane.last = Date.now();
+  if (lane.inFlight) {
+    lane.waiting = send;
+    return;
+  }
+  lane.inFlight = true;
+  let next: (() => Promise<void>) | undefined = send;
+  while (next) {
+    lane.waiting = undefined;
     try {
-      await send();
+      await next();
     } catch {
       /* a dropped volume packet self-corrects on the next drag or poll */
     }
-    return;
+    next = lane.waiting;
   }
-  entry.timer = setTimeout(() => {
-    entry.last = Date.now();
-    void send().catch(() => {});
-  }, 60);
+  lane.inFlight = false;
 }
 
 function actionWord(action: PlayAction, title: string, room: string) {
@@ -546,15 +833,16 @@ let topoTimer: ReturnType<typeof setTimeout> | undefined;
 export function startPolling() {
   stopPolling();
 
+  // A tick that finds its previous request still out simply skips.
   const stateLoop = () => {
     const s = useSonos.getState();
-    if (s.phase === 'ready') void s.pollState();
+    if (s.phase === 'ready' && !stateFlight.busy()) void s.pollState();
     stateTimer = setTimeout(stateLoop, document.hidden ? 4000 : 1000);
   };
 
   const topoLoop = () => {
     const s = useSonos.getState();
-    if (s.phase !== 'booting') void s.refreshTopology();
+    if (s.phase !== 'booting' && !topoFlight.busy()) void s.refreshTopology();
     topoTimer = setTimeout(topoLoop, document.hidden ? 20000 : 6000);
   };
 

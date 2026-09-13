@@ -64,6 +64,9 @@ function Sleeve({
     onPlay(action);
   };
 
+  const [brokenArt, setBrokenArt] = useState<string | null>(null);
+  const showArt = !!fav.art && brokenArt !== fav.art;
+
   return (
     <div ref={item} className={`crate-item${fav.playable ? '' : ' is-dim'}${held ? ' is-held' : ''}`}>
       <button
@@ -81,8 +84,14 @@ function Sleeve({
         aria-label={fav.playable ? `Play ${fav.title}` : `${fav.title} (not playable)`}
         title={fav.description ? `${fav.title} — ${fav.description}` : fav.title}
       >
-        {fav.art ? (
-          <img src={fav.art} alt="" loading="lazy" draggable={false} />
+        {showArt ? (
+          <img
+            src={fav.art}
+            alt=""
+            loading="lazy"
+            draggable={false}
+            onError={() => setBrokenArt(fav.art ?? null)}
+          />
         ) : (
           <span className={`crate-bill ground-${ground}`}>
             <span className="crate-bill-title">{fav.title}</span>

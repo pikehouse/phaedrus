@@ -41,10 +41,19 @@ export default function SearchOverlay() {
   const [drilling, setDrilling] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const runId = useRef(0);
+  const artistRun = useRef(0);
+
+  /** Leave the artist page; albums still on their way for it are dropped. */
+  const closeDrill = useCallback(() => {
+    artistRun.current++;
+    setDrill(null);
+    setDrilling(false);
+  }, []);
 
   const runSearch = useCallback(
     async (q: string) => {
       if (!anyIp || q.trim().length < 2) {
+        runId.current++; // anything still out is for a query that no longer stands
         setResults(EMPTY);
         setSearching(false);
         return;
@@ -66,11 +75,11 @@ export default function SearchOverlay() {
   // Focus, reset drill-down, and re-read service state each time it opens.
   useEffect(() => {
     if (!open) return;
-    setDrill(null);
+    closeDrill();
     inputRef.current?.focus();
     inputRef.current?.select();
     if (anyIp) api.getServices(anyIp).then(setServices).catch(() => setServices([]));
-  }, [open, anyIp]);
+  }, [open, anyIp, closeDrill]);
 
   useEffect(() => {
     if (!open) return;
@@ -83,23 +92,24 @@ export default function SearchOverlay() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
       e.stopPropagation();
-      if (drill) setDrill(null);
+      if (drill) closeDrill();
       else setOpen(false);
     };
     window.addEventListener('keydown', onKey, true);
     return () => window.removeEventListener('keydown', onKey, true);
-  }, [open, drill, setOpen]);
+  }, [open, drill, setOpen, closeDrill]);
 
   const openArtist = async (artist: MediaItem) => {
+    const id = ++artistRun.current;
     setDrilling(true);
     setDrill({ artist, albums: [] });
     try {
       const albums = await api.artistAlbums(anyIp, artist);
-      setDrill({ artist, albums });
+      if (id === artistRun.current) setDrill({ artist, albums });
     } catch {
-      setDrill({ artist, albums: [] });
+      if (id === artistRun.current) setDrill({ artist, albums: [] });
     } finally {
-      setDrilling(false);
+      if (id === artistRun.current) setDrilling(false);
     }
   };
 
@@ -155,7 +165,7 @@ export default function SearchOverlay() {
         <div className="search-results scroll">
           {drill ? (
             <>
-              <button type="button" className="search-crumb" onClick={() => setDrill(null)}>
+              <button type="button" className="search-crumb" onClick={closeDrill}>
                 <Back size={15} />
                 <span className="label">All results</span>
               </button>
@@ -222,11 +232,7 @@ function Row({
         aria-label={isArtist ? `Albums by ${item.title}` : `Play ${item.title}`}
       >
         <span className={`sresult-art${isArtist ? ' is-round' : ''}`}>
-          {item.art ? (
-            <img src={item.art} alt="" loading="lazy" draggable={false} />
-          ) : (
-            <span className="sresult-art-blank" />
-          )}
+          <RowArt src={item.art} />
         </span>
         <span className="sresult-text">
           <span className="sresult-title">{item.title}</span>
@@ -257,46 +263,76 @@ function Row({
   );
 }
 
+/** A cover the art cache refuses (403, gone) falls back to the blank stock. */
+function RowArt({ src }: { src?: string }) {
+  const [broken, setBroken] = useState<string | undefined>();
+  if (!src || broken === src) return <span className="sresult-art-blank" />;
+  return <img src={src} alt="" loading="lazy" draggable={false} onError={() => setBroken(src)} />;
+}
+
+/** Rust keeps answering 'pending' through timeouts; give up on our own after this. */
+const LINK_TIMEOUT_MS = 5 * 60 * 1000;
+
 /** One-time Spotify authorization: open the page, then wait for the household. */
 function SpotifyLink({ anyIp, onLinked }: { anyIp: string; onLinked: () => void }) {
   const say = useSonos((s) => s.say);
-  const [phase, setPhase] = useState<'idle' | 'waiting' | 'failed'>('idle');
+  const [phase, setPhase] = useState<'idle' | 'waiting' | 'failed' | 'timedOut'>('idle');
   const session = useRef<LinkSession | null>(null);
+  const startedAt = useRef(0);
+  // The parent hands us a new callback every render; the poll reads the latest
+  // without being torn down and rebuilt for it.
+  const linked = useRef(onLinked);
+  useEffect(() => {
+    linked.current = onLinked;
+  }, [onLinked]);
 
   useEffect(() => {
     if (phase !== 'waiting') return;
     let alive = true;
+    let checking = false;
     const timer = setInterval(async () => {
-      if (!session.current) return;
+      const s = session.current;
+      if (!s || checking) return;
+      checking = true;
       try {
-        const status = await api.linkPoll(anyIp, session.current);
-        if (!alive) return;
+        const status = await api.linkPoll(anyIp, s);
         if (status === 'linked') {
           clearInterval(timer);
+          // Rust has stored the token by now: finish the job even if this
+          // effect was torn down while the check was out — but only once.
+          if (session.current !== s) return;
+          session.current = null;
           setPhase('idle');
           say('Spotify connected');
-          onLinked();
-        } else if (status === 'failed') {
+          linked.current();
+        } else if (status === 'failed' && alive) {
           clearInterval(timer);
           setPhase('failed');
+        } else if (status === 'pending' && alive && Date.now() - startedAt.current >= LINK_TIMEOUT_MS) {
+          clearInterval(timer);
+          session.current = null;
+          setPhase('timedOut');
         }
       } catch {
         if (alive) {
           clearInterval(timer);
           setPhase('failed');
         }
+      } finally {
+        checking = false;
       }
     }, 2000);
     return () => {
       alive = false;
       clearInterval(timer);
     };
-  }, [phase, anyIp, onLinked, say]);
+  }, [phase, anyIp, say]);
 
   const begin = async () => {
     try {
       const s = await api.linkBegin(anyIp, 'spotify');
       session.current = s;
+      startedAt.current = Date.now();
       setPhase('waiting');
       if (isTauri()) {
         const { openUrl } = await import('@tauri-apps/plugin-opener');
@@ -318,7 +354,9 @@ function SpotifyLink({ anyIp, onLinked }: { anyIp: string; onLinked: () => void 
             ? 'Waiting for you to sign in…'
             : phase === 'failed'
               ? 'That did not go through.'
-              : 'Apple Music and TuneIn are already listening.'}
+              : phase === 'timedOut'
+                ? 'That took too long — try again.'
+                : 'Apple Music and TuneIn are already listening.'}
         </p>
       </div>
       {phase === 'waiting' ? (
@@ -327,7 +365,7 @@ function SpotifyLink({ anyIp, onLinked }: { anyIp: string; onLinked: () => void 
         </span>
       ) : (
         <button type="button" className="linkcard-btn" onClick={() => void begin()}>
-          {phase === 'failed' ? 'Try again' : 'Connect Spotify'}
+          {phase === 'failed' || phase === 'timedOut' ? 'Try again' : 'Connect Spotify'}
         </button>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSonos } from '../store/useSonos';
 import { useLivePosition } from './DeckSignal';
 import { useReducedMotion } from '../hooks/useReducedMotion';
@@ -34,6 +34,7 @@ const RING = Array.from({ length: SEGMENTS }, (_, i) => {
  * velocity model as the hi-fi's record. The art itself never spins.
  */
 export default function DeckJog() {
+  const [brokenArt, setBrokenArt] = useState<string | null>(null);
   const state = useSonos((s) => s.state);
   const receivedAt = useSonos((s) => s.receivedAt);
   const reduced = useReducedMotion();
@@ -99,8 +100,13 @@ export default function DeckJog() {
         <i className="jog-marker" />
       </div>
       <div className="jog-centre">
-        {!idle && track?.art ? (
-          <img src={track.art} alt={track.title ? `Album art for ${track.title}` : ''} draggable={false} />
+        {!idle && track?.art && brokenArt !== track.art ? (
+          <img
+            src={track.art}
+            alt={track.title ? `Album art for ${track.title}` : ''}
+            draggable={false}
+            onError={() => setBrokenArt(track.art ?? null)}
+          />
         ) : (
           <span className="jog-brand" aria-hidden="true">
             PHÆDRUS

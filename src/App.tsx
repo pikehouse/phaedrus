@@ -45,6 +45,10 @@ export default function App() {
   );
 }
 
+/** Space belongs to whatever control has focus; only a bare page hands it to play/pause. */
+const OWNS_SPACE =
+  'button, a[href], [role=switch], [role=tab], [role=slider], input, textarea, select, [contenteditable]:not([contenteditable=false])';
+
 /** Global hotkeys. Anything typed into an input or aimed at a slider is left alone. */
 function useKeyboard() {
   useEffect(() => {
@@ -71,6 +75,7 @@ function useKeyboard() {
 
       switch (e.key) {
         case ' ':
+          if (el && el !== document.body && el.closest(OWNS_SPACE)) return;
           e.preventDefault();
           void s.toggle();
           break;
@@ -114,11 +119,12 @@ function Booting() {
 function Nothing() {
   const rediscover = useSonos((s) => s.rediscover);
   const busy = useSonos((s) => s.busy);
+  const error = useSonos((s) => s.discoveryError);
   return (
     <div className="curtain" data-tauri-drag-region>
       <Vinyl playing={busy} />
       <p className="curtain-title">No Sonos found on this Wi-Fi.</p>
-      <p className="label curtain-sub">Same network as the speakers?</p>
+      <p className="label curtain-sub">{error ?? 'Same network as the speakers?'}</p>
       <button type="button" className="curtain-btn" onClick={() => void rediscover()} disabled={busy}>
         {busy ? 'Looking…' : 'Look again'}
       </button>

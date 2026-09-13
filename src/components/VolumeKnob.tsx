@@ -45,7 +45,8 @@ export default function VolumeKnob() {
 
   const onWheel = (e: React.WheelEvent) => {
     const step = e.deltaY < 0 ? 2 : -2;
-    void setGroupVolume(volume + step);
+    // Several wheel events can land in one frame; build on the store, not the last render.
+    void setGroupVolume((useSonos.getState().state?.volume ?? volume) + step);
     clearTimeout(wheelTimer.current);
     wheelTimer.current = setTimeout(() => {
       void setGroupVolume(useSonos.getState().state?.volume ?? volume, true);

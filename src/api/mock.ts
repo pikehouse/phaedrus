@@ -535,6 +535,8 @@ export class MockSonosApi implements SonosApi {
     const d = deckFor(ip);
     queue = queue.filter((q) => q.index !== index);
     reindex();
+    // The current track slides up with everything after it.
+    if (d.queueIndex > index) d.queueIndex -= 1;
     if (d.queueIndex > queue.length) d.queueIndex = Math.max(1, queue.length);
   }
 
@@ -583,9 +585,13 @@ export class MockSonosApi implements SonosApi {
     await wait(220);
     const z = byIp(zoneIp);
     if (!z) return;
-    // Anyone following this zone follows its new coordinator too (stereo pairs).
-    Object.keys(membership).forEach((uuid) => {
-      if (membership[uuid] === z.uuid) membership[uuid] = coordinatorUuid;
+    // Like Sonos: its own stereo half goes with it, but the rest of its group
+    // stays behind under whichever visible member is left.
+    const followers = ZONES.filter((o) => o.uuid !== z.uuid && membership[o.uuid] === z.uuid);
+    const heir = followers.find((o) => !o.invisible);
+    followers.forEach((o) => {
+      const pairHalf = o.invisible && o.name.startsWith(z.name);
+      membership[o.uuid] = pairHalf || !heir ? coordinatorUuid : heir.uuid;
     });
     membership[z.uuid] = coordinatorUuid;
   }

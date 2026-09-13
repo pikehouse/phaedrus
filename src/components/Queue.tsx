@@ -78,11 +78,7 @@ export default function Queue() {
                 >
                   <span className="qrow-marker" aria-hidden="true" />
                   <span className="qrow-art">
-                    {item.art ? (
-                      <img src={item.art} alt="" loading="lazy" draggable={false} />
-                    ) : (
-                      <span className="qrow-art-blank" />
-                    )}
+                    <QueueArt src={item.art} />
                     {current && playing && <span className="qrow-art-glow" aria-hidden="true" />}
                   </span>
                   <span className="qrow-text">
@@ -113,4 +109,11 @@ export default function Queue() {
       </ul>
     </div>
   );
+}
+
+/** A cover the art cache refuses (403, gone) falls back to the blank stock. */
+function QueueArt({ src }: { src?: string }) {
+  const [broken, setBroken] = useState<string | undefined>();
+  if (!src || broken === src) return <span className="qrow-art-blank" />;
+  return <img src={src} alt="" loading="lazy" draggable={false} onError={() => setBroken(src)} />;
 }

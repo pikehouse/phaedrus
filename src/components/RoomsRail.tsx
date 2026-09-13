@@ -26,7 +26,7 @@ export default function RoomsRail() {
 
   const groups = topology?.groups ?? [];
   const roomCount = groups.reduce((n, g) => n + g.members.length, 0);
-  const playing = state?.state === 'PLAYING';
+  const playing = state?.state === 'PLAYING' || state?.state === 'TRANSITIONING';
 
   return (
     <aside className="rail rooms">

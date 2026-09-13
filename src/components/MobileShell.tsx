@@ -134,6 +134,8 @@ function Sheet({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
+      // Search opens above the sheet; that Escape is the overlay's alone.
+      if (useSonos.getState().searchOpen) return;
       e.stopPropagation();
       onClose();
     };
