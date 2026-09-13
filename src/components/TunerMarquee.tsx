@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import '../styles/tuner.css';
 
 /** Blank run between the end of the line and the start of its repeat.
@@ -22,6 +23,7 @@ interface Props {
  * keeps the whole thing off React's render path.
  */
 export default function TunerMarquee({ text, speed = 50, pauseMs = 1500, className }: Props) {
+  const reduced = useReducedMotion();
   const viewport = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const seg = useRef<HTMLSpanElement>(null);
@@ -32,7 +34,6 @@ export default function TunerMarquee({ text, speed = 50, pauseMs = 1500, classNa
     const sg = seg.current;
     if (!vp || !tr || !sg) return;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let anim: Animation | null = null;
 
     const measure = () => {
@@ -85,7 +86,7 @@ export default function TunerMarquee({ text, speed = 50, pauseMs = 1500, classNa
       document.removeEventListener('visibilitychange', onVisibility);
       anim?.cancel();
     };
-  }, [text, speed, pauseMs]);
+  }, [reduced, text, speed, pauseMs]);
 
   return (
     <div className={`tmarq${className ? ` ${className}` : ''}`} ref={viewport}>

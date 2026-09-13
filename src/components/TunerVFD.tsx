@@ -26,9 +26,12 @@ const two = (n: number | undefined) => (n == null ? '--' : String(n).padStart(2,
 /**
  * Whole seconds of live position, resynced from the store rather than kept in
  * React — segments only need to change once a second, so this re-renders at
- * 1Hz however often the poller lands.
+ * 1Hz however often the poller lands. The ticker only runs while the track
+ * plays and the window is visible; otherwise each poll resyncs it.
  */
 function useElapsed(): number {
+  const receivedAt = useSonos((s) => s.receivedAt);
+  const playing = useSonos((s) => s.state?.state === 'PLAYING');
   const [secs, setSecs] = useState(() => Math.floor(livePosition(useSonos.getState())));
   useEffect(() => {
     const read = () => {
@@ -36,9 +39,27 @@ function useElapsed(): number {
       setSecs((prev) => (prev === n ? prev : n));
     };
     read();
-    const t = setInterval(read, 200);
-    return () => clearInterval(t);
-  }, []);
+    if (!playing) return;
+    let t = 0;
+    const start = () => {
+      if (!t) t = window.setInterval(read, 200);
+    };
+    const stop = () => {
+      clearInterval(t);
+      t = 0;
+    };
+    const onVisibility = () => {
+      if (document.hidden) return stop();
+      read();
+      start();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    if (!document.hidden) start();
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, [receivedAt, playing]);
   return secs;
 }
 

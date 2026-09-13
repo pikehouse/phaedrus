@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 /* ══════════════════════════════════════════════════════════════════════════
    THE GRID
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export default function DriveGrid({ playing }: Props) {
+  const reduced = useReducedMotion();
   const host = useRef<HTMLDivElement>(null);
   const play = useRef(playing);
   const wake = useRef<(() => void) | null>(null);
@@ -113,7 +115,7 @@ export default function DriveGrid({ playing }: Props) {
     ro.observe(el);
     measure();
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduced) {
       return () => ro.disconnect();
     }
 
@@ -128,7 +130,7 @@ export default function DriveGrid({ playing }: Props) {
       document.removeEventListener('visibilitychange', onVisibility);
       wake.current = null;
     };
-  }, []);
+  }, [reduced]);
 
   // Play/pause only nudges the loop; the road keeps its phase across a pause.
   useEffect(() => {

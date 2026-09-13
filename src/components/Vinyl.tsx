@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import '../styles/vinyl.css';
 
 // Real 33⅓ rpm is a turn every 1.8s, which is hard to look at from across
@@ -22,8 +23,14 @@ export default function Vinyl({ art, playing, title, onArtError }: Props) {
   const discRef = useRef<HTMLDivElement>(null);
   const angle = useRef(0);
   const velocity = useRef(0);
+  const reduced = useReducedMotion();
 
   useEffect(() => {
+    // Reduced motion: the record sits still wherever it last came to rest.
+    if (reduced) {
+      velocity.current = 0;
+      return;
+    }
     let raf = 0;
     let last = performance.now();
     let idleFrames = 0;
@@ -50,7 +57,7 @@ export default function Vinyl({ art, playing, title, onArtError }: Props) {
 
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [playing]);
+  }, [playing, reduced]);
 
   return (
     <div className="vinyl">

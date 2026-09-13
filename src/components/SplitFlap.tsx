@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import '../styles/splitflap.css';
 
 /** Drums, in the order the flaps are stacked. Advancing always goes forward.
@@ -105,6 +106,7 @@ export default function SplitFlap({
   tic,
   fit,
 }: Props) {
+  const reduced = useReducedMotion();
   const target = useMemo(() => normalize(text, drum, cells), [text, drum, cells]);
   const words = useMemo(() => groupWords(target), [target]);
   const rowRef = useRef<HTMLSpanElement>(null);
@@ -156,7 +158,6 @@ export default function SplitFlap({
     const row = rowRef.current;
     if (!row) return;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const flaps = [...row.querySelectorAll<HTMLSpanElement>('.flap')];
     let staggerSlot = 0;
 
@@ -226,11 +227,11 @@ export default function SplitFlap({
     });
 
     state.current.length = target.length; // cells added or removed with the text
-  }, [target, drum, instant]);
+  }, [target, drum, instant, reduced]);
 
   useEffect(() => {
     if (!tic || !TIC) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (reduced) return;
 
     let timer: number | undefined;
 
@@ -277,7 +278,7 @@ export default function SplitFlap({
       clearTimeout(timer);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [tic]);
+  }, [reduced, tic]);
 
   // Only on unmount — a re-render must not cancel chains that are still landing.
   useEffect(

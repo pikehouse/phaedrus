@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { createPortal } from 'react-dom';
 
 const SWEEP_MS = 2400; // must match the drive-sweep keyframes
@@ -12,10 +13,11 @@ const GAP_MAX_MS = 11000;
  * otherwise keep a fixed element inside its own box.
  */
 export default function DriveFilm({ playing }: { playing: boolean }) {
+  const reduced = useReducedMotion();
   const [passing, setPassing] = useState(false);
 
   useEffect(() => {
-    if (!playing || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!playing || reduced) return;
     let timer = 0;
     let end = 0;
     let cancelled = false;
@@ -45,7 +47,7 @@ export default function DriveFilm({ playing }: { playing: boolean }) {
       // A lamp we are already under finishes passing; the next one never comes.
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, [playing]);
+  }, [reduced, playing]);
 
   return createPortal(
     <>

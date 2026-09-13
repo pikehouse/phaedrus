@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import '../styles/tuner.css';
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -47,6 +48,7 @@ export default function TunerSpectrum({
   rows = 12,
   className,
 }: Props) {
+  const reduced = useReducedMotion();
   const host = useRef<HTMLDivElement>(null);
   const play = useRef(playing);
   const wake = useRef<(() => void) | null>(null);
@@ -171,7 +173,7 @@ export default function TunerSpectrum({
       if (!raf && !document.hidden) raf = requestAnimationFrame(step);
     };
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduced) {
       // Frozen at a low, plausible pattern — lit, but never moving.
       gain = 0.34;
       advance(0.001);
@@ -191,7 +193,7 @@ export default function TunerSpectrum({
       document.removeEventListener('visibilitychange', onVisibility);
       wake.current = null;
     };
-  }, [bands, rows, seed]);
+  }, [bands, rows, seed, reduced]);
 
   // Play/pause only nudges the loop; it never rebuilds it, so the synthesised
   // programme keeps its phase across a pause instead of restarting.

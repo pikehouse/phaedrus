@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { livePosition, useSonos } from '../store/useSonos';
 import { hashString } from '../lib/hash';
 import { mmss } from '../lib/format';
@@ -14,26 +14,37 @@ const MAX_BARS = 160;
 const LIVE_SCALE = 0.36;
 
 /**
- * The interpolated needle at ~10fps, resynced whenever a fresh snapshot lands —
- * the same clock Progress keeps.
+ * The interpolated needle, resynced whenever a fresh snapshot lands — the
+ * same clock Progress keeps. While playing, `paint` is handed the fine
+ * position at ~10fps and writes it straight to the DOM; React only hears whole
+ * seconds, for the readout. Paused, the needle cannot move between polls, so
+ * no loop runs. `hold` (a scrub in progress) owns the playhead instead.
  */
-function useLivePosition(receivedAt: number) {
-  const [pos, setPos] = useState(() => livePosition(useSonos.getState()));
-  useEffect(() => {
-    setPos(livePosition(useSonos.getState()));
+function useLivePosition(receivedAt: number, paint: (secs: number) => void, hold: boolean) {
+  const playing = useSonos((s) => s.state?.state === 'PLAYING');
+  const [secs, setSecs] = useState(() => Math.floor(livePosition(useSonos.getState())));
+  useLayoutEffect(() => {
+    if (hold) return;
+    const read = () => {
+      const pos = livePosition(useSonos.getState());
+      paint(pos);
+      setSecs(Math.floor(pos));
+    };
+    read();
+    if (!playing) return;
     let raf = 0;
     let last = 0;
     const frame = (t: number) => {
       if (t - last > 100) {
         last = t;
-        setPos(livePosition(useSonos.getState()));
+        read();
       }
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [receivedAt]);
-  return pos;
+  }, [receivedAt, playing, paint, hold]);
+  return secs;
 }
 
 /** mulberry32: a small deterministic generator, [0, 1). */
@@ -93,9 +104,9 @@ export default function DaylightWave() {
   const receivedAt = useSonos((s) => s.receivedAt);
   const seekTo = useSonos((s) => s.seekTo);
   const trackRef = useRef<HTMLDivElement>(null);
+  const playedRef = useRef<HTMLDivElement>(null);
   const [bars, setBars] = useState(96);
   const [scrub, setScrub] = useState<number | null>(null);
-  const live = useLivePosition(receivedAt);
 
   const ready = !!state;
   const radio = !!state?.isRadio;
@@ -103,7 +114,36 @@ export default function DaylightWave() {
   const heights = useMemo(() => shape(seed), [seed]);
 
   const duration = state?.durationSecs ?? 0;
+
+  // The played layer's clip is written directly, so a moving needle never re-renders the bars.
+  const paint = useCallback(
+    (secs: number) => {
+      const el = playedRef.current;
+      if (!el) return;
+      const pct = !radio && duration > 0 ? Math.max(0, Math.min(1, secs / duration)) * 100 : 0;
+      el.style.clipPath = `inset(0 ${(100 - pct).toFixed(2)}% 0 0)`;
+    },
+    [radio, duration],
+  );
+  const live = useLivePosition(receivedAt, paint, scrub !== null);
   const position = scrub ?? live;
+
+  useLayoutEffect(() => {
+    if (scrub !== null) paint(scrub);
+  }, [scrub, paint]);
+
+  // No timeline at all (nothing on): a flat baseline, not a made-up song.
+  const scale = radio ? LIVE_SCALE : duration > 0 ? 1 : 0;
+  // Rebuilt only when the shape or the fit changes — never for the needle.
+  const row = useMemo(
+    () =>
+      Array.from({ length: bars }, (_, i) => {
+        const h = heights[Math.floor(((i + 0.5) / bars) * SAMPLES)] * scale;
+        const style = { height: `max(3px, ${(h * 100).toFixed(1)}%)`, '--i': i } as React.CSSProperties;
+        return <i key={i} style={style} />;
+      }),
+    [heights, bars, scale],
+  );
 
   // How many bars fit the row at the minimum gap.
   useLayoutEffect(() => {
@@ -145,16 +185,10 @@ export default function DaylightWave() {
     void seekTo(target);
   };
 
-  if (!state) return null;
+  // A cancelled drag (the system took the pointer away) is not a decision to seek.
+  const onPointerCancel = () => setScrub(null);
 
-  const pct = !radio && duration > 0 ? Math.max(0, Math.min(1, position / duration)) * 100 : 0;
-  // No timeline at all (nothing on): a flat baseline, not a made-up song.
-  const scale = radio ? LIVE_SCALE : duration > 0 ? 1 : 0;
-  const row = Array.from({ length: bars }, (_, i) => {
-    const h = heights[Math.floor(((i + 0.5) / bars) * SAMPLES)] * scale;
-    const style = { height: `max(3px, ${(h * 100).toFixed(1)}%)`, '--i': i } as React.CSSProperties;
-    return <i key={i} style={style} />;
-  });
+  if (!state) return null;
 
   if (radio) {
     return (
@@ -183,7 +217,7 @@ export default function DaylightWave() {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
+        onPointerCancel={onPointerCancel}
         role="slider"
         tabIndex={0}
         aria-label="Seek"
@@ -199,11 +233,7 @@ export default function DaylightWave() {
         <div className="dl-wave-layer dl-wave-rest" aria-hidden="true">
           {row}
         </div>
-        <div
-          className="dl-wave-layer dl-wave-played"
-          style={{ clipPath: `inset(0 ${(100 - pct).toFixed(2)}% 0 0)` }}
-          aria-hidden="true"
-        >
+        <div className="dl-wave-layer dl-wave-played" ref={playedRef} aria-hidden="true">
           {row}
         </div>
       </div>

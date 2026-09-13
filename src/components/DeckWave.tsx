@@ -69,6 +69,8 @@ export default function DeckWave({ deck, title, artist, seed, position, duration
     setScrub(null);
     onSeek?.(target);
   };
+  // A cancelled drag (the system took the pointer away) is not a decision to seek.
+  const onPointerCancel = () => setScrub(null);
 
   const cls = `dwave dwave-${deck.toLowerCase()}${live ? ' is-live' : ''}${empty ? ' is-empty' : ''}${
     scrub !== null ? ' is-scrubbing' : ''
@@ -114,7 +116,7 @@ export default function DeckWave({ deck, title, artist, seed, position, duration
                 onPointerDown={onPointerDown}
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
-                onPointerCancel={onPointerUp}
+                onPointerCancel={onPointerCancel}
                 {...(seekable
                   ? {
                       role: 'slider' as const,

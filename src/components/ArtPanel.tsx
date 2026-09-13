@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import '../styles/artpanel.css';
 
 const FLIP_MS = 460;
@@ -27,7 +28,9 @@ export default function ArtPanel({ art, title, playing }: Props) {
   const shown = useRef<string | undefined>(undefined);
   const slot = useRef<HTMLSpanElement>(null);
   const slotTimer = useRef<number | undefined>(undefined);
+  const flip = useRef<Animation[]>([]);
   const [broken, setBroken] = useState(false);
+  const reduced = useReducedMotion();
 
   /* The slot is the mechanism: it belongs on screen while the panel is
      turning, and gets out of the way of the artwork once it has settled. */
@@ -48,7 +51,23 @@ export default function ArtPanel({ art, title, playing }: Props) {
     }, delay);
   };
 
-  useEffect(() => () => clearTimeout(slotTimer.current), []);
+  /* A flip still turning when the next art lands is stopped where it is:
+     left alone, its onfinish would stamp the older cover over the new flip. */
+  const cancelFlip = () => {
+    for (const a of flip.current) {
+      a.onfinish = null;
+      a.cancel();
+    }
+    flip.current = [];
+  };
+
+  useEffect(
+    () => () => {
+      clearTimeout(slotTimer.current);
+      cancelFlip();
+    },
+    [],
+  );
 
   useEffect(() => {
     const next = art ?? '';
@@ -59,18 +78,26 @@ export default function ArtPanel({ art, title, playing }: Props) {
       return;
     }
     const first = shown.current === undefined;
+    const previous = shown.current ?? '';
     shown.current = next;
     setBroken(false);
 
     const set = (el: HTMLImageElement | null, src: string) => {
       if (!el) return;
       el.style.visibility = src ? 'visible' : 'hidden';
+      // No art must leave no cover behind on the element, either.
       if (src) el.src = src;
+      else el.removeAttribute('src');
     };
 
-    if (first || !leafTop.current || !leafBottom.current) {
+    cancelFlip();
+
+    // Reduced motion swaps the card in place rather than turning it over.
+    if (first || reduced || !leafTop.current || !leafBottom.current) {
       set(top.current, next);
       set(bottom.current, next);
+      if (leafTop.current) leafTop.current.style.opacity = '0';
+      if (leafBottom.current) leafBottom.current.style.opacity = '0';
       showSlot();
       retireSlot(SLOT_LINGER_MS);
       return;
@@ -79,15 +106,15 @@ export default function ArtPanel({ art, title, playing }: Props) {
     showSlot();
     retireSlot(FLIP_MS + SLOT_LINGER_MS);
 
-    const previous = bottom.current?.src ?? '';
     set(top.current, next); // revealed as the old top falls
+    set(bottom.current, previous); // an interrupted flip may not have landed it yet
     set(leafTopImg.current, previous);
     set(leafBottomImg.current, next);
     leafTop.current.style.opacity = '1';
     leafBottom.current.style.opacity = '1';
 
     const half = FLIP_MS / 2;
-    leafTop.current.animate(
+    const fall = leafTop.current.animate(
       [{ transform: 'rotateX(0deg)' }, { transform: 'rotateX(-90deg)' }],
       { duration: half, easing: 'cubic-bezier(0.45, 0, 0.9, 0.55)', fill: 'forwards' },
     );
@@ -95,12 +122,14 @@ export default function ArtPanel({ art, title, playing }: Props) {
       [{ transform: 'rotateX(90deg)' }, { transform: 'rotateX(0deg)' }],
       { duration: half, delay: half, easing: 'cubic-bezier(0.2, 0.85, 0.35, 1)', fill: 'forwards' },
     );
+    flip.current = [fall, drop];
     drop.onfinish = () => {
+      flip.current = [];
       set(bottom.current, next);
       if (leafTop.current) leafTop.current.style.opacity = '0';
       if (leafBottom.current) leafBottom.current.style.opacity = '0';
     };
-  }, [art]);
+  }, [art, reduced]);
 
   const blank = !art || broken;
 

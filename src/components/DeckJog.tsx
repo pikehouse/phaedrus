@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useSonos } from '../store/useSonos';
 import { useLivePosition } from './DeckSignal';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import '../styles/deck.css';
 
 const SEGMENTS = 60;
@@ -35,22 +36,31 @@ const RING = Array.from({ length: SEGMENTS }, (_, i) => {
 export default function DeckJog() {
   const state = useSonos((s) => s.state);
   const receivedAt = useSonos((s) => s.receivedAt);
-  const live = useLivePosition(receivedAt);
+  const reduced = useReducedMotion();
 
   const playing = state?.state === 'PLAYING' || state?.state === 'TRANSITIONING';
   const track = state?.track;
   const idle = !state || state.state === 'NO_MEDIA_PRESENT' || !track;
   const duration = state?.durationSecs ?? 0;
-  const played =
-    !idle && !state.isRadio && duration > 0 ? Math.max(0, Math.min(1, live / duration)) : 0;
-  const lit = Math.round(played * SEGMENTS);
+  const timed = !idle && !state.isRadio && duration > 0;
+  // The arc moves a segment at a time, so the clock is read in whole segments
+  // and the platter re-renders only when another one lights.
+  const live = useLivePosition(receivedAt, timed ? duration / SEGMENTS : Infinity);
+  const lit = timed ? Math.round(Math.max(0, Math.min(1, live / duration)) * SEGMENTS) : 0;
+  const ring = useMemo(
+    () => RING.map((p, i) => <line key={i} {...p} className={`jog-led${i < lit ? ' is-lit' : ''}`} />),
+    [lit],
+  );
 
   const arm = useRef<HTMLDivElement>(null);
   const angle = useRef(0);
   const velocity = useRef(0);
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (reduced) {
+      velocity.current = 0;
+      return;
+    }
     let raf = 0;
     let last = performance.now();
     let idleFrames = 0;
@@ -77,15 +87,13 @@ export default function DeckJog() {
 
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [playing]);
+  }, [playing, reduced]);
 
   return (
     <div className={`jog${playing ? ' is-live' : ''}${idle ? ' is-idle' : ''}`}>
       <i className="jog-rubber" aria-hidden="true" />
       <svg className="jog-ring" viewBox="0 0 200 200" aria-hidden="true">
-        {RING.map((p, i) => (
-          <line key={i} {...p} className={`jog-led${i < lit ? ' is-lit' : ''}`} />
-        ))}
+        {ring}
       </svg>
       <div className="jog-arm" ref={arm} aria-hidden="true">
         <i className="jog-marker" />

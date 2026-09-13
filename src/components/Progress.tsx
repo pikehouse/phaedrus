@@ -10,10 +10,12 @@ import '../styles/progress.css';
  * cheap enough to leave running. rAF is throttled to nothing in a hidden
  * window, so we also resync whenever a fresh snapshot lands.
  */
-function useLivePosition(receivedAt: number) {
+function useLivePosition(receivedAt: number, playing: boolean) {
   const [pos, setPos] = useState(() => livePosition(useSonos.getState()));
   useEffect(() => {
     setPos(livePosition(useSonos.getState()));
+    // Paused, the position only changes when a poll lands; don't burn frames.
+    if (!playing) return;
     let raf = 0;
     let last = 0;
     const frame = (t: number) => {
@@ -25,7 +27,7 @@ function useLivePosition(receivedAt: number) {
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
-  }, [receivedAt]);
+  }, [receivedAt, playing]);
   return pos;
 }
 
@@ -36,7 +38,8 @@ export default function Progress() {
   const seekTo = useSonos((s) => s.seekTo);
   const trackRef = useRef<HTMLDivElement>(null);
   const [scrub, setScrub] = useState<number | null>(null);
-  const live = useLivePosition(receivedAt);
+  const playingNow = useSonos((st) => st.state?.state === 'PLAYING' || st.state?.state === 'TRANSITIONING');
+  const live = useLivePosition(receivedAt, playingNow);
 
   const duration = state?.durationSecs ?? 0;
   const position = scrub ?? live;

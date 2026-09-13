@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 /* ══════════════════════════════════════════════════════════════════════════
    THE NEON SIGN
@@ -27,6 +28,7 @@ export default function DriveTitle({ text, lit }: Props) {
   const [size, setSize] = useState(SIZES[0]);
   const [dip, setDip] = useState<number | null>(null);
   const chars = useMemo(() => [...text], [text]);
+  const reduced = useReducedMotion();
 
   // The largest size at which the sign sits on at most two lines. Never an
   // ellipsis: a sign that runs out of room is bent smaller.
@@ -48,12 +50,22 @@ export default function DriveTitle({ text, lit }: Props) {
     fit();
     const ro = new ResizeObserver(fit);
     if (h.parentElement) ro.observe(h.parentElement);
-    return () => ro.disconnect();
+    // The first fit may have measured a fallback face: fit again once the web font is in.
+    let alive = true;
+    void document.fonts.ready.then(() => {
+      if (alive) fit();
+    });
+    document.fonts.addEventListener('loadingdone', fit);
+    return () => {
+      alive = false;
+      ro.disconnect();
+      document.fonts.removeEventListener('loadingdone', fit);
+    };
   }, [text]);
 
   // Once every minute or two, one letter loses its arc for 120 ms.
   useEffect(() => {
-    if (!lit || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!lit || reduced) return;
     const candidates = chars.map((c, i) => (/\S/.test(c) ? i : -1)).filter((i) => i >= 0);
     if (candidates.length === 0) return;
     let timer = 0;
@@ -78,8 +90,9 @@ export default function DriveTitle({ text, lit }: Props) {
       clearTimeout(timer);
       clearTimeout(end);
       document.removeEventListener('visibilitychange', onVisibility);
+      setDip(null);
     };
-  }, [chars, lit]);
+  }, [chars, lit, reduced]);
 
   return (
     <h1

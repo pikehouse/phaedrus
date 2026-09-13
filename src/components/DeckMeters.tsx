@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useSonos } from '../store/useSonos';
 import type { MemberVolume } from '../api/types';
 import { mulberry, trackSeed } from './DeckSignal';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 /* ══════════════════════════════════════════════════════════════════════════
    CHANNEL METERS
@@ -34,6 +35,9 @@ export default function DeckMeters() {
   const seed = trackSeed(state?.isRadio ? state.stationName : track?.title, track?.artist);
   // The rows are keyed by room, so a new room set means new elements.
   const roster = members.map((m) => m.uuid).join('|');
+  // Every snapshot brings a fresh members array; only a real level change should reach the loop.
+  const levels = members.map((m) => `${m.uuid}:${m.volume}:${m.muted ? 1 : 0}`).join('|');
+  const reduced = useReducedMotion();
 
   const play = useRef(playing);
   const gains = useRef(new Float32Array(0));
@@ -44,7 +48,7 @@ export default function DeckMeters() {
   useEffect(() => {
     gains.current = Float32Array.from(members, (m) => (m.muted ? 0 : Math.pow(m.volume / 100, 0.6)));
     wake.current?.();
-  }, [members]);
+  }, [levels]);
 
   useEffect(() => {
     play.current = playing;
@@ -135,8 +139,10 @@ export default function DeckMeters() {
     };
 
     /* One frame on its own, then the loop if allowed — a meter mounted in a
-       hidden tab must not be a dead strip the moment it is seen. */
+       hidden tab must not be a dead strip the moment it is seen. A running
+       loop needs no nudge: it reads the change on its next frame. */
     const nudge = () => {
+      if (raf) return;
       advance(0.05);
       paint();
       if (!raf && !document.hidden) raf = requestAnimationFrame(step);
@@ -149,7 +155,7 @@ export default function DeckMeters() {
       }
     };
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduced) {
       gain = 0.34;
       advance(0.001);
       paint();
@@ -170,7 +176,7 @@ export default function DeckMeters() {
       wake.current = null;
       clear();
     };
-  }, [seed, roster]);
+  }, [seed, roster, reduced]);
 
   return null;
 }
