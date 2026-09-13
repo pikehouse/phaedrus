@@ -12,6 +12,7 @@ import TunerStage from './TunerStage';
 import DriveStage from './DriveStage';
 import DaylightStage from './DaylightStage';
 import DeckStage from './DeckStage';
+import PrismStage from './PrismStage';
 import '../styles/nowplaying.css';
 
 /** How long each line of the board's cycling sub-head holds before it turns. */
@@ -138,7 +139,7 @@ export default function NowPlaying() {
   );
 
   const faceplate = (
-    <div className="faceplate" aria-label="Volume">
+    <div className="faceplate" role="group" aria-label="Volume">
       <VolumeKnob />
       <Faders />
       <div className="faceplate-brand" aria-hidden="true">
@@ -196,6 +197,20 @@ export default function NowPlaying() {
         <div className="stage-scroll">
           <div className="stage-body">
             <DeckStage />
+          </div>
+        </div>
+
+        {faceplate}
+      </section>
+    );
+  }
+
+  if (skin === 'prism') {
+    return (
+      <section className="stage stage-prism" aria-label="Now playing">
+        <div className="stage-scroll">
+          <div className="stage-body">
+            <PrismStage />
           </div>
         </div>
 

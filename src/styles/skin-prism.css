@@ -1,0 +1,969 @@
+@import '@fontsource-variable/inter/wght.css';
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PRISM SKIN — light through glass, a spectrum on the wall.
+
+   A dark filmic photograph: a soft spectrum projected on a warm brown wall,
+   a matte black instrument with a comb of glowing filaments, a glossy floor
+   carrying their reflection. Deep blacks, fine grain, no chrome, and glow
+   that is present but never loud. Keyed off [data-skin='prism'] on <html>.
+
+   The first block re-points the hi-fi tokens so everything that speaks only
+   in tokens restyles for free; the rest is the work tokens cannot do.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin='prism'] {
+  /* ── The photograph's own vocabulary ───────────────────────────────────── */
+  --pr-ground: #0a0807;
+  --pr-wall: #1a120d;
+  --pr-body: #070708;
+  --pr-floor: #0d0c0c;
+
+  --pr-ink: #e9e4de;
+  --pr-dim: #8a837c;
+  --pr-ghost-ink: rgba(233, 228, 222, 0.14);
+  --pr-hair: rgba(233, 228, 222, 0.07);
+  --pr-blue: #eaf2ff;
+  --pr-coral: #ff7a5c;
+
+  --pr-spectrum: linear-gradient(
+    90deg,
+    #ff5a2a 0%,
+    #ffb13b 14%,
+    #43d86a 29%,
+    #1fa6b8 43%,
+    #5b5bd6 57%,
+    #e05aa8 71%,
+    #eaf2ff 86%,
+    #ff7a5c 100%
+  );
+  --pr-spectrum-v: linear-gradient(180deg, #ff5a2a, #ffb13b 16%, #43d86a 33%, #1fa6b8 50%, #5b5bd6 66%, #e05aa8 83%, #eaf2ff);
+
+  /* ── Hi-fi tokens, re-pointed ──────────────────────────────────────────── */
+  --bg-deep: var(--pr-ground);
+  --bg: #0c0a09;
+  --bg-raised: #15110f;
+  --walnut: #1b1613;
+  --walnut-light: #251e1a;
+
+  --cream: var(--pr-ink);
+  --cream-dim: var(--pr-dim);
+  --cream-faint: rgba(233, 228, 222, 0.42);
+  --cream-ghost: var(--pr-ghost-ink);
+
+  --amber: #ffb13b;
+  --amber-hot: #ffc566;
+  --amber-glow: rgba(255, 177, 59, 0.2);
+
+  --rust: var(--pr-coral);
+  --burgundy: #1c1512;
+  --wine: #120e0c;
+  --olive: #1a1714;
+  --mustard: #ffb13b;
+
+  --display: 'Inter Variable', 'Helvetica Neue', Helvetica, sans-serif;
+  --face: 'Inter Variable', 'Helvetica Neue', Helvetica, sans-serif;
+
+  --radius: 2px;
+
+  --sink: inset 0 1px 2px rgba(0, 0, 0, 0.8), inset 0 -1px 0 rgba(233, 228, 222, 0.03);
+  --lift: 0 10px 30px rgba(0, 0, 0, 0.62), 0 0 0 0.5px rgba(233, 228, 222, 0.06);
+}
+
+[data-skin='prism'] body,
+[data-skin='prism'] .shell,
+[data-skin='prism'] .stage {
+  background: var(--pr-ground);
+}
+
+/* Inter has weight and nothing else: clear Fraunces's axes and its italics. */
+[data-skin='prism'] .meta-title,
+[data-skin='prism'] .meta-artist,
+[data-skin='prism'] .room-name,
+[data-skin='prism'] .arrange-name,
+[data-skin='prism'] .qrow-title,
+[data-skin='prism'] .crate-caption,
+[data-skin='prism'] .crate-bill-title,
+[data-skin='prism'] .sresult-title,
+[data-skin='prism'] .search-input,
+[data-skin='prism'] .search-drill-title,
+[data-skin='prism'] .curtain-title,
+[data-skin='prism'] .boundary-title,
+[data-skin='prism'] .panel-empty-line,
+[data-skin='prism'] .search-prompt,
+[data-skin='prism'] .linkcard-title {
+  font-variation-settings: normal;
+  font-style: normal;
+  font-weight: 350;
+  letter-spacing: 0.01em;
+}
+
+[data-skin='prism'] .label {
+  font-weight: 500;
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  color: rgba(233, 228, 222, 0.4);
+}
+
+[data-skin='prism'] .num {
+  letter-spacing: 0.06em;
+}
+
+/* ── Film: the hi-fi room is put away; grain and a soft vignette instead ─ */
+
+[data-skin='prism'] .atmo-leak,
+[data-skin='prism'] .atmo-grain {
+  display: none;
+}
+
+[data-skin='prism'] .atmo-vignette {
+  background: radial-gradient(125% 100% at 50% 42%, transparent 48%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+/* Three positions of one noise tile, stepped at ~4fps — the grain lives,
+   it never flickers. */
+html[data-skin='prism'] body::after {
+  content: '';
+  position: fixed;
+  inset: -64px;
+  z-index: 9001;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='3' seed='23' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23p)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: soft-light;
+  opacity: 0.05;
+  animation: prism-grain 720ms steps(1) infinite;
+}
+
+@keyframes prism-grain {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  33.3% {
+    transform: translate3d(-38px, 21px, 0);
+  }
+  66.6% {
+    transform: translate3d(17px, -44px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-skin='prism'] body::after {
+    animation: none;
+  }
+}
+
+/* ── Rails: dark glass with hairlines ──────────────────────────────────── */
+
+[data-skin='prism'] .rooms,
+[data-skin='prism'] .right-rail {
+  background:
+    linear-gradient(180deg, rgba(233, 228, 222, 0.022), transparent 260px),
+    linear-gradient(180deg, #0d0b0a, #090706);
+}
+
+[data-skin='prism'] .rooms {
+  box-shadow: inset -1px 0 0 var(--pr-hair), 14px 0 36px rgba(0, 0, 0, 0.45);
+}
+
+[data-skin='prism'] .right-rail {
+  box-shadow: inset 1px 0 0 var(--pr-hair), -14px 0 36px rgba(0, 0, 0, 0.45);
+}
+
+[data-skin='prism'] .rooms-head .label,
+[data-skin='prism'] .panel-head .label {
+  color: rgba(233, 228, 222, 0.5);
+}
+
+[data-skin='prism'] .room {
+  padding: 11px 12px 13px 16px;
+}
+
+[data-skin='prism'] .room:hover {
+  background: rgba(233, 228, 222, 0.03);
+}
+
+[data-skin='prism'] .room.is-selected {
+  background: linear-gradient(90deg, rgba(233, 228, 222, 0.035), transparent 90%);
+  box-shadow: none;
+}
+
+/* The selected room is underlined in light. */
+[data-skin='prism'] .room-marker {
+  left: 16px;
+  right: 14px;
+  top: auto;
+  bottom: 5px;
+  width: auto;
+  height: 1px;
+  border-radius: 0;
+}
+
+[data-skin='prism'] .room.is-selected .room-marker {
+  background: var(--pr-spectrum);
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+[data-skin='prism'] .room-name {
+  font-size: 15px;
+  font-weight: 380;
+}
+
+[data-skin='prism'] .room-with,
+[data-skin='prism'] .qrow-artist,
+[data-skin='prism'] .sresult-sub,
+[data-skin='prism'] .crate-caption-sub {
+  letter-spacing: 0.04em;
+  color: var(--pr-dim);
+}
+
+/* Three still filaments, not a bouncing meter. */
+[data-skin='prism'] .bars i {
+  width: 1px;
+  animation: none;
+  opacity: 0.85;
+}
+
+[data-skin='prism'] .bars i:nth-child(1) {
+  height: 55%;
+  background: #ffb13b;
+}
+
+[data-skin='prism'] .bars i:nth-child(2) {
+  height: 100%;
+  background: #43d86a;
+}
+
+[data-skin='prism'] .bars i:nth-child(3) {
+  height: 72%;
+  background: #5b5bd6;
+}
+
+[data-skin='prism'] .rooms-foot {
+  border-top-color: var(--pr-hair);
+}
+
+[data-skin='prism'] .rooms-everywhere-rule {
+  background: var(--pr-hair);
+}
+
+[data-skin='prism'] .rooms-everywhere:hover:not(:disabled) .label,
+[data-skin='prism'] .rooms-arrange.is-on,
+[data-skin='prism'] .arrange-hint em {
+  color: var(--pr-blue);
+}
+
+[data-skin='prism'] .rooms-everywhere:hover:not(:disabled) .rooms-everywhere-rule {
+  background: rgba(234, 242, 255, 0.24);
+}
+
+[data-skin='prism'] .rooms-rescan:hover:not(:disabled) {
+  color: var(--pr-ink);
+}
+
+[data-skin='prism'] .switch {
+  border-radius: 11px;
+  background: #050505;
+  box-shadow: inset 0 0 0 1px rgba(233, 228, 222, 0.1);
+}
+
+[data-skin='prism'] .switch-thumb {
+  background: #3a3531;
+  box-shadow: none;
+}
+
+[data-skin='prism'] .switch.is-on {
+  background: rgba(234, 242, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(234, 242, 255, 0.34);
+}
+
+[data-skin='prism'] .switch.is-on .switch-thumb {
+  background: var(--pr-blue);
+  box-shadow: 0 0 5px rgba(234, 242, 255, 0.25);
+}
+
+/* ── Skin picker: colours only — the layout is the rail's own ──────────── */
+
+[data-skin='prism'] .skinpick-btn {
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px rgba(233, 228, 222, 0.09);
+}
+
+[data-skin='prism'] .skinpick-btn.is-on {
+  color: var(--pr-ink);
+  background: var(--pr-spectrum) left bottom / 100% 1px no-repeat, rgba(233, 228, 222, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(233, 228, 222, 0.2);
+}
+
+/* ── Transport: bare light glyphs, play in a thin ring ─────────────────── */
+
+[data-skin='prism'] .tactile {
+  color: rgba(233, 228, 222, 0.62);
+  background: none;
+  box-shadow: none;
+}
+
+[data-skin='prism'] .tactile-sm {
+  width: 40px;
+  height: 40px;
+}
+
+[data-skin='prism'] .tactile-sm svg {
+  width: 17px;
+  height: 17px;
+}
+
+[data-skin='prism'] .tactile-lg {
+  width: 50px;
+  height: 50px;
+  color: var(--pr-ink);
+  box-shadow: inset 0 0 0 1px rgba(234, 242, 255, 0.4);
+}
+
+[data-skin='prism'] .tactile-lg svg {
+  width: 19px;
+  height: 19px;
+}
+
+[data-skin='prism'] .tactile-lg .glyph-play {
+  margin-left: 2px;
+}
+
+[data-skin='prism'] .tactile-lg.is-playing {
+  color: var(--pr-blue);
+  box-shadow: inset 0 0 0 1px rgba(234, 242, 255, 0.62), 0 0 12px rgba(234, 242, 255, 0.05);
+}
+
+[data-skin='prism'] .tactile:hover:not(:disabled) {
+  color: var(--pr-blue);
+}
+
+[data-skin='prism'] .tactile-lg:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 1px rgba(234, 242, 255, 0.8), 0 0 12px rgba(234, 242, 255, 0.06);
+}
+
+[data-skin='prism'] .tactile:active:not(:disabled) {
+  transform: none;
+  color: rgba(234, 242, 255, 0.66);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .tactile-lg:active:not(:disabled) {
+  box-shadow: inset 0 0 0 1px rgba(234, 242, 255, 0.36);
+}
+
+[data-skin='prism'] .tactile:disabled {
+  color: rgba(233, 228, 222, 0.14);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .tactile-lg:disabled {
+  box-shadow: inset 0 0 0 1px rgba(233, 228, 222, 0.1);
+}
+
+[data-skin='prism'] .mod {
+  color: rgba(233, 228, 222, 0.3);
+}
+
+[data-skin='prism'] .mod:hover:not(:disabled) {
+  color: var(--pr-ink);
+  background: none;
+}
+
+[data-skin='prism'] .mod.is-on {
+  color: var(--pr-ink);
+  text-shadow: none;
+}
+
+[data-skin='prism'] .mod.is-on::after {
+  width: 3px;
+  height: 3px;
+  background: var(--pr-blue);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .mod:disabled {
+  color: rgba(233, 228, 222, 0.08);
+}
+
+/* ── Progress: a hairline with a white-blue playhead ───────────────────── */
+
+[data-skin='prism'] .progress-time {
+  font-size: 10.5px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: rgba(233, 228, 222, 0.42);
+}
+
+[data-skin='prism'] .progress-groove {
+  inset: auto 0;
+  top: 50%;
+  height: 1px;
+  margin-top: -0.5px;
+  border-radius: 0;
+  background: rgba(233, 228, 222, 0.13);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .progress-played {
+  top: 50%;
+  height: 1px;
+  margin-top: -0.5px;
+  border-radius: 0;
+  background: linear-gradient(90deg, rgba(234, 242, 255, 0.06), rgba(234, 242, 255, 0.5));
+  box-shadow: none;
+}
+
+[data-skin='prism'] .progress-cap {
+  width: 1.5px;
+  height: 11px;
+  margin-left: -0.75px;
+  border-radius: 0;
+  background: var(--pr-blue);
+  box-shadow: 0 0 4px rgba(234, 242, 255, 0.3);
+}
+
+[data-skin='prism'] .progress-track:hover .progress-cap,
+[data-skin='prism'] .progress-track.is-scrubbing .progress-cap {
+  width: 2px;
+  height: 15px;
+  margin-left: -1px;
+}
+
+[data-skin='prism'] .progress-live .label {
+  color: rgba(233, 228, 222, 0.55);
+}
+
+[data-skin='prism'] .live-pip {
+  width: 4px;
+  height: 4px;
+  background: var(--pr-coral);
+  box-shadow: 0 0 4px rgba(255, 122, 92, 0.35);
+  animation: none;
+}
+
+[data-skin='prism'] .progress-live-rule {
+  background: linear-gradient(90deg, rgba(233, 228, 222, 0.12), transparent);
+}
+
+/* ── Faceplate: matte black, one faint top highlight ───────────────────── */
+
+[data-skin='prism'] .faceplate {
+  background: var(--pr-body);
+  border-top: 1px solid rgba(233, 228, 222, 0.06);
+  box-shadow: inset 0 1px 0 rgba(233, 228, 222, 0.025), 0 -18px 40px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='prism'] .faceplate::before {
+  background: none;
+}
+
+[data-skin='prism'] .faceplate-brand {
+  font-weight: 500;
+  font-size: 8px;
+  letter-spacing: 0.42em;
+  color: rgba(233, 228, 222, 0.16);
+}
+
+[data-skin='prism'] .faceplate-led {
+  width: 3px;
+  height: 3px;
+  background: rgba(233, 228, 222, 0.07);
+  box-shadow: none;
+  transition: none;
+}
+
+[data-skin='prism'] .faceplate-led.is-lit {
+  background: #ffd08a;
+  box-shadow: 0 0 3px rgba(255, 177, 59, 0.5), 0 0 8px rgba(255, 177, 59, 0.1);
+}
+
+[data-skin='prism'] .knob-caption,
+[data-skin='prism'] .faders-caption {
+  font-weight: 500;
+  font-size: 8.5px;
+  letter-spacing: 0.28em;
+  color: rgba(233, 228, 222, 0.36);
+}
+
+/* The dial: black, a thin white-blue index, an arc lit in the spectrum as
+   far as the volume goes. */
+[data-skin='prism'] .knob {
+  width: 104px;
+  height: 104px;
+}
+
+[data-skin='prism'] .knob-tick,
+[data-skin='prism'] .knob-tick.is-major {
+  stroke: rgba(233, 228, 222, 0.1);
+  stroke-width: 1.2;
+  stroke-linecap: butt;
+}
+
+[data-skin='prism'] .knob-tick.is-major {
+  stroke: rgba(233, 228, 222, 0.2);
+}
+
+[data-skin='prism'] .knob-tick.is-lit {
+  stroke-width: 1.6;
+}
+
+[data-skin='prism'] .knob-tick.is-lit:nth-child(1) { stroke: rgb(255, 90, 42); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(2) { stroke: rgb(255, 120, 48); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(3) { stroke: rgb(255, 151, 54); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(4) { stroke: rgb(246, 179, 61); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(5) { stroke: rgb(180, 193, 78); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(6) { stroke: rgb(114, 206, 94); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(7) { stroke: rgb(63, 211, 114); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(8) { stroke: rgb(51, 194, 141); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(9) { stroke: rgb(38, 176, 168); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(10) { stroke: rgb(40, 155, 189); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(11) { stroke: rgb(61, 129, 199); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(12) { stroke: rgb(82, 102, 210); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(13) { stroke: rgb(118, 91, 205); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(14) { stroke: rgb(164, 90, 189); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(15) { stroke: rgb(211, 90, 173); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(16) { stroke: rgb(227, 128, 190); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(17) { stroke: rgb(230, 181, 220); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(18) { stroke: rgb(234, 234, 251); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(19) { stroke: rgb(240, 206, 206); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(20) { stroke: rgb(248, 164, 149); }
+[data-skin='prism'] .knob-tick.is-lit:nth-child(21) { stroke: rgb(255, 122, 92); }
+
+[data-skin='prism'] .knob-body {
+  inset: 16px;
+  background: radial-gradient(circle at 42% 32%, #191716 0%, #0c0b0b 58%, #070707 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(233, 228, 222, 0.07),
+    inset 0 0 0 1px rgba(233, 228, 222, 0.045),
+    0 6px 18px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='prism'] .knob-body::before {
+  background: none;
+}
+
+[data-skin='prism'] .knob:hover .knob-body,
+[data-skin='prism'] .knob.is-dragging .knob-body {
+  box-shadow:
+    inset 0 1px 0 rgba(233, 228, 222, 0.09),
+    inset 0 0 0 1px rgba(234, 242, 255, 0.12),
+    0 6px 18px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='prism'] .knob-pointer {
+  top: 6px;
+  width: 1.5px;
+  height: 13px;
+  margin-left: -0.75px;
+  border-radius: 0;
+  background: var(--pr-blue);
+  box-shadow: 0 0 3px rgba(234, 242, 255, 0.3);
+}
+
+[data-skin='prism'] .knob-value {
+  font-weight: 300;
+  font-size: 17px;
+  color: var(--pr-ink);
+  text-shadow: none;
+}
+
+/* Faders: a hairline track, a small bright cap, the spectrum at low alpha. */
+[data-skin='prism'] .fader-name {
+  font-weight: 500;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--pr-dim);
+}
+
+[data-skin='prism'] .fader-value {
+  font-weight: 400;
+  color: rgba(233, 228, 222, 0.42);
+}
+
+[data-skin='prism'] .fader-mute {
+  color: rgba(233, 228, 222, 0.36);
+}
+
+[data-skin='prism'] .fader-mute:hover {
+  color: var(--pr-ink);
+  background: rgba(233, 228, 222, 0.05);
+}
+
+[data-skin='prism'] .fader-slot {
+  inset: auto 0;
+  top: 50%;
+  height: 1px;
+  margin-top: -0.5px;
+  border-radius: 0;
+  background: rgba(233, 228, 222, 0.12);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .fader-fill {
+  top: 50%;
+  height: 1px;
+  margin-top: -0.5px;
+  border-radius: 0;
+  background: var(--pr-spectrum);
+  opacity: 0.55;
+}
+
+[data-skin='prism'] .fader.is-muted .fader-fill {
+  background: var(--pr-coral);
+  opacity: 0.3;
+}
+
+[data-skin='prism'] .fader-cap {
+  width: 5px;
+  height: 11px;
+  margin-left: -2.5px;
+  border-radius: 1px;
+  background: var(--pr-blue);
+  box-shadow: 0 0 4px rgba(234, 242, 255, 0.28);
+}
+
+[data-skin='prism'] .fader-cap::after {
+  display: none;
+}
+
+[data-skin='prism'] .fader-rail:hover .fader-cap,
+[data-skin='prism'] .fader-rail.is-dragging .fader-cap {
+  box-shadow: 0 0 6px rgba(234, 242, 255, 0.4);
+}
+
+[data-skin='prism'] .fader.is-muted .fader-cap {
+  opacity: 0.35;
+}
+
+/* ── Right rail: tabs, queue, crate ────────────────────────────────────── */
+
+[data-skin='prism'] .right-tab.is-active::after {
+  height: 1px;
+  border-radius: 0;
+  background: var(--pr-spectrum);
+  box-shadow: none;
+  opacity: 0.8;
+}
+
+[data-skin='prism'] .right-search:hover {
+  color: var(--pr-ink);
+}
+
+[data-skin='prism'] .qrow:hover {
+  background: rgba(233, 228, 222, 0.03);
+}
+
+[data-skin='prism'] .qrow.is-current {
+  background: linear-gradient(90deg, rgba(233, 228, 222, 0.04), transparent 85%);
+}
+
+/* The record that is on carries a short bar of the spectrum. */
+[data-skin='prism'] .qrow.is-current .qrow-marker {
+  top: 50%;
+  bottom: auto;
+  width: 2px;
+  height: 16px;
+  margin-top: -8px;
+  border-radius: 0;
+  background: var(--pr-spectrum-v);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .qrow-title {
+  font-size: 13px;
+  font-weight: 400;
+}
+
+[data-skin='prism'] .qrow-time {
+  font-weight: 400;
+}
+
+[data-skin='prism'] .qrow-art,
+[data-skin='prism'] .sresult-art {
+  border-radius: 0;
+  background: #120f0d;
+  box-shadow: inset 0 0 0 1px rgba(233, 228, 222, 0.06);
+}
+
+[data-skin='prism'] .qrow-art img,
+[data-skin='prism'] .sresult-art img,
+[data-skin='prism'] .crate-face img {
+  filter: none;
+}
+
+[data-skin='prism'] .qrow-art-glow {
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px rgba(234, 242, 255, 0.36);
+}
+
+[data-skin='prism'] .qrow-remove:hover {
+  background: rgba(255, 122, 92, 0.14);
+}
+
+[data-skin='prism'] .panel-empty-line {
+  font-size: 15px;
+  font-weight: 300;
+  color: rgba(233, 228, 222, 0.42);
+}
+
+[data-skin='prism'] .panel-action.is-armed {
+  color: var(--pr-coral);
+  background: rgba(255, 122, 92, 0.12);
+}
+
+[data-skin='prism'] .crate-face {
+  border-radius: 0;
+  background: #120f0d;
+  box-shadow: 0 0 0 1px rgba(233, 228, 222, 0.07), 0 8px 22px -10px rgba(0, 0, 0, 0.8);
+}
+
+[data-skin='prism'] .crate-item:hover .crate-face:not(:disabled) {
+  box-shadow: 0 0 0 1px rgba(234, 242, 255, 0.3), 0 10px 26px -10px rgba(0, 0, 0, 0.85);
+}
+
+[data-skin='prism'] .crate-wear {
+  background-image: none;
+  box-shadow: none;
+}
+
+[data-skin='prism'] .crate-caption {
+  font-size: 12.5px;
+  font-weight: 400;
+}
+
+[data-skin='prism'] .crate-bill-title {
+  font-weight: 320;
+  letter-spacing: 0.02em;
+}
+
+[data-skin='prism'] .ground-walnut { background: linear-gradient(160deg, #221a15, #0e0b09); }
+[data-skin='prism'] .ground-burgundy { background: linear-gradient(160deg, #24161a, #0e0a0b); }
+[data-skin='prism'] .ground-olive { background: linear-gradient(160deg, #1a1d18, #0b0c0a); }
+[data-skin='prism'] .ground-wine { background: linear-gradient(160deg, #1b1417, #0b0909); }
+[data-skin='prism'] .ground-mustard { background: linear-gradient(160deg, #261d12, #0e0b08); }
+
+[data-skin='prism'] .crate-tool,
+[data-skin='prism'] .sresult-tool {
+  border-radius: 50%;
+  color: var(--pr-ink);
+  background: rgba(10, 8, 7, 0.86);
+  box-shadow: inset 0 0 0 1px rgba(233, 228, 222, 0.14);
+}
+
+[data-skin='prism'] .crate-tool:hover,
+[data-skin='prism'] .sresult-tool:hover {
+  color: #0a0807;
+  background: var(--pr-blue);
+}
+
+/* ── Search ────────────────────────────────────────────────────────────── */
+
+[data-skin='prism'] .search-scrim {
+  background: rgba(8, 7, 6, 0.95);
+}
+
+[data-skin='prism'] .search-bar {
+  border-bottom: 1px solid rgba(233, 228, 222, 0.12);
+}
+
+[data-skin='prism'] .search-bar:focus-within {
+  border-bottom-color: rgba(234, 242, 255, 0.5);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .search-input {
+  font-weight: 300;
+  caret-color: var(--pr-blue);
+}
+
+[data-skin='prism'] .search-input::placeholder {
+  color: var(--pr-ghost-ink);
+}
+
+[data-skin='prism'] .search-section-head {
+  color: rgba(233, 228, 222, 0.5);
+}
+
+[data-skin='prism'] .sresult:hover {
+  background: rgba(233, 228, 222, 0.03);
+}
+
+[data-skin='prism'] .linkcard {
+  border-radius: 2px;
+  background: #13100e;
+  box-shadow: inset 0 0 0 1px var(--pr-hair), 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='prism'] .linkcard-btn {
+  color: #0a0807;
+  background: var(--pr-blue);
+}
+
+[data-skin='prism'] .linkcard-btn:hover {
+  background: #ffffff;
+}
+
+[data-skin='prism'] .linkcard-dot {
+  background: var(--pr-blue);
+}
+
+/* ── Status, curtains, boundary ────────────────────────────────────────── */
+
+[data-skin='prism'] .status-pill {
+  border-radius: 2px;
+  font-weight: 500;
+  background: rgba(10, 8, 7, 0.94);
+  box-shadow: inset 0 0 0 1px var(--pr-hair), 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='prism'] .status-pill.is-bad {
+  color: var(--pr-coral);
+  box-shadow: inset 0 0 0 1px rgba(255, 122, 92, 0.35), 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='prism'] .curtain,
+[data-skin='prism'] .boundary {
+  background: radial-gradient(90% 70% at 50% 40%, #1a120d, #0a0807 72%);
+}
+
+[data-skin='prism'] .curtain-btn,
+[data-skin='prism'] .boundary-btn {
+  background: none;
+  box-shadow: inset 0 0 0 1px rgba(234, 242, 255, 0.36);
+}
+
+[data-skin='prism'] .curtain-btn:hover:not(:disabled),
+[data-skin='prism'] .boundary-btn:hover {
+  color: var(--pr-blue);
+  box-shadow: inset 0 0 0 1px rgba(234, 242, 255, 0.7);
+}
+
+/* ── Scrollbars, selection, focus ──────────────────────────────────────── */
+
+[data-skin='prism'] .scroll {
+  scrollbar-color: rgba(233, 228, 222, 0.14) transparent;
+}
+
+[data-skin='prism'] .scroll::-webkit-scrollbar-thumb {
+  background: rgba(233, 228, 222, 0.12);
+  background-clip: padding-box;
+}
+
+[data-skin='prism'] ::selection {
+  background: rgba(234, 242, 255, 0.22);
+  color: var(--pr-ink);
+}
+
+[data-skin='prism'] :focus-visible {
+  outline: 1px solid rgba(234, 242, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* ── Phone chrome ──────────────────────────────────────────────────────── */
+
+[data-skin='prism'] .phone-room-marker {
+  width: 1px;
+  background: var(--pr-spectrum-v);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .mtab.is-active svg {
+  color: var(--pr-ink);
+}
+
+[data-skin='prism'] .mtab.is-active::before {
+  height: 1px;
+  border-radius: 0;
+  background: var(--pr-spectrum);
+  box-shadow: none;
+}
+
+/* ── Phone shell: wall, record, instrument, floor, controls ────────────── */
+
+html[data-shell='phone'][data-skin='prism'] .pw {
+  flex: none;
+  min-height: 0;
+  background: linear-gradient(180deg, #120c09 0%, #1a120d 34%, #110b08 72%, #0a0807 100%);
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw-cast {
+  inset: 0 -8% auto;
+  height: 210px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw-band {
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, #000 34%, #000 66%, transparent 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, #000 34%, #000 66%, transparent 100%);
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw::after {
+  background:
+    linear-gradient(0deg, rgba(4, 3, 3, 0.45) 0%, transparent 10%),
+    linear-gradient(90deg, rgba(6, 4, 3, 0.4), transparent 18%, transparent 82%, rgba(6, 4, 3, 0.4));
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw-head {
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 44px 22px 22px;
+  text-align: center;
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw-cover {
+  --cover: min(46vw, 22vh);
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw-lockup {
+  align-items: center;
+  width: 100%;
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw-title {
+  font-size: clamp(24px, 7.4vw, 32px);
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw-artist {
+  margin-top: 6px;
+  font-size: 15px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .pw-album {
+  margin-top: 10px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .pc {
+  height: 118px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .pc-rooms {
+  gap: 7px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .pf {
+  height: 40px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .prism-dash {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  padding: 6px 16px 14px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .prism-dash .transport {
+  justify-content: center;
+  gap: 8px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .tactile-sm {
+  width: 44px;
+  height: 44px;
+}
+
+html[data-shell='phone'][data-skin='prism'] .tactile-lg {
+  width: 56px;
+  height: 56px;
+}

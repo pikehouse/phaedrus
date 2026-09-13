@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Skin = 'hifi' | 'board' | 'tuner' | 'drive' | 'daylight' | 'deck';
+export type Skin = 'hifi' | 'board' | 'tuner' | 'drive' | 'daylight' | 'deck' | 'prism';
 
 export const SKINS: { id: Skin; label: string; hint: string }[] = [
   { id: 'hifi', label: 'Hi-Fi', hint: 'Late night, warm lamp, a record spinning' },
@@ -9,6 +9,7 @@ export const SKINS: { id: Skin; label: string; hint: string }[] = [
   { id: 'drive', label: 'Drive', hint: 'LA at 2 a.m., neon script, sodium streetlights' },
   { id: 'daylight', label: 'Daylight', hint: 'Light, quiet, modern' },
   { id: 'deck', label: 'Deck', hint: 'DJ controller, orange LEDs, red waveforms' },
+  { id: 'prism', label: 'Prism', hint: 'Light through glass, a spectrum on the wall' },
 ];
 
 const KEY = 'phaedrus.skin';
@@ -16,7 +17,7 @@ const KEY = 'phaedrus.skin';
 function recall(): Skin {
   try {
     const v = localStorage.getItem(KEY);
-    if (v === 'hifi' || v === 'board' || v === 'tuner' || v === 'drive' || v === 'daylight' || v === 'deck') return v;
+    if (v === 'hifi' || v === 'board' || v === 'tuner' || v === 'drive' || v === 'daylight' || v === 'deck' || v === 'prism') return v;
   } catch {
     /* private mode — fall through to the default */
   }

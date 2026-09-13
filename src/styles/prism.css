@@ -1,0 +1,496 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   PRISM — the wall, the instrument, the floor.
+
+   Shared components are re-pointed in skin-prism.css; this file owns the
+   stage structure: the spectrum on the wall with the record hung in it, the
+   matte black instrument and its comb window, the glossy floor with the
+   reflection, and the slim row of controls on it.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* The cover's light crossfades between records rather than switching. */
+@property --pw-l {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ff8a4a;
+}
+
+@property --pw-r {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #4aa6d8;
+}
+
+@property --pw-mix {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 0%;
+}
+
+@property --pw-lift {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+@property --pw-shift {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 0%;
+}
+
+/* ── The stage becomes one photograph ──────────────────────────────────── */
+
+.stage-prism .stage-scroll {
+  align-items: stretch;
+  padding: 0;
+}
+
+.stage-prism .stage-body {
+  width: 100%;
+  max-width: none;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.prism {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: #0a0807;
+}
+
+/* ── The wall ──────────────────────────────────────────────────────────── */
+
+.pw {
+  position: relative;
+  flex: 1 1 0;
+  min-height: clamp(196px, 38vh, 520px);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(80% 110% at 46% 12%, rgba(52, 34, 23, 0.55), transparent 72%),
+    linear-gradient(180deg, #120c09 0%, #1a120d 58%, #150e0a 100%);
+  transition:
+    --pw-l 2.4s var(--ease-soft),
+    --pw-r 2.4s var(--ease-soft),
+    --pw-mix 2.4s var(--ease-soft),
+    --pw-lift 3s var(--ease-soft),
+    --pw-shift 4s var(--ease-soft);
+}
+
+/* The corners of the room fall away, and the instrument shades the wall
+   just above itself. */
+.pw::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(0deg, rgba(4, 3, 3, 0.5) 0%, transparent 14%),
+    linear-gradient(90deg, rgba(6, 4, 3, 0.5), transparent 16%, transparent 84%, rgba(6, 4, 3, 0.5));
+}
+
+.pw-cast {
+  position: absolute;
+  inset: 0 -5%;
+  pointer-events: none;
+  transform: translateX(var(--pw-shift));
+  opacity: calc(0.94 * var(--pw-lift));
+  transition: opacity 3s var(--ease-soft);
+}
+
+.pw.is-paused .pw-cast {
+  opacity: calc(0.5 * var(--pw-lift));
+}
+
+.pw.is-idle .pw-cast {
+  opacity: 0.24;
+}
+
+.pw-drift {
+  position: absolute;
+  inset: 0;
+  animation: pw-drift 110s ease-in-out infinite alternate;
+}
+
+@keyframes pw-drift {
+  from {
+    transform: translateX(-2.2%);
+  }
+  to {
+    transform: translateX(2.2%);
+  }
+}
+
+/* One band of light: soft both sides, faintest at the top of the wall. */
+.pw-band {
+  --tone: color-mix(in oklab, var(--c), var(--tint) var(--pw-mix));
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--x);
+  width: var(--w);
+  opacity: var(--a);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in oklab, var(--tone) 38%, transparent) 24%,
+    var(--tone) 50%,
+    color-mix(in oklab, var(--tone) 38%, transparent) 76%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, #000 34%, #000 90%, rgba(0, 0, 0, 0.6) 100%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, #000 34%, #000 90%, rgba(0, 0, 0, 0.6) 100%);
+  animation: pw-breathe var(--d) ease-in-out var(--p) infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes pw-breathe {
+  from {
+    opacity: var(--a);
+    transform: translateX(-5%) scaleX(0.96);
+  }
+  to {
+    opacity: calc(var(--a) * 0.7);
+    transform: translateX(5%) scaleX(1.05);
+  }
+}
+
+/* Paused, the light settles where it is and dims. */
+.pw.is-paused .pw-drift,
+.pw.is-paused .pw-band,
+.pw[data-hidden] .pw-drift,
+.pw[data-hidden] .pw-band {
+  animation-play-state: paused;
+}
+
+/* ── The record on the wall, and its lockup ────────────────────────────── */
+
+.pw-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 3.2cqw, 40px);
+  width: 100%;
+  padding: clamp(18px, 4vh, 48px) clamp(20px, 7cqw, 96px);
+}
+
+.pw-cover {
+  --cover: clamp(140px, min(22vh, 28cqw), 240px);
+  position: relative;
+  flex: none;
+  width: var(--cover);
+  height: var(--cover);
+  overflow: hidden;
+  background: #0b0908;
+  box-shadow: 0 12px 34px -18px rgba(0, 0, 0, 0.8);
+}
+
+.pw-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The hairline edge, and the spectrum grazing the sleeve from its left. */
+.pw-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in oklab, var(--pw-l) 16%, transparent), transparent 22%);
+  box-shadow:
+    inset 0 0 0 1px rgba(233, 228, 222, 0.1),
+    inset 1px 0 0 color-mix(in oklab, var(--pw-l) 34%, transparent);
+  mix-blend-mode: screen;
+}
+
+.pw-cover.is-blank::before {
+  content: '';
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  top: 62%;
+  height: 1px;
+  background: var(--pr-spectrum);
+  opacity: 0.55;
+}
+
+.pw-lockup {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-shadow: 0 1px 20px rgba(0, 0, 0, 0.5);
+}
+
+.pw-title {
+  font-family: 'Inter Variable', 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: 320;
+  font-size: clamp(28px, 4.6cqw, 44px);
+  line-height: 1.12;
+  letter-spacing: 0.02em;
+  color: var(--pr-ink);
+  text-wrap: balance;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Room for descenders: the clamp's overflow clip would cut a g or y. */
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+
+.pw-title.is-idle {
+  color: var(--pr-ghost-ink);
+}
+
+.pw-artist {
+  margin-top: 10px;
+  font-family: 'Inter Variable', 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: 360;
+  font-size: clamp(14px, 1.9cqw, 18px);
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  color: var(--pr-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+.pw-album,
+.pw-where {
+  max-width: 100%;
+  font-family: 'Inter Variable', 'Helvetica Neue', Helvetica, sans-serif;
+  font-weight: 500;
+  font-size: 9.5px;
+  line-height: 1.6;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pw-album {
+  margin-top: 14px;
+  color: rgba(233, 228, 222, 0.44);
+}
+
+.pw-where {
+  margin-top: 4px;
+  color: rgba(233, 228, 222, 0.28);
+}
+
+.pw-where span + span::before {
+  content: '·';
+  margin: 0 0.7em;
+  color: rgba(233, 228, 222, 0.2);
+}
+
+/* ── The instrument ────────────────────────────────────────────────────── */
+
+.pc {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  height: clamp(108px, 22vh, 224px);
+  padding-top: 10px;
+  background: linear-gradient(180deg, #0d0d0e 0%, #070708 14%, #070708 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(233, 228, 222, 0.07),
+    0 -1px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* A little of the spectrum spills on the top ledge. */
+.pc::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 1px;
+  height: 1px;
+  background: var(--pr-spectrum);
+  opacity: 0.08;
+}
+
+.pc-window {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  background: #040405;
+  box-shadow:
+    inset 0 1px 0 rgba(233, 228, 222, 0.04),
+    inset 0 -1px 0 rgba(233, 228, 222, 0.035),
+    inset 0 8px 16px rgba(0, 0, 0, 0.75);
+}
+
+.pc-canvas,
+.pf-canvas {
+  position: absolute;
+  display: block;
+  width: 100%;
+}
+
+.pc-canvas {
+  inset: 0;
+  height: 100%;
+}
+
+.pc-rail {
+  position: relative;
+  flex: none;
+  height: 20px;
+}
+
+.pc-rooms {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  gap: 9px;
+  transform: translate(-50%, -50%);
+}
+
+.pc-led {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 50%;
+  background: rgba(233, 228, 222, 0.06);
+}
+
+.pc-rooms .pc-led {
+  position: relative;
+  top: auto;
+  margin: 0;
+}
+
+.pc-led-play {
+  left: 12%;
+}
+
+.pc-led-more {
+  right: 12%;
+}
+
+/* Lit LEDs switch, they never fade or pulse. Blooms stay tiny. */
+.pc-led-play.is-on {
+  background: #ffd08a;
+  box-shadow: 0 0 3px rgba(255, 177, 59, 0.55), 0 0 9px rgba(255, 177, 59, 0.12);
+}
+
+/* The lens catches the amber one in a short horizontal streak. */
+.pc-led-play.is-on::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 1px;
+  margin: -0.5px 0 0 -13px;
+  background: linear-gradient(90deg, transparent, rgba(255, 196, 110, 0.3), transparent);
+}
+
+.pc-led-room.is-on {
+  background: #ff5a4a;
+  box-shadow: 0 0 3px rgba(255, 90, 74, 0.45), 0 0 8px rgba(255, 90, 74, 0.1);
+}
+
+.pc-led-more.is-on {
+  background: #ff9a55;
+  box-shadow: 0 0 3px rgba(255, 122, 60, 0.5), 0 0 9px rgba(255, 122, 60, 0.12);
+}
+
+/* ── The floor ─────────────────────────────────────────────────────────── */
+
+.pf {
+  position: relative;
+  flex: none;
+  height: clamp(34px, 8vh, 96px);
+  overflow: hidden;
+  background: linear-gradient(180deg, #0d0c0c 0%, #0c0b0b 60%, #0b0a0a 100%);
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.9), inset 0 2px 0 rgba(233, 228, 222, 0.025);
+}
+
+.pf-canvas {
+  left: 0;
+  top: 4px;
+  height: 100%;
+  opacity: 0.62;
+  filter: blur(2px) saturate(1.2);
+  -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.45) 40%, transparent 92%);
+  mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.45) 40%, transparent 92%);
+}
+
+/* ── Controls on the floor ─────────────────────────────────────────────── */
+
+.prism-dash {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: clamp(4px, 1vh, 12px) clamp(20px, 5cqw, 64px) clamp(10px, 1.8vh, 18px);
+  background: #0b0a0a;
+}
+
+.prism-dash .transport {
+  justify-content: center;
+}
+
+@container (min-width: 720px) {
+  .prism-dash {
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(22px, 3cqw, 44px);
+  }
+
+  .prism-dash .progress {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .prism-dash .transport {
+    width: auto;
+    flex: none;
+    gap: 14px;
+  }
+
+  .prism-dash .transport-mods {
+    flex: none;
+  }
+}
+
+@media (max-height: 700px) {
+  .pc {
+    height: clamp(100px, 19vh, 150px);
+  }
+
+  .pf {
+    height: clamp(28px, 6vh, 60px);
+  }
+
+  .prism-dash {
+    padding-top: 2px;
+    padding-bottom: 6px;
+  }
+}

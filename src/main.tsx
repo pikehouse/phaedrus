@@ -8,6 +8,7 @@ import './styles/skin-tuner.css';
 import './styles/skin-drive.css';
 import './styles/skin-daylight.css';
 import './styles/skin-deck.css';
+import './styles/skin-prism.css';
 import './store/skin'; // stamps data-skin before the first paint
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
