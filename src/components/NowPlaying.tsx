@@ -220,8 +220,16 @@ export default function NowPlaying() {
                   size="xl"
                   className="board-title"
                   tic
+                  fit={{ lines: 3, min: 18 }}
                 />
-                {boardLine && <SplitFlap text={boardLine} size="lg" className="board-artist" />}
+                {boardLine && (
+                  <SplitFlap
+                    text={boardLine}
+                    size="lg"
+                    className="board-artist"
+                    fit={{ lines: 2, min: 12, to: boardLines }}
+                  />
+                )}
                 {tertiary && <p className="meta-album">{tertiary}</p>}
               </div>
             </div>

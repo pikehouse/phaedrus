@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import '../styles/splitflap.css';
 
 /** Drums, in the order the flaps are stacked. Advancing always goes forward.
@@ -41,6 +41,12 @@ interface Props {
   instant?: boolean;
   /** Let this row occasionally re-seat one of its flaps while it sits idle. */
   tic?: boolean;
+  /**
+   * Shrink cells (never grow them) so the text wraps into at most `lines`
+   * rows without a word running past the column. `to` sizes against several
+   * texts at once, so a cycling line keeps one cell size for all of them.
+   */
+  fit?: { lines: number; min: number; to?: string[] };
 }
 
 function normalize(text: string, drum: DrumId, cells?: number): string[] {
@@ -85,6 +91,8 @@ interface CellState {
   shown: string;
   target: string;
   timer?: number;
+  /** The DOM node this state last painted; a word re-split remounts cells. */
+  node?: HTMLSpanElement;
 }
 
 export default function SplitFlap({
@@ -95,11 +103,54 @@ export default function SplitFlap({
   drum = 'text',
   instant,
   tic,
+  fit,
 }: Props) {
   const target = useMemo(() => normalize(text, drum, cells), [text, drum, cells]);
   const words = useMemo(() => groupWords(target), [target]);
   const rowRef = useRef<HTMLSpanElement>(null);
   const state = useRef<CellState[]>([]);
+  const rootRef = useRef<HTMLSpanElement>(null);
+
+  const fitTexts = fit ? (fit.to?.length ? fit.to : [text]) : null;
+  const fitKey = fit && fitTexts ? `${fit.lines}|${fit.min}|${fitTexts.join('\u0001')}` : '';
+
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    const host = root?.parentElement;
+    if (!fit || !fitTexts || !root || !host) return;
+    const { lines, min } = fit;
+    const layouts = fitTexts.map((t) => groupWords(normalize(t, drum, cells)).map((w) => w.length));
+    let lastWidth = -1;
+
+    const apply = () => {
+      const width = host.clientWidth;
+      if (width === lastWidth || width === 0) return;
+      lastWidth = width;
+      root.style.removeProperty('--flap-w');
+      root.style.removeProperty('--flap-h');
+      root.style.removeProperty('--flap-fs');
+      const probe = root.querySelector<HTMLElement>('.flap');
+      const row = root.querySelector<HTMLElement>('.flaps-row');
+      if (!probe || !row || !probe.offsetWidth) return;
+      const baseW = probe.offsetWidth;
+      const baseH = probe.offsetHeight;
+      const glyphEl = probe.querySelector<HTMLElement>('.flap-glyph');
+      const baseFs = glyphEl ? parseFloat(getComputedStyle(glyphEl).fontSize) || baseW : baseW;
+      const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+      const w = fitCell(layouts, width, gap, baseW, lines, min);
+      if (w >= baseW) return;
+      root.style.setProperty('--flap-w', `${w}px`);
+      root.style.setProperty('--flap-h', `${(w * baseH) / baseW}px`);
+      root.style.setProperty('--flap-fs', `${(w * baseFs) / baseW}px`);
+    };
+
+    apply();
+    const ro = new ResizeObserver(apply);
+    ro.observe(host);
+    return () => ro.disconnect();
+    // fitKey captures fit and the texts; the rest are the normalize inputs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fitKey, drum, cells]);
 
   useEffect(() => {
     const row = rowRef.current;
@@ -114,6 +165,16 @@ export default function SplitFlap({
       if (!parts) return;
 
       const cell = (state.current[i] ??= { shown: ' ', target: ' ' });
+      // When the word breaks shift, React remounts this cell with empty glyphs.
+      // Paint what it was showing and drop any chain still writing to the old node.
+      if (cell.node !== flaps[i]) {
+        if (cell.node) {
+          clearTimeout(cell.timer);
+          cell.timer = undefined;
+          write(parts, cell.shown);
+        }
+        cell.node = flaps[i];
+      }
       // Skip only if the card is already resting on the target, or a chain is
       // genuinely still running toward it. A chain that was cancelled (React's
       // StrictMode remount does exactly that) must be restarted, or the cell
@@ -230,7 +291,7 @@ export default function SplitFlap({
   );
 
   return (
-    <span className={`flaps flaps-${size}${className ? ` ${className}` : ''}`}>
+    <span className={`flaps flaps-${size}${className ? ` ${className}` : ''}`} ref={rootRef}>
       <span className="flaps-row" ref={rowRef} aria-hidden="true">
         {words.map((word, w) => (
           <span className="flaps-word" key={w}>
@@ -256,6 +317,32 @@ export default function SplitFlap({
       <span className="flaps-text">{text}</span>
     </span>
   );
+}
+
+/** Rows a greedy word wrap needs at `perRow` cells, or Infinity if a word can't fit. */
+function rowsFor(words: number[], perRow: number): number {
+  let rows = 1;
+  let used = 0;
+  for (const n of words) {
+    if (n > perRow) return Infinity;
+    if (used + n <= perRow) used += n;
+    else {
+      rows++;
+      used = n;
+    }
+  }
+  return rows;
+}
+
+/** Largest cell width (px, at most `base`) at which every layout fits. */
+function fitCell(layouts: number[][], width: number, gap: number, base: number, lines: number, min: number): number {
+  const fits = (w: number) => {
+    const perRow = Math.floor((width + gap) / (w + gap));
+    return layouts.every((words) => rowsFor(words, perRow) <= lines);
+  };
+  if (fits(base)) return base;
+  for (let w = Math.floor(base) - 1; w > min; w--) if (fits(w)) return w;
+  return min;
 }
 
 /** Characters to pass through, inclusive of both ends. */

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSonos } from '../store/useSonos';
 import { Muted, Sound } from './Icons';
 import type { MemberVolume } from '../api/types';
@@ -6,14 +6,43 @@ import '../styles/faders.css';
 
 export default function Faders() {
   const state = useSonos((s) => s.state);
-  if (!state || state.members.length === 0) return null;
+  const listRef = useRef<HTMLUListElement>(null);
+  const [edges, setEdges] = useState({ above: false, below: false });
+  const count = state?.members.length ?? 0;
+
+  // Past a few rooms the list scrolls; fade whichever edge has rooms beyond it
+  // so it is obvious there is more to see.
+  useEffect(() => {
+    const el = listRef.current;
+    if (!el) return;
+    const update = () => {
+      const above = el.scrollTop > 1;
+      const below = el.scrollTop + el.clientHeight < el.scrollHeight - 1;
+      setEdges((e) => (e.above === above && e.below === below ? e : { above, below }));
+    };
+    update();
+    el.addEventListener('scroll', update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    el.querySelectorAll('li').forEach((li) => ro.observe(li));
+    return () => {
+      el.removeEventListener('scroll', update);
+      ro.disconnect();
+    };
+  }, [count]);
+
+  if (!state || count === 0) return null;
 
   return (
     <div className="faders">
       <span className="label faders-caption">
-        {state.members.length === 1 ? 'Room' : 'Rooms'}
+        {count === 1 ? 'Room' : 'Rooms'}
+        {(edges.above || edges.below) && <span className="faders-count"> · {count}</span>}
       </span>
-      <ul className="faders-list">
+      <ul
+        ref={listRef}
+        className={`faders-list${edges.above ? ' has-more-above' : ''}${edges.below ? ' has-more-below' : ''}`}
+      >
         {state.members.map((m) => (
           <Fader key={m.uuid} member={m} />
         ))}

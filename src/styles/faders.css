@@ -15,17 +15,50 @@
   color: rgba(242, 228, 201, 0.5);
 }
 
+/* Grows with the household up to a share of the window, then scrolls with a
+   visible thumb and a fade on whichever edge hides more rooms. */
 .faders-list {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: 128px;
+  max-height: clamp(128px, 24vh, 232px);
   overflow-y: auto;
-  scrollbar-width: none;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--cream-ghost) transparent;
 }
 
 .faders-list::-webkit-scrollbar {
-  display: none;
+  width: 6px;
+}
+
+.faders-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.faders-list::-webkit-scrollbar-thumb {
+  background: var(--cream-ghost);
+  border-radius: 3px;
+}
+
+.faders-list.has-more-below {
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 30px), transparent);
+  mask-image: linear-gradient(180deg, #000 calc(100% - 30px), transparent);
+}
+
+.faders-list.has-more-above {
+  -webkit-mask-image: linear-gradient(0deg, #000 calc(100% - 30px), transparent);
+  mask-image: linear-gradient(0deg, #000 calc(100% - 30px), transparent);
+}
+
+.faders-list.has-more-above.has-more-below {
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 30px, #000 calc(100% - 30px), transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 30px, #000 calc(100% - 30px), transparent);
+}
+
+.faders-count {
+  opacity: 0.7;
 }
 
 .fader {
