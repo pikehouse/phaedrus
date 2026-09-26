@@ -33,25 +33,30 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* Where the road runs out. The sun sits on it; the grid reads it too. */
-  --vp: 40%;
-  --horizon: 58%;
-  --cover: clamp(140px, min(36vh, 30cqw), 250px);
-  --cover-x: clamp(18px, 4cqw, 44px);
-  --sun: clamp(96px, min(21cqw, 30vh), 200px);
   /* Set from the cover's average colour once it has been sampled. */
   --tint: transparent;
 }
 
+/* The windshield is a size container, so the composition is laid out in the
+   glass's own units. Three things share the horizon and each owns its space:
+   the cover stands on the ground at the left; the sun sits on the far end of
+   the road, centred in what is left; the sign hangs in the sky above the sun.
+   The road's vanishing point is measured from the sun, never assumed. */
 .drive-view {
   position: relative;
   flex: 1;
   min-height: 0;
-}
-
-.drive-view > i {
-  display: block;
-  pointer-events: none;
+  container: drive-view / size;
+  --horizon: 61%;
+  --gap: clamp(18px, 3.5cqw, 44px);
+  --cover-x: clamp(18px, 4.5cqw, 52px);
+  --cover: clamp(120px, min(42cqh, 28cqw), 280px);
+  --sun: clamp(84px, min(28cqh, 22cqw), 230px);
+  /* How much of the sun stands above the horizon. */
+  --rise: 0.78;
+  --lock-l: calc(var(--cover-x) + var(--cover) + var(--gap));
+  --lock-r: clamp(18px, 4cqw, 48px);
+  --vpx: calc((var(--lock-l) + 100cqw - var(--lock-r)) / 2);
 }
 
 /* ── Sky ───────────────────────────────────────────────────────────────── */
@@ -70,17 +75,18 @@
       transparent var(--horizon)
     ),
     /* Sodium smog, warmest where the sun is. */
-    radial-gradient(64% 34% at var(--vp) var(--horizon), rgba(255, 106, 61, 0.3), transparent 72%),
+    radial-gradient(64% 34% at var(--vpx) var(--horizon), rgba(255, 106, 61, 0.3), transparent 72%),
     linear-gradient(180deg, #07060f 0%, #0a0818 34%, #0f0a24 calc(var(--horizon) - 12%), #180d34 var(--horizon));
 }
 
 .drive-sun-glow {
   position: absolute;
-  left: var(--vp);
-  top: var(--horizon);
-  width: calc(var(--sun) * 2.6);
-  height: calc(var(--sun) * 1.6);
-  transform: translate(-50%, -60%);
+  left: var(--vpx);
+  top: calc(var(--horizon) - var(--sun) * (var(--rise) - 0.5));
+  width: calc(var(--sun) * 2.8);
+  height: calc(var(--sun) * 1.7);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
   background: radial-gradient(closest-side, rgba(255, 106, 61, 0.26), rgba(255, 45, 149, 0.12) 46%, transparent 100%);
 }
 
@@ -88,11 +94,12 @@
    cut out of its lower half. Its bottom sets behind the ground plane. */
 .drive-sun {
   position: absolute;
-  left: var(--vp);
-  top: var(--horizon);
+  left: var(--vpx);
+  top: calc(var(--horizon) - var(--sun) * var(--rise));
   width: var(--sun);
   height: var(--sun);
-  transform: translate(-50%, -64%);
+  transform: translateX(-50%);
+  pointer-events: none;
   border-radius: 50%;
   isolation: isolate;
   opacity: 0.88;
@@ -136,6 +143,85 @@
   background: var(--tint);
   mix-blend-mode: overlay;
   opacity: 0.55;
+}
+
+/* ── Stars, hills, the city ────────────────────────────────────────────── */
+
+.drive-stars,
+.drive-land {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: var(--horizon);
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.drive-star {
+  fill: #f4f1ff;
+  opacity: var(--o);
+}
+
+/* A slow swell, not a blink: the air, not the star. Parked when the car is. */
+.drive-star.is-twinkle {
+  animation: drive-twinkle 11s ease-in-out infinite alternate;
+  animation-play-state: paused;
+}
+
+.drive.is-playing:not(.is-hidden) .drive-star.is-twinkle {
+  animation-play-state: running;
+}
+
+@keyframes drive-twinkle {
+  0%,
+  40% {
+    opacity: var(--o);
+  }
+  100% {
+    opacity: calc(var(--o) * 0.3);
+  }
+}
+
+.drive-rim {
+  fill: none;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+
+.drive-rim.is-near {
+  stroke-width: 1;
+}
+
+.drive-palms {
+  fill: #0a0619;
+}
+
+.drive-windows rect {
+  fill: #ffb347;
+}
+
+/* One aircraft lamp on the tallest roof, breathing on a long, slow cycle. */
+.drive-beacon {
+  fill: #ff3b4f;
+  filter: drop-shadow(0 0 2px rgba(255, 59, 79, 0.9));
+  animation: drive-beacon 3.6s ease-in-out infinite;
+  animation-play-state: paused;
+}
+
+.drive.is-playing:not(.is-hidden) .drive-beacon {
+  animation-play-state: running;
+}
+
+@keyframes drive-beacon {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.15;
+  }
 }
 
 /* ── Ground ────────────────────────────────────────────────────────────── */
@@ -183,6 +269,34 @@
   stroke-width: 3;
 }
 
+/* The road: asphalt laid over the grid, so the grid dims under it. */
+.drive-grid path.drive-road-road {
+  fill: rgba(6, 4, 14, 0.62);
+}
+
+.drive-road-edges {
+  stroke: rgba(200, 244, 255, 0.42);
+  stroke-width: 1.4;
+}
+
+.drive-road-edges-glow {
+  stroke: rgba(45, 226, 255, 0.1);
+  stroke-width: 5;
+}
+
+/* The centre line is sodium paint, catching the streetlights. */
+.drive-grid path.drive-road-dash {
+  fill: rgba(255, 179, 71, 0.78);
+  stroke: none;
+}
+
+.drive-grid path.drive-road-dash-glow {
+  fill: none;
+  stroke: rgba(255, 138, 61, 0.16);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
 /* The far grid dissolves into the sunset before it can shimmer. */
 .drive-haze {
   position: absolute;
@@ -191,7 +305,7 @@
   top: var(--horizon);
   height: 36%;
   background:
-    radial-gradient(56% 100% at var(--vp) 0%, rgba(255, 106, 61, 0.26), transparent 72%),
+    radial-gradient(56% 100% at var(--vpx) 0%, rgba(255, 106, 61, 0.26), transparent 72%),
     linear-gradient(180deg, rgba(255, 45, 149, 0.17), rgba(122, 43, 255, 0.08) 38%, transparent 100%),
     linear-gradient(180deg, rgba(20, 10, 44, 0.95), transparent 24%);
 }
@@ -206,9 +320,9 @@
   background: linear-gradient(
     90deg,
     rgba(255, 45, 149, 0) 0%,
-    rgba(255, 45, 149, 0.7) 18%,
-    #ff8ac6 var(--vp),
-    rgba(255, 45, 149, 0.7) 82%,
+    rgba(255, 45, 149, 0.55) 18%,
+    #ff8ac6 var(--vpx),
+    rgba(255, 45, 149, 0.55) 82%,
     rgba(255, 45, 149, 0) 100%
   );
   box-shadow: 0 0 6px rgba(255, 45, 149, 0.65), 0 0 18px rgba(255, 45, 149, 0.3);
@@ -221,6 +335,7 @@
   left: var(--cover-x);
   /* Its base sits a little below the horizon, on the wet ground. */
   bottom: calc(100% - var(--horizon) - 5%);
+  z-index: 1;
   width: var(--cover);
   height: var(--cover);
   perspective: 900px;
@@ -423,22 +538,30 @@
 
 .drive-lockup {
   position: absolute;
-  left: max(
-    calc(var(--cover-x) + var(--cover) + clamp(20px, 4cqw, 48px)),
-    calc(var(--vp) + var(--sun) / 2 + clamp(14px, 3cqw, 36px))
-  );
-  right: clamp(14px, 3cqw, 36px);
-  top: 5%;
-  bottom: calc(100% - var(--horizon) - 5%);
+  z-index: 2;
+  left: var(--lock-l);
+  right: var(--lock-r);
+  top: clamp(12px, 4cqh, 40px);
+  /* Hung over the sun, clear of its top edge. */
+  bottom: calc(100% - var(--horizon) + var(--sun) * var(--rise) + clamp(8px, 2cqh, 18px));
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  align-items: center;
+  text-align: center;
   min-width: 0;
+}
+
+/* Nothing in the lockup may shrink: DriveTitle measures what it really needs. */
+.drive-lockup > * {
+  flex: none;
 }
 
 .drive-over {
   display: flex;
   align-items: center;
+  justify-content: center;
+  max-width: 100%;
   gap: 9px;
   margin-bottom: 10px;
   font-family: var(--face);
@@ -472,7 +595,9 @@
   font-family: var(--face);
   font-style: italic;
   font-variation-settings: 'wdth' 115, 'wght' 600;
-  font-size: 56px; /* DriveTitle fits this to two lines */
+  font-size: 56px; /* DriveTitle fits this: one line if it can, two balanced if not */
+  align-self: stretch;
+  text-wrap: balance;
   line-height: 1.1; /* must match LINE in DriveTitle.tsx */
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -537,6 +662,8 @@
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
+  max-width: 100%;
+  text-wrap: balance;
   -webkit-box-orient: vertical;
   overflow: hidden;
   padding-bottom: 2px; /* room for the drop shadow under the clip */
@@ -553,24 +680,24 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* ── The dash ──────────────────────────────────────────────────────────── */
 
+/* A Testarossa-era binnacle: black vinyl, a chrome bezel, and inside it one
+   panel of backlit rubber keys and a smoked instrument window. */
 .drive-dash {
   position: relative;
   flex: none;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px clamp(16px, 3cqw, 34px);
-  min-height: 62px;
-  padding: 10px clamp(16px, 3cqw, 32px) 12px;
-  background: linear-gradient(180deg, #17151f 0%, #0e0c16 58%, #09080f 100%);
+  padding: 9px clamp(12px, 2.4cqw, 28px) 11px;
+  background:
+    radial-gradient(120% 140% at 50% -40%, rgba(255, 45, 149, 0.06), transparent 60%),
+    linear-gradient(180deg, #121019 0%, #0a0910 60%, #07060b 100%);
   box-shadow:
-    inset 0 1px 0 rgba(226, 230, 250, 0.2),
-    inset 0 2px 0 rgba(0, 0, 0, 0.7),
-    0 -14px 34px rgba(0, 0, 0, 0.5);
+    inset 0 1px 0 rgba(226, 230, 250, 0.16),
+    inset 0 2px 0 rgba(0, 0, 0, 0.8),
+    0 -14px 34px rgba(0, 0, 0, 0.55);
 }
 
 /* Grained vinyl, seen close. */
@@ -582,26 +709,143 @@
   background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px);
 }
 
-.drive-dash .transport {
-  width: auto;
-  max-width: none;
-  flex: none;
-  gap: 12px;
+.drive-dash-bezel {
+  position: relative;
+  padding: 1.5px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f4f4ff 0%, #9aa0b8 28%, #4c5068 50%, #c9cfe0 64%, #5f6580 100%);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.8);
 }
 
-.drive-dash .transport-mods {
+.drive-dash-panel {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2cqw, 20px);
+  padding: 6px 8px 6px 10px;
+  border-radius: 6.5px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 40%),
+    linear-gradient(180deg, #0c0b11 0%, #050408 100%);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.drive-dash-keys {
+  flex: none;
+}
+
+.drive-dash-keys .transport {
+  width: auto;
+  max-width: none;
+  gap: 6px;
+}
+
+.drive-dash-keys .transport-mods {
   flex: none;
   gap: 6px;
 }
 
-.drive-dash .transport-main {
-  gap: 8px;
+.drive-dash-keys .transport-main {
+  gap: 6px;
 }
 
-.drive-dash .progress {
-  flex: 1 1 240px;
-  min-width: 200px;
+/* Smoked glass over the readouts: a faint diagonal glare, a dark edge. */
+.drive-dash-window {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(60px, 1fr) auto;
+  align-items: center;
+  gap: clamp(10px, 1.8cqw, 18px);
+  padding: 6px clamp(10px, 1.6cqw, 16px) 7px;
+  border-radius: 4px;
+  background:
+    radial-gradient(90% 140% at 50% 120%, rgba(255, 138, 61, 0.05), transparent 70%),
+    linear-gradient(180deg, #0a0710 0%, #050308 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 1px rgba(255, 138, 61, 0.05),
+    inset 0 6px 14px rgba(0, 0, 0, 0.7),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.drive-dash-window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(104deg, transparent 0 38%, rgba(255, 255, 255, 0.035) 38% 52%, transparent 52%);
+}
+
+.drive-gauge {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+.drive-gauge.is-right {
+  justify-items: end;
+}
+
+.drive-gauge-label {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 7.5px;
+  line-height: 1;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 179, 71, 0.5);
+}
+
+.drive-gauge.is-right .drive-gauge-label {
+  margin-right: -0.28em;
+}
+
+/* Sodium segments: the unlit bars stay faintly visible in the glass. */
+.drive-seg {
+  height: 19px;
+}
+
+.drive .drive-seg .seg14-off polygon {
+  fill: rgba(255, 138, 61, 0.038);
+}
+
+.drive .drive-seg .seg14-on {
+  filter: drop-shadow(0 0 2px rgba(255, 150, 60, 0.55)) drop-shadow(0 0 7px rgba(255, 120, 40, 0.16));
+}
+
+.drive .drive-seg .seg14-on polygon,
+.drive .drive-seg .seg14-on circle {
+  fill: #ffb347;
+}
+
+.drive .drive-seg.is-dark .seg14-on {
+  filter: none;
+}
+
+.drive .drive-seg.is-dark .seg14-on polygon,
+.drive .drive-seg.is-dark .seg14-on circle {
+  fill: rgba(255, 138, 61, 0.22);
+}
+
+.drive-dash-road {
+  min-width: 0;
+}
+
+.drive-dash-road .progress {
+  width: 100%;
   max-width: none;
+}
+
+/* The readouts either side say the times; the road itself only shows them. */
+.drive-dash-road .progress-time,
+.drive-dash-road .progress-live .label {
+  display: none;
 }
 
 /* ── The film ──────────────────────────────────────────────────────────── */
@@ -661,16 +905,42 @@
   }
 }
 
-/* ── Narrow windshields ────────────────────────────────────────────────── */
+/* ── Narrow windshields: the eclipse ───────────────────────────────────── */
 
-@container (max-width: 600px) {
-  .drive {
-    --vp: 33%;
-    --cover: clamp(120px, min(30vh, 30cqw), 250px);
+/* Too narrow to put three things side by side: the cover stands in front of
+   the sun, which rims it, and the sign hangs under them over the wet road. */
+@container (max-width: 619px) {
+  .drive-view {
+    --horizon: 54%;
+    --cover: clamp(104px, min(34cqh, 44cqw), 230px);
+    --sun: calc(var(--cover) * 1.45);
+    --rise: 0.93;
+    --vpx: 50cqw;
+  }
+
+  .drive-dash-panel {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 8px;
+  }
+
+  .drive-dash-window {
+    flex-basis: 100%;
+  }
+}
+
+@container drive-view (max-width: 619px) {
+  .drive-cover {
+    left: calc(50% - var(--cover) / 2);
+    bottom: calc(100% - var(--horizon) - 3%);
   }
 
   .drive-lockup {
-    top: 4%;
+    left: 16px;
+    right: 16px;
+    top: calc(var(--horizon) + 7%);
+    bottom: 4%;
+    justify-content: center;
   }
 
   .drive-over {
@@ -680,19 +950,16 @@
 
 /* Short windows: the sky gives its height back before anything else. */
 @media (max-height: 720px) {
-  .drive {
-    --horizon: 56%;
-  }
-
   .drive-dash {
-    min-height: 56px;
-    padding-top: 8px;
-    padding-bottom: 10px;
+    padding-top: 7px;
+    padding-bottom: 8px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .drive-title {
+  .drive-title,
+  .drive-star.is-twinkle,
+  .drive-beacon {
     animation: none;
   }
 

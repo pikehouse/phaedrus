@@ -11,7 +11,9 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
    with tracking give up nothing to the split.
    ══════════════════════════════════════════════════════════════════════════ */
 
-const SIZES = [60, 56, 52, 46, 40, 36, 32];
+const SIZES = [64, 60, 56, 52, 48, 44, 40, 36, 32, 28, 24];
+/** A one-line sign at this size or larger beats a two-line sign at any size. */
+const ONE_LINE_MIN = 40;
 const LINE = 1.1; // must match .drive-title line-height
 const DIP_MS = 120;
 const DIP_MIN_S = 45;
@@ -30,26 +32,35 @@ export default function DriveTitle({ text, lit }: Props) {
   const chars = useMemo(() => [...text], [text]);
   const reduced = useReducedMotion();
 
-  // The largest size at which the sign sits on at most two lines. Never an
-  // ellipsis: a sign that runs out of room is bent smaller.
+  // One line when it fits at a proper size; otherwise two lines, balanced so
+  // nothing is left hanging on its own. Never an ellipsis: a sign that runs
+  // out of room is bent smaller. The lockup's own height is a limit too — the
+  // sign must never climb out of the sky it is hung in.
   useLayoutEffect(() => {
     const h = box.current;
     if (!h) return;
-    const fit = () => {
-      let pick = SIZES[SIZES.length - 1];
-      for (const s of SIZES) {
-        h.style.fontSize = `${s}px`;
-        if (Math.round(h.offsetHeight / (s * LINE)) <= 2) {
-          pick = s;
-          break;
-        }
+    const lockup = h.parentElement;
+    const fits = (s: number, lines: number) => {
+      h.style.fontSize = `${s}px`;
+      if (Math.round(h.offsetHeight / (s * LINE)) > lines) return false;
+      if (!lockup) return true;
+      let used = 0;
+      for (const c of lockup.children) {
+        const cs = getComputedStyle(c);
+        used += (c as HTMLElement).offsetHeight + parseFloat(cs.marginTop) + parseFloat(cs.marginBottom);
       }
+      return used <= lockup.clientHeight + 1;
+    };
+    const fit = () => {
+      let pick = SIZES.find((s) => s >= ONE_LINE_MIN && fits(s, 1));
+      if (pick === undefined) pick = SIZES.find((s) => fits(s, 2));
+      if (pick === undefined) pick = SIZES[SIZES.length - 1];
       h.style.fontSize = `${pick}px`;
       setSize(pick);
     };
     fit();
     const ro = new ResizeObserver(fit);
-    if (h.parentElement) ro.observe(h.parentElement);
+    if (lockup) ro.observe(lockup);
     // The first fit may have measured a fallback face: fit again once the web font is in.
     let alive = true;
     void document.fonts.ready.then(() => {

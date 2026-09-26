@@ -252,101 +252,122 @@
   box-shadow: inset 0 0 0 1px var(--pink), 0 0 14px rgba(255, 45, 149, 0.3);
 }
 
-/* ── Transport: black rubber keys in a chrome bezel ────────────────────── */
+/* ── Transport: backlit rubber dash keys ───────────────────────────────── */
 
-[data-skin='drive'] .tactile {
-  border-radius: 4px;
-  color: var(--ink-dim);
-  background: linear-gradient(180deg, #26243a 0%, #16141f 52%, #0d0c14 100%);
+/* Matte black rubber, a millimetre of travel, and the legend is the lamp: the
+   icons are lit pink from behind, the way a 1985 dash lights its switches. */
+[data-skin='drive'] .tactile,
+[data-skin='drive'] .mod {
+  position: relative;
+  border-radius: 5px;
+  color: #ff4fa6;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.06), transparent 60%),
+    linear-gradient(180deg, #25232c 0%, #1a1920 45%, #131218 100%);
   box-shadow:
-    0 0 0 1px rgba(200, 205, 232, 0.3),
+    0 0 0 1px #000,
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    inset 0 -2px 3px rgba(0, 0, 0, 0.6),
-    0 2px 6px rgba(0, 0, 0, 0.6);
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45),
+    0 2px 0 #020203,
+    0 3px 5px rgba(0, 0, 0, 0.5);
+  transition:
+    color var(--t) var(--ease),
+    transform 90ms var(--ease),
+    box-shadow 90ms var(--ease),
+    filter var(--t) var(--ease);
+}
+
+[data-skin='drive'] .tactile svg,
+[data-skin='drive'] .mod svg {
+  filter: drop-shadow(0 0 2.5px rgba(255, 45, 149, 0.55));
 }
 
 [data-skin='drive'] .tactile-sm {
   width: 40px;
-  height: 30px;
+  height: 32px;
 }
 
 [data-skin='drive'] .tactile-lg {
-  width: 54px;
-  height: 34px;
-  color: var(--ink);
+  width: 52px;
+  height: 36px;
+  color: #ff6fb8;
+}
+
+[data-skin='drive'] .mod {
+  width: 32px;
+  height: 28px;
+  color: rgba(255, 79, 166, 0.4);
+}
+
+[data-skin='drive'] .mod svg {
+  filter: none;
 }
 
 [data-skin='drive'] .tactile:hover:not(:disabled),
-[data-skin='drive'] .tactile-lg:hover:not(:disabled) {
-  color: var(--ink);
-  background: linear-gradient(180deg, #2c2a42 0%, #1a1826 52%, #0f0e17 100%);
-  box-shadow:
-    0 0 0 1px rgba(255, 45, 149, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.09),
-    inset 0 -2px 3px rgba(0, 0, 0, 0.6),
-    0 2px 6px rgba(0, 0, 0, 0.6),
-    0 0 14px rgba(255, 45, 149, 0.16);
+[data-skin='drive'] .mod:hover:not(:disabled) {
+  color: #ff7cc0;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.08), transparent 60%),
+    linear-gradient(180deg, #2a2832 0%, #1d1c24 45%, #15141a 100%);
 }
 
-[data-skin='drive'] .tactile:active:not(:disabled) {
-  transform: none;
-  background: linear-gradient(180deg, #0d0c14 0%, #14121c 60%, #191724 100%);
+/* Pressed: the key sinks its full travel. */
+[data-skin='drive'] .tactile:active:not(:disabled),
+[data-skin='drive'] .mod:active:not(:disabled) {
+  transform: translateY(2px);
   box-shadow:
-    0 0 0 1px rgba(200, 205, 232, 0.3),
-    inset 0 2px 4px rgba(0, 0, 0, 0.7);
+    0 0 0 1px #000,
+    inset 0 1px 3px rgba(0, 0, 0, 0.7),
+    0 0 0 #020203;
 }
 
-[data-skin='drive'] .tactile:disabled {
-  color: var(--ink-ghost);
-  background: linear-gradient(180deg, #1a1826 0%, #100f18 100%);
-  box-shadow: 0 0 0 1px rgba(200, 205, 232, 0.14), inset 0 -2px 3px rgba(0, 0, 0, 0.5);
+[data-skin='drive'] .tactile:disabled,
+[data-skin='drive'] .mod:disabled {
+  color: rgba(255, 79, 166, 0.16);
+}
+
+[data-skin='drive'] .tactile:disabled svg,
+[data-skin='drive'] .mod:disabled svg {
+  filter: none;
 }
 
 [data-skin='drive'] .tactile-lg.is-playing {
-  color: var(--pink-hot);
+  color: #ff8ac6;
 }
 
 [data-skin='drive'] .tactile-lg.is-playing svg {
-  filter: drop-shadow(0 0 4px rgba(255, 45, 149, 0.85)) drop-shadow(0 0 9px rgba(255, 45, 149, 0.35));
+  filter: drop-shadow(0 0 3px rgba(255, 45, 149, 0.8)) drop-shadow(0 0 8px rgba(255, 45, 149, 0.28));
 }
 
-/* Backlit toggles: the icon is the lamp. */
-[data-skin='drive'] .mod {
-  width: 32px;
-  height: 26px;
-  border-radius: 3px;
-  color: rgba(238, 240, 255, 0.26);
-  background: linear-gradient(180deg, #1f1d2e 0%, #13111c 52%, #0c0b12 100%);
-  box-shadow:
-    0 0 0 1px rgba(200, 205, 232, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 1px 3px rgba(0, 0, 0, 0.6);
-}
-
-[data-skin='drive'] .mod:hover:not(:disabled) {
-  color: var(--ink);
-  background: linear-gradient(180deg, #262438 0%, #17151f 52%, #0e0d14 100%);
-}
-
+/* A toggle that is on: the legend lights fully, and a sodium tell-tale
+   glows in the key's corner. */
 [data-skin='drive'] .mod.is-on {
-  color: var(--pink-hot);
+  color: #ff6fb8;
   text-shadow: none;
-  box-shadow:
-    0 0 0 1px rgba(255, 45, 149, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 [data-skin='drive'] .mod.is-on svg {
-  filter: drop-shadow(0 0 4px rgba(255, 45, 149, 0.8));
+  filter: drop-shadow(0 0 3px rgba(255, 45, 149, 0.7));
+}
+
+[data-skin='drive'] .mod::after {
+  content: '';
+  position: absolute;
+  display: block;
+  top: 4px;
+  left: 5px;
+  margin: 0;
+  width: 5px;
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(255, 138, 61, 0.12);
+  box-shadow: none;
 }
 
 [data-skin='drive'] .mod.is-on::after {
-  display: none;
-}
-
-[data-skin='drive'] .mod:disabled {
-  color: rgba(238, 240, 255, 0.1);
+  display: block;
+  background: var(--sodium);
+  box-shadow: 0 0 4px rgba(255, 138, 61, 0.9);
 }
 
 /* ── Progress: the road ────────────────────────────────────────────────── */
@@ -369,34 +390,36 @@
   height: 20px;
 }
 
+/* The road as a bar graph: pink blocks, the unlit ones just visible. */
 [data-skin='drive'] .progress-groove {
-  inset: 9.5px 0;
+  inset: 7px 0;
   border-radius: 0;
-  background: rgba(255, 45, 149, 0.18);
+  background: repeating-linear-gradient(90deg, rgba(255, 45, 149, 0.13) 0 4px, transparent 4px 6px);
   box-shadow: none;
 }
 
 [data-skin='drive'] .progress-played {
-  top: 9px;
-  height: 2px;
+  top: 7px;
+  height: 6px;
   border-radius: 0;
-  background: linear-gradient(90deg, rgba(255, 45, 149, 0.45), var(--pink));
-  box-shadow: 0 0 6px rgba(255, 45, 149, 0.7), 0 0 14px rgba(255, 45, 149, 0.3);
+  background: repeating-linear-gradient(90deg, #ff3d9c 0 4px, transparent 4px 6px);
+  box-shadow: none;
+  filter: drop-shadow(0 0 3px rgba(255, 45, 149, 0.55));
 }
 
 [data-skin='drive'] .progress-cap {
-  width: 3px;
-  height: 12px;
-  margin-left: -1.5px;
-  border-radius: 1px;
-  background: var(--chrome);
-  box-shadow: 0 0 6px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.8);
+  width: 2px;
+  height: 14px;
+  margin-left: -1px;
+  border-radius: 0;
+  background: #f4f1ff;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
 [data-skin='drive'] .progress-track:hover .progress-cap,
 [data-skin='drive'] .progress-track.is-scrubbing .progress-cap {
-  width: 3px;
-  height: 15px;
+  width: 2px;
+  height: 17px;
 }
 
 [data-skin='drive'] .live-pip {
@@ -570,9 +593,37 @@
 /* ── Faceplate ─────────────────────────────────────────────────────────── */
 
 [data-skin='drive'] .faceplate {
-  background: linear-gradient(180deg, #13111d 0%, #0c0a15 55%, #08070f 100%);
-  border-top: 1px solid var(--chrome-line);
-  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.7), 0 -14px 30px rgba(0, 0, 0, 0.45);
+  background:
+    radial-gradient(120% 140% at 50% -40%, rgba(255, 45, 149, 0.04), transparent 60%),
+    linear-gradient(180deg, #100e17 0%, #09080e 55%, #060509 100%);
+  border-top: 1px solid rgba(0, 0, 0, 0.9);
+  box-shadow:
+    inset 0 1px 0 rgba(226, 230, 250, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.7),
+    0 -14px 30px rgba(0, 0, 0, 0.45);
+}
+
+/* The level bars sit behind the same smoked glass as the dash readouts,
+   in a thin chrome frame. */
+[data-skin='drive'] .faceplate .faders {
+  position: relative;
+  padding: 8px 14px 9px;
+  border-radius: 5px;
+  background:
+    radial-gradient(90% 140% at 50% 120%, rgba(255, 138, 61, 0.04), transparent 70%),
+    linear-gradient(180deg, #0a0710 0%, #050308 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.9),
+    0 0 0 2px rgba(200, 205, 232, 0.2),
+    inset 0 6px 14px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='drive'] .faders-caption {
+  color: rgba(255, 179, 71, 0.5);
+}
+
+html[data-skin='drive'][data-shell='phone'] .faceplate .faders {
+  padding: 6px 8px 7px;
 }
 
 [data-skin='drive'] .faceplate::before {

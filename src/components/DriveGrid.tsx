@@ -21,6 +21,10 @@ const CELL_SECONDS = 1.6; // one rung passes under the car every 1.6 s
 const TAU_UP = 0.55;
 const TAU_DOWN = 0.7; // ≈2 s from full speed to rest
 const MIN_GAP = 2.4; // px between rungs before the haze takes over
+const ROAD = 1.25; // road half-width, in rail pitches
+const LINE = 0.028; // centre-line half-width, in rail pitches
+const DASH_PERIOD = 2 * CELL; // one dash every two cells…
+const DASH_LEN = 0.42 * DASH_PERIOD; // …and a little under half of it painted
 
 interface Props {
   playing: boolean;
@@ -35,12 +39,18 @@ export default function DriveGrid({ playing }: Props) {
   useEffect(() => {
     const el = host.current;
     if (!el) return;
-    const [railsGlow, rails, rungsGlow, rungs] = [...el.querySelectorAll<SVGPathElement>('path')];
+    const $ = (c: string) => el.querySelector<SVGPathElement>(`.${c}`)!;
+    const [railsGlow, rails, rungsGlow, rungs] = ['rails-glow', 'rails', 'rungs-glow', 'rungs'].map((c) =>
+      $(`drive-grid-${c}`),
+    );
+    const [road, edgesGlow, edges, dashGlow, dashes] = ['road', 'edges-glow', 'edges', 'dash-glow', 'dash'].map(
+      (c) => $(`drive-road-${c}`),
+    );
 
     let W = 0;
     let H = 0;
     let vpx = 0;
-    let phase = 0; // 0..CELL — how far the nearest rung has slid toward us
+    let travel = 0; // how far the car has gone, in near-edge units (mod a long cycle)
     let velocity = 0; // cells per second
     let raf = 0;
     let last = 0;
@@ -55,13 +65,45 @@ export default function DriveGrid({ playing }: Props) {
       }
       rails.setAttribute('d', d);
       railsGlow.setAttribute('d', d);
+
+      // The road: a darker strip over the grid, with a painted edge each side.
+      const half = ROAD * pitch;
+      const v = `${vpx.toFixed(1)} 0`;
+      road.setAttribute('d', `M${v}L${(vpx + half).toFixed(1)} ${H.toFixed(1)}H${(vpx - half).toFixed(1)}Z`);
+      const e = `M${(vpx - half).toFixed(1)} ${H.toFixed(1)}L${v}L${(vpx + half).toFixed(1)} ${H.toFixed(1)}`;
+      edges.setAttribute('d', e);
+      edgesGlow.setAttribute('d', e);
+    };
+
+    // The centre line: trapezoids on the ground plane, sliding with the rungs.
+    const drawDashes = () => {
+      const pitch = H * LATERAL;
+      if (pitch < 4 || W === 0) return;
+      const off = travel % DASH_PERIOD;
+      const hw = LINE * pitch;
+      let d = '';
+      for (let k = 1; k < 120; k++) {
+        const near = Math.max(0.35, k * DASH_PERIOD - off);
+        const far = k * DASH_PERIOD - off + DASH_LEN;
+        if (far <= 0.35) continue;
+        const y1 = H / near;
+        const y2 = H / far;
+        if (y1 - y2 < 0.7) break;
+        const x1 = hw / near;
+        const x2 = hw / far;
+        d +=
+          `M${(vpx - x1).toFixed(2)} ${y1.toFixed(2)}L${(vpx - x2).toFixed(2)} ${y2.toFixed(2)}` +
+          `L${(vpx + x2).toFixed(2)} ${y2.toFixed(2)}L${(vpx + x1).toFixed(2)} ${y1.toFixed(2)}Z`;
+      }
+      dashes.setAttribute('d', d);
+      dashGlow.setAttribute('d', d);
     };
 
     const drawRungs = () => {
       let d = '';
       let prev = Infinity;
       for (let n = 1; n < 200; n++) {
-        const y = H / (1 + n * CELL - phase);
+        const y = H / (1 + n * CELL - (travel % CELL));
         if (prev - y < MIN_GAP) break;
         prev = y;
         d += `M0 ${y.toFixed(2)}H${W.toFixed(1)}`;
@@ -92,27 +134,37 @@ export default function DriveGrid({ playing }: Props) {
         stop(); // genuinely still — give the frame budget back
         return;
       }
-      phase = (phase + velocity * CELL * dt) % CELL;
+      // One shared odometer, so the rungs and the centre line stop together.
+      travel = (travel + velocity * CELL * dt) % (CELL * DASH_PERIOD * 64);
       drawRungs();
+      drawDashes();
     };
 
     const nudge = () => {
       if (!raf && !document.hidden) raf = requestAnimationFrame(step);
     };
 
-    // The vanishing point is a CSS variable so the sun and the road agree.
+    // The road runs out under the sun: its centre is measured, not assumed,
+    // so every layout (side by side, eclipse, phone) agrees with itself.
+    const sun = el.parentElement?.querySelector<HTMLElement>('.drive-sun') ?? null;
     const measure = () => {
       const r = el.getBoundingClientRect();
       W = r.width;
       H = r.height;
-      const vp = parseFloat(getComputedStyle(el).getPropertyValue('--vp'));
-      vpx = Number.isFinite(vp) ? (W * vp) / 100 : W / 2;
+      if (sun) {
+        const s = sun.getBoundingClientRect();
+        vpx = s.left + s.width / 2 - r.left;
+      } else {
+        vpx = W / 2;
+      }
       drawRails();
       drawRungs();
+      drawDashes();
     };
 
     const ro = new ResizeObserver(measure);
     ro.observe(el);
+    if (sun) ro.observe(sun);
     measure();
 
     if (reduced) {
@@ -132,7 +184,7 @@ export default function DriveGrid({ playing }: Props) {
     };
   }, [reduced]);
 
-  // Play/pause only nudges the loop; the road keeps its phase across a pause.
+  // Play/pause only nudges the loop; the road keeps its place across a pause.
   useEffect(() => {
     play.current = playing;
     wake.current?.();
@@ -145,6 +197,11 @@ export default function DriveGrid({ playing }: Props) {
         <path className="drive-grid-rails" />
         <path className="drive-grid-rungs-glow" />
         <path className="drive-grid-rungs" />
+        <path className="drive-road-road" />
+        <path className="drive-road-edges-glow" />
+        <path className="drive-road-edges" />
+        <path className="drive-road-dash-glow" />
+        <path className="drive-road-dash" />
       </svg>
     </div>
   );

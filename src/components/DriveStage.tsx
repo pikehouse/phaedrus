@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useSonos } from '../store/useSonos';
 import { averageColor } from '../lib/color';
-import Progress from './Progress';
-import Transport from './Transport';
 import DriveGrid from './DriveGrid';
 import DriveCover from './DriveCover';
 import DriveTitle from './DriveTitle';
 import DriveFilm from './DriveFilm';
+import DriveWorld from './DriveWorld';
+import DriveDash from './DriveDash';
 import '../styles/drive.css';
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -19,10 +19,11 @@ const SOURCE_LABEL: Record<string, string> = {
 };
 
 /**
- * Los Angeles from the driver's seat at two in the morning: a sky that never
- * quite finishes its sunset, a grid road running out to a low sun, the cover
- * floating over the wet ground with the title in neon beside it, and a slim
- * dashboard under the windshield. The volume knob and room faders live on
+ * Los Angeles from the driver's seat at two in the morning: a few stars, a
+ * sky that never quite finishes its sunset, hills and a distant city along
+ * the horizon, a road running out under a low sun. The cover stands on the
+ * wet ground to the left; the title hangs in neon over the sun; a 1985
+ * digital dash sits under the windshield. The volume knob and room faders live on
  * the faceplate below, which NowPlaying keeps for every skin.
  *
  * Transport and Progress are the app's own components — the dash restyles
@@ -80,8 +81,7 @@ export default function DriveStage() {
     >
       <div className="drive-view">
         <i className="drive-sky" aria-hidden="true" />
-        <i className="drive-sun-glow" aria-hidden="true" />
-        <i className="drive-sun" aria-hidden="true" />
+        <DriveWorld />
         <DriveGrid playing={!!playing} />
         <i className="drive-haze" aria-hidden="true" />
         <i className="drive-horizon" aria-hidden="true" />
@@ -116,10 +116,7 @@ export default function DriveStage() {
         </div>
       </div>
 
-      <div className="drive-dash">
-        <Transport />
-        <Progress />
-      </div>
+      <DriveDash />
 
       <DriveFilm playing={!!playing} />
     </div>
