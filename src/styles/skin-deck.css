@@ -481,16 +481,54 @@
 
 /* ── The mixer: the faceplate under the deck ───────────────────────────── */
 
+/* The mixer is the third plate: the same anodising, a screw at each top
+   corner, and the seam above it cut as deep as the ones between the decks. */
 [data-skin='deck'] .faceplate {
+  --screw: radial-gradient(
+    circle at 50% 50%,
+    #030304 0 1.3px,
+    #0b0c0e 1.7px,
+    #40444b 2.1px,
+    #2a2d33 3px,
+    #16181b 3.7px,
+    rgba(0, 0, 0, 0.9) 4.2px,
+    rgba(255, 255, 255, 0.07) 4.7px,
+    transparent 5.2px
+  );
   background:
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0 1px, rgba(0, 0, 0, 0.03) 1px 2px),
-    linear-gradient(180deg, #131518 0%, #0e1013 55%, #0a0b0d 100%);
-  border-top: 1px solid var(--chamfer-hi);
-  box-shadow: inset 0 -1px 0 var(--chamfer-lo), 0 -16px 32px rgba(0, 0, 0, 0.55);
+    var(--screw) left 8px top 8px / 11px 11px no-repeat,
+    var(--screw) right 8px top 8px / 11px 11px no-repeat,
+    radial-gradient(90% 140% at 0% 0%, rgba(255, 255, 255, 0.04), transparent 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .055 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0 / 180px 180px,
+    linear-gradient(180deg, #15171a 0%, #0f1114 55%, #0b0c0e 100%);
+  border-top: 1px solid #020203;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.075),
+    inset 0 -1px 0 var(--chamfer-lo),
+    0 -1px 0 1px #050607,
+    0 -16px 32px rgba(0, 0, 0, 0.45);
 }
 
 [data-skin='deck'] .faceplate::before {
   background: none;
+}
+
+/* The section's silkscreen, top right, opposite the brand at the bottom. */
+[data-skin='deck'] .faceplate::after {
+  content: 'Mixer';
+  position: absolute;
+  top: 10px;
+  right: 26px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--silk-dim);
+  pointer-events: none;
 }
 
 [data-skin='deck'] .faceplate-brand {

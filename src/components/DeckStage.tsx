@@ -9,10 +9,11 @@ import { trackSeed, useLivePosition } from './DeckSignal';
 import '../styles/deck.css';
 
 /**
- * A DJ controller seen from the booth: two display strips across the top
- * (the playing track on A, the next one cued on B), the jog wheel with the
- * cover in its centre display, and the transport and eight hot-cue pads
- * beside it. The volume knob and room faders live on the faceplate below,
+ * A DJ controller seen from the booth, built as two anodised plates with a
+ * recessed seam between them: the display plate carries the two strips (the
+ * playing track on A, the next one cued on B); the performance plate carries
+ * the jog wheel with the cover in its centre display, and the transport and
+ * a 4×2 block of hot-cue pads beside it. The volume knob and room faders live on the faceplate below,
  * which NowPlaying keeps for every skin — here it is the mixer section,
  * and DeckMeters drives a channel meter in each of its fader rows.
  *
@@ -33,47 +34,56 @@ export default function DeckStage() {
   }, [queue, state?.queueIndex, state?.isRadio]);
 
   return (
-    <div className="deck">
-      <header className="deck-head">
-        <span className="deck-model deck-silk">
-          <b>DDJ-33</b>
-          <span className="deck-model-legend">2-deck controller · 4-channel mixer</span>
-        </span>
-        <span className="deck-lamps" aria-hidden="true">
-          <span className={`deck-lamp${group ? ' is-on' : ''}`}>
-            <i />
-            Power
+    <div className={`deck${playing ? ' is-playing' : ''}`}>
+      {/* The display plate: badge row and the two strips of smoked glass. */}
+      <section className="deck-plate deck-plate-display" aria-label="Decks">
+        <header className="deck-head">
+          <span className="deck-model deck-silk">
+            <b>DDJ-33</b>
+            <span className="deck-model-legend">2-deck controller · 4-channel mixer</span>
           </span>
-          <span className={`deck-lamp${playing ? ' is-on' : ''}`}>
-            <i />
-            Master
+          <span className="deck-lamps" aria-hidden="true">
+            <span className={`deck-lamp${group ? ' is-on' : ''}`}>
+              <i />
+              Power
+            </span>
+            <span className={`deck-lamp${playing ? ' is-on' : ''}`}>
+              <i />
+              Master
+            </span>
           </span>
-        </span>
-        <span className="deck-brand" aria-hidden="true">
-          PHÆDRUS
-        </span>
-      </header>
+          <span className="deck-brand" aria-hidden="true">
+            PHÆDRUS
+          </span>
+        </header>
 
-      <div className="deck-strips">
-        <DeckA />
-        <DeckWave
-          deck="B"
-          title={next?.title}
-          artist={next?.artist}
-          seed={trackSeed(next?.title, next?.artist)}
-          duration={next?.durationSecs}
-        />
-      </div>
-
-      <div className="deck-row">
-        <DeckJog />
-        <div className="deck-controls">
-          <div className="deck-transport">
-            <Transport />
-          </div>
-          <DeckPads />
+        <div className="deck-strips">
+          <DeckA />
+          <DeckWave
+            deck="B"
+            title={next?.title}
+            artist={next?.artist}
+            seed={trackSeed(next?.title, next?.artist)}
+            duration={next?.durationSecs}
+          />
         </div>
-      </div>
+      </section>
+
+      {/* The performance plate: jog, transport and pads. */}
+      <section className="deck-plate deck-plate-perf" aria-label="Deck A">
+        <span className="deck-silk deck-legend" aria-hidden="true">
+          Deck <b>A</b>
+        </span>
+        <div className="deck-row">
+          <DeckJog />
+          <div className="deck-controls">
+            <div className="deck-transport">
+              <Transport />
+            </div>
+            <DeckPads />
+          </div>
+        </div>
+      </section>
 
       <DeckMeters />
     </div>

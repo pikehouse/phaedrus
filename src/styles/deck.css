@@ -26,23 +26,103 @@
 
 /* ── The panel ─────────────────────────────────────────────────────────── */
 
+/* The stage is already an inline-size container; naming it lets the narrow
+   rules below keep asking the stage, not the performance plate inside it. */
+.stage-deck {
+  container-name: deckstage;
+}
+
+/* The chassis: a near-black well that shows only as the seams between the
+   plates bolted onto it. */
 .deck {
+  /* Fine anodising: fractal noise at a whisper, tiled. */
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .055 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* A countersunk hex-socket machine screw, lit from the upper left. */
+  --screw: radial-gradient(
+    circle at 50% 50%,
+    #030304 0 1.3px,
+    #0b0c0e 1.7px,
+    #40444b 2.1px,
+    #2a2d33 3px,
+    #16181b 3.7px,
+    rgba(0, 0, 0, 0.9) 4.2px,
+    rgba(255, 255, 255, 0.07) 4.7px,
+    transparent 5.2px
+  );
   position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: safe center;
-  gap: clamp(8px, 1.7vh, 20px);
-  padding: clamp(10px, 1.9vh, 24px) clamp(16px, 3cqw, 42px) clamp(8px, 1.5vh, 20px);
-  /* Anodised black, brushed at a 1px pitch with almost no contrast, a hair
-     lighter at the top where the key light lands. */
+  gap: 5px;
+  padding: 6px 6px 7px;
+  background: #050607;
+}
+
+/* A plate: matte anodised black, a hair lighter where the key light lands at
+   the upper left, a chamfer on the top edge, a screw in each corner. */
+.deck-plate {
+  position: relative;
+  border-radius: 5px;
   background:
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0 1px, rgba(0, 0, 0, 0.04) 1px 2px),
-    linear-gradient(180deg, #16181c 0%, #101215 44%, #0b0c0e 100%);
+    var(--screw) left 6px top 6px / 11px 11px no-repeat,
+    var(--screw) right 6px top 6px / 11px 11px no-repeat,
+    var(--screw) left 6px bottom 6px / 11px 11px no-repeat,
+    var(--screw) right 6px bottom 6px / 11px 11px no-repeat,
+    radial-gradient(120% 95% at 0% 0%, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012) 45%, transparent 70%),
+    var(--noise) 0 0 / 180px 180px,
+    linear-gradient(180deg, #17191d 0%, #111316 52%, #0d0e11 100%);
   box-shadow:
-    inset 0 1px 0 var(--chamfer-hi),
-    inset 0 -1px 0 var(--chamfer-lo);
+    inset 0 1px 0 rgba(255, 255, 255, 0.075),
+    inset 1px 0 0 rgba(255, 255, 255, 0.025),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.75),
+    0 0 0 1px #020203,
+    0 1px 0 1px rgba(255, 255, 255, 0.025);
+}
+
+.deck-plate-display {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(7px, 1.2vh, 12px);
+  padding: clamp(9px, 1.4vh, 14px) 24px clamp(12px, 1.8vh, 18px);
+}
+
+.deck-plate-perf {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(14px, 2.4vh, 26px) clamp(20px, 3cqw, 34px) clamp(14px, 2.4vh, 26px) 40px;
+}
+
+/* The section legend, printed up the left edge between two short rules. */
+.deck-legend {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  writing-mode: vertical-rl;
+  transform: translate(-50%, -50%) rotate(180deg);
+  transform-origin: 50% 50%;
+  font-size: 8.5px;
+  letter-spacing: 0.3em;
+  pointer-events: none;
+}
+
+.deck-legend::before,
+.deck-legend::after {
+  content: '';
+  width: 1px;
+  height: 26px;
+  background: rgba(238, 240, 243, 0.14);
+}
+
+.deck-legend b {
+  color: var(--led);
+  text-shadow: 0 0 5px rgba(255, 159, 28, 0.3);
 }
 
 /* Silkscreen: condensed caps, letterspaced, printed white or grey. */
@@ -157,14 +237,17 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 3px;
-  border-radius: 5px;
-  background: linear-gradient(180deg, #24272d 0%, #14161a 55%, #0c0d10 100%);
+  padding: 4px;
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 40%),
+    linear-gradient(180deg, #202328 0%, #14161a 55%, #0b0c0f 100%);
   box-shadow:
-    inset 0 1px 0 var(--chamfer-hi),
-    inset 0 -1px 0 var(--chamfer-lo),
-    0 3px 10px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(0, 0, 0, 0.8);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.85),
+    0 0 0 1px #030304,
+    0 2px 0 1px rgba(255, 255, 255, 0.022),
+    0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .dwave-glass {
@@ -176,7 +259,21 @@
   background: radial-gradient(130% 150% at 18% -30%, #15171b 0%, #0a0b0d 46%, #050607 100%);
   box-shadow:
     inset 0 2px 9px rgba(0, 0, 0, 0.9),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.95);
+    inset 0 0 0 1px rgba(0, 0, 0, 0.95),
+    inset 0 -1px 0 1px rgba(255, 255, 255, 0.025);
+}
+
+/* The glass is curved just enough to catch the ceiling: a soft band across
+   the top third, and a bright hairline where the bezel meets it. */
+.dwave-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0) 1px),
+    linear-gradient(176deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.012) 34%, transparent 35%);
 }
 
 .dwave-a .dwave-glass {
@@ -414,14 +511,19 @@
   color: rgba(238, 240, 243, 0.3);
 }
 
-/* ── The controls row ──────────────────────────────────────────────────── */
+/* ── The controls row ─────────────────────────────────────────────────── */
 
+/* On a desktop-width stage the row is a size container, so the jog can be as
+   big as the plate is tall and the pads can be as wide as their height allows. */
 .deck-row {
+  container: deckperf / size;
+  flex: 1;
+  min-height: 250px;
   display: flex;
   align-items: center;
-  gap: clamp(16px, 3cqw, 38px);
-  flex: none;
-  padding: 0 2px;
+  justify-content: center;
+  gap: clamp(20px, 4cqw, 48px);
+  --jog: clamp(180px, min(100cqh, 44cqw), 460px);
 }
 
 .deck-controls {
@@ -429,7 +531,10 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 1.6vh, 18px);
+  justify-content: center;
+  gap: clamp(14px, 3.4cqh, 26px);
+  /* Wide enough for four pads, never so wide that two rows outgrow the plate. */
+  max-width: min(560px, calc((100cqh - 140px) * 2.35));
 }
 
 /* The silkscreen hangs below each key; the box has to own that space. */
@@ -440,12 +545,24 @@
 /* ── The jog wheel ─────────────────────────────────────────────────────── */
 
 .jog {
-  --jog: clamp(200px, min(38vh, 42cqw), 350px);
   position: relative;
   width: var(--jog);
   height: var(--jog);
   flex: none;
   border-radius: 50%;
+}
+
+/* The collar: the jog sits in a machined well cut into the plate. */
+.jog::before {
+  content: '';
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #050607 calc(50% - 2px), #0c0d10 calc(50% - 1px), #1c1f23 100%);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 0, 0, 0.85),
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 -1px 0 rgba(0, 0, 0, 0.7);
 }
 
 /* The rim: black rubber with a fine radial grip, lit from the upper left. */
@@ -571,141 +688,250 @@
 .pads {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
 }
 
-.pads-row {
+.pads-head {
   display: flex;
-  gap: clamp(6px, 1.1cqw, 11px);
-  padding-bottom: 14px;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
 }
 
-/* A rubber pad: a little taller than it is wide, as the real ones are deep. */
+/* The mode the pads are in — printed, not a button: this deck has one. */
+.pads-mode {
+  padding: 1px 6px 2px;
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(238, 240, 243, 0.14);
+  font-size: 8px;
+}
+
+.pads-queue {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.pads-queue b {
+  color: var(--led);
+  text-shadow: 0 0 5px rgba(255, 159, 28, 0.35);
+}
+
+.pads-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(7px, 1.2cqw, 12px);
+  padding: 8px;
+  margin: -2px -8px -8px;
+  border-radius: 7px;
+  /* The pads sit in one recessed pocket, like the rubber mat they are moulded as. */
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Unlit: dark rubber, the pink LED under it showing only as a faint edge. */
 .pad {
   position: relative;
-  width: clamp(38px, 5.5cqw, 58px);
-  aspect-ratio: 1 / 1.14;
-  flex: none;
+  width: 100%;
+  aspect-ratio: 1 / 0.84;
   border-radius: 5px;
-  background: linear-gradient(180deg, #25282d 0%, #17191d 58%, #101216 100%);
+  cursor: pointer;
+  background:
+    var(--noise) 0 0 / 120px 120px,
+    linear-gradient(180deg, #1d1f23 0%, #16181b 58%, #111215 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -2px 3px rgba(0, 0, 0, 0.65),
-    0 2px 4px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(0, 0, 0, 0.85);
-  transition: transform 90ms var(--ease);
+    inset 0 0 0 1px rgba(255, 60, 120, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.55),
+    0 2px 3px rgba(0, 0, 0, 0.7),
+    0 0 0 1px #040405;
+  transition:
+    box-shadow 700ms var(--ease-soft),
+    transform 90ms var(--ease);
+}
+
+.pad:disabled {
+  cursor: default;
+}
+
+/* The under-glow: pink light pooling up from the bottom edge of the rubber. */
+.pad::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(130% 85% at 50% 115%, rgba(255, 60, 120, 0.25), rgba(255, 60, 120, 0.06) 55%, transparent 78%);
+  opacity: 0;
+  transition: opacity 700ms var(--ease-soft);
 }
 
 .pad:active:not(:disabled) {
   transform: translateY(1px);
 }
 
-/* Lit: pink rubber, the LED under it blooming through. */
+/* Loaded: a dim pink under-glow and a slightly brighter edge. */
 .pad.is-loaded {
-  background: radial-gradient(circle at 50% 34%, #ff7aa6 0%, var(--pad) 52%, #b8215a 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -3px 5px rgba(110, 0, 44, 0.65),
-    0 0 6px rgba(255, 60, 120, 0.3),
-    0 0 16px rgba(255, 60, 120, 0.1),
-    0 2px 4px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(0, 0, 0, 0.85);
+    inset 0 0 0 1px rgba(255, 60, 120, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.45),
+    0 2px 3px rgba(0, 0, 0, 0.7),
+    0 0 0 1px #040405;
 }
 
-.pad.is-loaded:hover {
-  background: radial-gradient(circle at 50% 34%, #ff8fb4 0%, #ff4f88 52%, #c42863 100%);
+.pad.is-loaded::after {
+  opacity: 1;
 }
 
+.pad.is-loaded:hover:not(.is-current) {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 60, 120, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.45),
+    0 2px 3px rgba(0, 0, 0, 0.7),
+    0 0 0 1px #040405;
+}
+
+.pad.is-loaded:hover:not(.is-current)::after {
+  opacity: 1;
+  background: radial-gradient(130% 90% at 50% 112%, rgba(255, 60, 120, 0.3), rgba(255, 60, 120, 0.08) 55%, transparent 80%);
+}
+
+/* The one playing is lit — light through translucent rubber: brightest in the
+   middle, deeper at the edges, a soft pool on the mat around it. */
 .pad.is-current {
-  background: radial-gradient(circle at 50% 34%, #ffb0c9 0%, #ff5c92 48%, #d02a68 100%);
+  background:
+    var(--noise) 0 0 / 120px 120px,
+    radial-gradient(95% 85% at 50% 42%, #fb85aa 0%, #e24f82 42%, #b73262 78%, #93264f 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -3px 5px rgba(110, 0, 44, 0.5),
-    0 0 8px rgba(255, 60, 120, 0.5),
-    0 0 22px rgba(255, 60, 120, 0.18),
-    0 2px 4px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(0, 0, 0, 0.85);
-  animation: pad-breathe 4s ease-in-out infinite;
+    inset 0 0 0 1px rgba(255, 170, 200, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -3px 6px rgba(90, 0, 35, 0.4),
+    0 0 10px rgba(255, 60, 120, 0.2),
+    0 0 26px rgba(255, 60, 120, 0.07),
+    0 2px 3px rgba(0, 0, 0, 0.6),
+    0 0 0 1px #040405;
+  animation: pad-breathe 6s ease-in-out infinite;
+}
+
+.pad.is-current::after {
+  opacity: 0;
+}
+
+/* It only breathes while the music does. */
+.deck:not(.is-playing) .pad.is-current {
+  animation-play-state: paused;
 }
 
 @keyframes pad-breathe {
   0%,
   100% { filter: brightness(1); }
-  50% { filter: brightness(0.9); }
+  50% { filter: brightness(0.92); }
 }
 
+/* The number, moulded into the corner of the rubber. */
 .pad-n {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 4px);
-  text-align: center;
+  left: 8px;
+  bottom: 6px;
   font-family: var(--face);
   font-variation-settings: 'wdth' 80, 'wght' 700;
-  font-size: 8px;
-  letter-spacing: 0.1em;
-  color: var(--silk-dim);
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
+  color: rgba(238, 240, 243, 0.16);
   pointer-events: none;
 }
 
+.pad.is-loaded .pad-n {
+  color: rgba(255, 140, 175, 0.42);
+}
+
 .pad.is-current .pad-n {
-  color: var(--silk);
+  color: rgba(80, 0, 30, 0.6);
 }
 
-.pads-foot {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-}
+/* ── Narrow stages: jog beside a 2×4 pad block, the transport below ─────── */
 
-.pads-queue {
-  font-variant-numeric: tabular-nums;
-}
-
-.pads-queue b {
-  color: var(--led);
-  text-shadow: 0 0 5px rgba(255, 159, 28, 0.45);
-}
-
-/* ── Narrow stages: the transport drops under the jog ──────────────────── */
-
-@container (max-width: 640px) {
+@container deckstage (max-width: 640px) {
   .deck-model-legend {
     display: none;
   }
 
-  .deck-row {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    row-gap: clamp(8px, 1.6vh, 16px);
+  .deck-plate-display {
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
-  /* The column dissolves: the pads sit beside the jog, the transport takes
-     the full width of the next line. */
+  .deck-plate-perf {
+    flex: none;
+    padding: 14px 18px 14px 34px;
+  }
+
+  .deck-legend {
+    left: 11px;
+  }
+
+  /* Content-sized again: a narrow stage scrolls rather than squeezes. */
+  .deck-row {
+    container-type: normal;
+    flex: none;
+    min-height: 0;
+    --jog: clamp(160px, min(46cqw, 29vh), 250px);
+    display: grid;
+    grid-template-columns: var(--jog) minmax(0, 1fr);
+    grid-template-areas:
+      'jog pads'
+      'transport transport';
+    align-items: stretch;
+    column-gap: clamp(12px, 3.5cqw, 20px);
+    row-gap: 14px;
+  }
+
+  .jog {
+    grid-area: jog;
+  }
+
   .deck-controls {
     display: contents;
   }
 
   .pads {
-    flex: 1;
+    grid-area: pads;
     min-width: 0;
-    order: 2;
-    align-self: center;
+    height: var(--jog);
+    gap: 6px;
+  }
+
+  .pads-head {
+    flex-wrap: wrap;
+    row-gap: 2px;
+    column-gap: 8px;
+  }
+
+  .pads-mode {
+    display: none;
+  }
+
+  .pads-grid {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 6px;
+    padding: 6px;
+    margin: 0 -6px -6px;
+  }
+
+  .pad {
+    aspect-ratio: auto;
+    height: 100%;
   }
 
   .deck-transport {
-    order: 3;
-    flex-basis: 100%;
-  }
-
-  .pads-row {
-    flex-wrap: wrap;
-  }
-
-  /* Six pads, two rows of three. */
-  .pad:nth-child(n + 7) {
-    display: none;
+    grid-area: transport;
   }
 
   .dwave-a .dwave-glass {
@@ -725,11 +951,74 @@
   }
 }
 
+/* The phone scrolls, so it can afford the real thing: the jog on its own,
+   the transport under it, and the full 4×2 block under that. mobile.css lays
+   the old deck out for the phone; these win over it on specificity. */
+html[data-skin='deck'][data-shell='phone'] .deck-plate-perf {
+  padding: 14px 14px 16px 30px;
+}
+
+html[data-skin='deck'][data-shell='phone'] .deck-legend {
+  left: 10px;
+}
+
+html[data-skin='deck'][data-shell='phone'] .deck-row {
+  --jog: min(64vw, 28vh);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'jog'
+    'transport'
+    'pads';
+  justify-items: center;
+  row-gap: 12px;
+}
+
+html[data-skin='deck'][data-shell='phone'] .jog {
+  --jog: inherit;
+}
+
+html[data-skin='deck'][data-shell='phone'] .pads {
+  height: auto;
+  width: 100%;
+}
+
+html[data-skin='deck'][data-shell='phone'] .pads-mode {
+  display: inline-block;
+}
+
+html[data-skin='deck'][data-shell='phone'] .pads-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: none;
+  gap: 8px;
+  padding: 8px;
+  margin: 0 -8px;
+}
+
+html[data-skin='deck'][data-shell='phone'] .pad {
+  aspect-ratio: 1 / 0.72;
+  height: auto;
+}
+
+html[data-skin='deck'][data-shell='phone'] .deck-transport {
+  justify-self: stretch;
+}
+
+/* Six keys across a phone: the gaps give way so X-Fade stays on the plate. */
+html[data-skin='deck'][data-shell='phone'] .deck-transport .transport {
+  gap: 8px;
+}
+
+html[data-skin='deck'][data-shell='phone'] .deck-transport .transport-main,
+html[data-skin='deck'][data-shell='phone'] .deck-transport .transport-mods-right {
+  gap: 6px;
+}
+
+html[data-skin='deck'][data-shell='phone'] .deck-transport .transport-mods-left {
+  margin-left: 2px;
+}
+
 /* Short windows: the strips give up their height before anything else. */
 @media (max-height: 740px) {
-  .deck {
-    gap: clamp(7px, 1.4vh, 14px);
-  }
 
   .dwave-a .dwave-glass {
     height: clamp(52px, 8.4vh, 76px);

@@ -5,10 +5,10 @@ const PADS = [1, 2, 3, 4, 5, 6, 7, 8];
 const two = (n: number) => String(n).padStart(2, '0');
 
 /**
- * Eight rubber performance pads wired to the head of the queue. A pad lights
- * pink when there is a track under it, goes dark when there is not, and the
- * one that is playing burns brighter and breathes. Pressing one jumps the
- * queue — the only cue a Sonos can actually hit.
+ * Eight rubber performance pads in a 4×2 block, wired to the head of the
+ * queue. Unlit pads are dark rubber with a faint pink edge; a pad with a
+ * track under it glows dimly from beneath; only the one that is playing is
+ * lit, softly. Pressing one jumps the queue — the only cue a Sonos can hit.
  */
 export default function DeckPads() {
   const queue = useSonos((s) => s.queue);
@@ -19,7 +19,14 @@ export default function DeckPads() {
 
   return (
     <div className="pads">
-      <div className="pads-row">
+      <div className="pads-head">
+        <span className="deck-silk">Performance pads</span>
+        <span className="deck-silk pads-mode">Hot cue</span>
+        <span className="deck-silk pads-queue">
+          Queue <b>{two(current ?? 0)}</b> / <b>{two(total)}</b>
+        </span>
+      </div>
+      <div className="pads-grid">
         {PADS.map((n) => {
           const item = queue.find((q) => q.index === n);
           const on = current === n;
@@ -40,12 +47,6 @@ export default function DeckPads() {
             </button>
           );
         })}
-      </div>
-      <div className="pads-foot">
-        <span className="deck-silk">Hot cue</span>
-        <span className="deck-silk pads-queue">
-          Queue <b>{two(current ?? 0)}</b> / <b>{two(total)}</b>
-        </span>
       </div>
     </div>
   );
