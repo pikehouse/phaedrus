@@ -28,7 +28,9 @@ const TIC = true;
 const TIC_MIN_MS = 40_000;
 const TIC_MAX_MS = 90_000;
 
-type Size = 'xl' | 'lg' | 'md' | 'sm';
+/** `custom` sets no cell size of its own, so --flap-w/-h/-fs inherit from
+    whatever the row sits in (the board's departure table sizes its grid). */
+type Size = 'xl' | 'lg' | 'md' | 'sm' | 'custom';
 
 interface Props {
   text: string;

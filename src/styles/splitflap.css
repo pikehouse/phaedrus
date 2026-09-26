@@ -57,7 +57,23 @@
   top: calc(50% - 0.5px);
   height: 1px;
   background: var(--flap-seam, rgba(0, 0, 0, 0.55));
+  /* The lip of the lower card catching light just under the slot. */
+  box-shadow: 0 1px 0 var(--flap-seam-light, transparent);
   z-index: 5;
+  pointer-events: none;
+}
+
+/* The axle pins: a notch at each side of the slot where the cards hang. */
+.flap::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(50% - 2px);
+  height: 4px;
+  background:
+    linear-gradient(90deg, var(--flap-pin, transparent) 0 1px, transparent 1px calc(100% - 1px), var(--flap-pin, transparent) calc(100% - 1px));
+  z-index: 6;
   pointer-events: none;
 }
 

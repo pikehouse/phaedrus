@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSonos } from '../store/useSonos';
 import { useSkin } from '../store/skin';
 import Hero from './Hero';
-import ArtPanel from './ArtPanel';
-import SplitFlap from './SplitFlap';
+import BoardStage from './BoardStage';
 import Progress from './Progress';
 import Transport from './Transport';
 import VolumeKnob from './VolumeKnob';
@@ -224,33 +223,7 @@ export default function NowPlaying() {
       <section className="stage stage-board" aria-label="Now playing">
         <div className="stage-scroll">
           <div className="stage-body">
-            {over}
-
-            <div className="board-head">
-              <ArtPanel art={track?.art} title={title} playing={!!playing} />
-
-              <div className="meta">
-                <SplitFlap
-                  text={idle ? 'Nothing on' : (title ?? '')}
-                  size="xl"
-                  className="board-title"
-                  tic
-                  fit={{ lines: 3, min: 18 }}
-                />
-                {boardLine && (
-                  <SplitFlap
-                    text={boardLine}
-                    size="lg"
-                    className="board-artist"
-                    fit={{ lines: 2, min: 12, to: boardLines }}
-                  />
-                )}
-                {tertiary && <p className="meta-album">{tertiary}</p>}
-              </div>
-            </div>
-
-            <Progress />
-            <Transport />
+            <BoardStage line={boardLine} lines={boardLines} />
           </div>
         </div>
 
