@@ -7,7 +7,7 @@ import '../styles/tuner.css';
 
 const KEY = 'phaedrus.tuner.display';
 const ORDER: Display[] = ['text', 'spectrum', 'image'];
-const FACE: Record<Display, string> = { text: 'TEXT', spectrum: 'SPEC', image: 'IMAGE' };
+const FACE: Record<Display, string> = { text: 'DIAL', spectrum: 'SPEC', image: 'IMAGE' };
 
 function recall(): Display {
   try {
@@ -88,32 +88,81 @@ export default function TunerStage() {
         </div>
       </div>
 
-      {/* Station presets, wired to the first six of the queue — the row of
-          numbered keys every tuner had, doing the only thing it could here. */}
-      <div className="tuner-presets">
-        <span className="tuner-presets-cap">Preset</span>
-        {[1, 2, 3, 4, 5, 6].map((n) => {
-          const item = queue.find((q) => q.index === n);
-          return (
-            <button
-              key={n}
-              type="button"
-              className={`tkey tkey-preset${current === n ? ' is-on' : ''}`}
-              disabled={!item}
-              onClick={() => void playQueueIndex(n)}
-              aria-label={item ? `Preset ${n} — ${item.title}` : `Preset ${n}, empty`}
-              aria-pressed={current === n}
-            >
-              <span className="tkey-face">{n}</span>
-            </button>
-          );
-        })}
-        <span className="tuner-presets-name">
-          {queue.find((q) => q.index === current)?.title ?? ''}
-        </span>
+      <i className="tuner-seam" aria-hidden="true" />
+
+      <div className="tuner-lower">
+        {/* Station presets, wired to the first six of the queue — the row of
+            numbered keys every tuner had, doing the only thing it could here. */}
+        <div className="tuner-presets">
+          <span className="tuner-presets-cap">Memory</span>
+          {[1, 2, 3, 4, 5, 6].map((n) => {
+            const item = queue.find((q) => q.index === n);
+            return (
+              <button
+                key={n}
+                type="button"
+                className={`tkey tkey-preset${current === n ? ' is-on' : ''}`}
+                disabled={!item}
+                onClick={() => void playQueueIndex(n)}
+                aria-label={item ? `Preset ${n} — ${item.title}` : `Preset ${n}, empty`}
+                aria-pressed={current === n}
+              >
+                <span className="tkey-face">{n}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <SubDisplay name={queue.find((q) => q.index === current)?.title} />
       </div>
 
       <i className="tuner-vents" aria-hidden="true" />
+    </div>
+  );
+}
+
+/**
+ * The second, smaller window every separate had under the main one: a signal
+ * meter (here, how hard the group is being driven) and the preset's name.
+ */
+function SubDisplay({ name }: { name?: string }) {
+  const state = useSonos((s) => s.state);
+  const playing = state?.state === 'PLAYING' || state?.state === 'TRANSITIONING';
+  const volume = Math.max(0, Math.min(100, state?.volume ?? 0));
+  const muted = !!state?.muted;
+  const lit = Math.round((volume / 100) * 20);
+  const members = state?.members.length ?? 0;
+  const shown = state?.isRadio ? state.stationName ?? state.track?.title : name;
+
+  return (
+    <div className="tsub" role="img" aria-label={`Signal ${volume}${muted ? ', muted' : ''}`}>
+      <div className="tsub-glass">
+        <div className="tsub-meter">
+          <span className="tsub-cap">Signal</span>
+          <span className="tsub-bars">
+            {Array.from({ length: 20 }, (_, i) => (
+              <i
+                key={i}
+                className={i < lit ? (muted ? 'is-on is-muted' : i >= 16 ? 'is-on is-peak' : 'is-on') : undefined}
+              />
+            ))}
+          </span>
+          <span className="tsub-scale">
+            {['1', '2', '3', '4', '5'].map((n) => (
+              <b key={n}>{n}</b>
+            ))}
+          </span>
+        </div>
+        <div className="tsub-info">
+          <span className="tsub-name">{(shown ?? '').toUpperCase() || '— — —'}</span>
+          <span className="tsub-lamps">
+            <span className={`tsub-lamp${playing ? ' is-on' : ''}`}>ST</span>
+            <span className={`tsub-lamp${!playing && !!state?.track ? ' is-on' : ''}`}>MONO</span>
+            <span className={`tsub-lamp is-amber${members > 1 ? ' is-on' : ''}`}>LINK {members || '-'}</span>
+            <span className={`tsub-lamp is-red${muted ? ' is-on' : ''}`}>MUTING</span>
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

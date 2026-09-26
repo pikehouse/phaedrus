@@ -6,6 +6,8 @@ import { mmss } from '../lib/format';
 import TunerSegment14 from './TunerSegment14';
 import TunerMarquee from './TunerMarquee';
 import TunerSpectrum from './TunerSpectrum';
+import TunerDial from './TunerDial';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import '../styles/tuner.css';
 
 export type Display = 'text' | 'spectrum' | 'image';
@@ -65,14 +67,17 @@ function useElapsed(): number {
 
 /**
  * The vacuum-fluorescent display: a smoked-glass window with a segment clock
- * on the left, a programme area in the middle, an analyzer and a signal meter
- * on the right, and a strip of indicator lamps across the bottom.
+ * on the left, the programme line beside it, a small analyzer on the right;
+ * under those the band that makes it a tuner — the tuning scale (or the wide
+ * analyzer, or the cover redrawn in phosphor) — and a strip of indicator
+ * lamps across the bottom.
  */
 export default function TunerVFD({ mode }: { mode: Display }) {
   const state = useSonos((s) => s.state);
   const group = useSonos((s) => s.group);
   const queue = useSonos((s) => s.queue);
   const elapsed = useElapsed();
+  const reduced = useReducedMotion();
 
   const track = state?.track;
   const playing = state?.state === 'PLAYING' || state?.state === 'TRANSITIONING';
@@ -96,6 +101,18 @@ export default function TunerVFD({ mode }: { mode: Display }) {
   const seed = useMemo(() => hashString(`${title ?? ''}|${track?.artist ?? ''}`), [title, track?.artist]);
   const { shuffle, repeat } = fromPlayMode(state?.playMode ?? 'NORMAL');
   const rooms = group?.members.length ?? 0;
+  const duration = state?.durationSecs || track?.durationSecs || 0;
+  const progress = duration > 0 ? Math.min(1, elapsed / duration) : null;
+  const dial = (
+    <TunerDial
+      progress={progress}
+      radio={radio}
+      station={state?.stationName ?? title}
+      playing={!!playing}
+      loaded={loaded}
+      glide={!reduced}
+    />
+  );
   const raw = state?.source ?? '';
   const source = SOURCE[raw] ?? (raw ? raw.toUpperCase() : 'IDLE');
 
@@ -129,26 +146,37 @@ export default function TunerVFD({ mode }: { mode: Display }) {
             </div>
           </div>
 
-          <div className="tvfd-centre">
-            {mode === 'text' && (
-              <>
-                <TunerMarquee text={line} className="tvfd-line" />
-                {!radio && <Calendar length={state?.queueLength || queue.length} current={state?.queueIndex} />}
-              </>
+          <div className="tvfd-prog">
+            <TunerMarquee text={line} className="tvfd-line" />
+            {radio ? (
+              <span className="tvfd-rds">
+                <span className="tvfd-tag">RDS</span>
+                <span className="tvfd-tag tvfd-tag-dim">PS</span>
+                <span className="tvfd-rds-name">{(state?.stationName ?? '').toUpperCase() || 'NO NAME'}</span>
+              </span>
+            ) : (
+              <Calendar length={state?.queueLength || queue.length} current={state?.queueIndex} />
             )}
-            {mode === 'spectrum' && (
-              <TunerSpectrum seed={seed} playing={!!playing} bands={26} rows={18} className="tsp-wide" />
-            )}
-            {mode === 'image' && <Phosphor art={track?.art} title={title} />}
           </div>
 
           {mode !== 'spectrum' && (
             <div className="tvfd-spec">
-              <TunerSpectrum seed={seed} playing={!!playing} bands={14} rows={18} />
+              <TunerSpectrum seed={seed} playing={!!playing} bands={14} rows={14} />
             </div>
           )}
 
-          <Signal volume={state?.volume ?? 0} playing={!!playing} loaded={loaded} />
+          <div className="tvfd-centre">
+            {mode === 'text' && dial}
+            {mode === 'spectrum' && (
+              <TunerSpectrum seed={seed} playing={!!playing} bands={40} rows={14} className="tsp-wide" />
+            )}
+            {mode === 'image' && (
+              <div className="tvfd-split">
+                <Phosphor art={track?.art} title={title} />
+                {dial}
+              </div>
+            )}
+          </div>
 
           <div className="tvfd-strip">
             <span className="tvfd-source">
@@ -231,25 +259,6 @@ function Lamp({
     <span className={`tvfd-lamp${on ? ' is-on' : ''}`} data-tone={tone}>
       {children}
     </span>
-  );
-}
-
-/** Eight bars of received signal — here, how hard the group is being driven. */
-function Signal({ volume, playing, loaded }: { volume: number; playing: boolean; loaded: boolean }) {
-  const lit = Math.round((Math.max(0, Math.min(100, volume)) / 100) * 8);
-  return (
-    <div className="tvfd-signal">
-      <span className="tvfd-signal-bars" aria-hidden="true">
-        {Array.from({ length: 8 }, (_, i) => (
-          <i key={i} className={7 - i < lit ? 'is-on' : undefined} />
-        ))}
-      </span>
-      <span className="tvfd-tag tvfd-tag-dim">SIGNAL</span>
-      <span className="tvfd-signal-mode">
-        <Lamp on={playing}>ST</Lamp>
-        <Lamp on={loaded && !playing}>MONO</Lamp>
-      </span>
-    </div>
   );
 }
 

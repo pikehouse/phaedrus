@@ -30,6 +30,24 @@
   --vfd-seg-off: rgba(141, 255, 240, 0.06);
   --vfd-dot: rgba(141, 255, 240, 0.11);
   --vfd-bloom: 0 0 6px rgba(120, 255, 235, 0.55), 0 0 18px rgba(80, 230, 210, 0.25);
+  /* The brightest elements — the big clock, the cursor, the figure under it —
+     run a touch warmer and whiter than the rest, as a hot filament does. */
+  --vfd-hot: #c2ffe9;
+
+  /* The glass: a blue-green filter over black, lightest where the room
+     reaches it at the top. */
+  --vfd-glass: radial-gradient(120% 140% at 28% -18%, #0b2327 0%, #06171a 44%, #030d0e 100%);
+
+  /* The control grid you see through real VFD glass — a fine diagonal mesh,
+     multiplied over the lit elements with a faint blue-green cast. */
+  --vfd-mesh: repeating-linear-gradient(60deg, rgba(10, 40, 40, 0.26) 0 0.8px, transparent 0.8px 3.4px),
+    repeating-linear-gradient(-60deg, rgba(10, 40, 40, 0.26) 0 0.8px, transparent 0.8px 3.4px),
+    linear-gradient(#d4f6f6, #d4f6f6);
+
+  /* Brushing: fractal noise stretched ~300:1 along the grain, rendered once
+     as a tile. Grey at 11% alpha, so it only ever moves the ground a few
+     levels either way. */
+  --brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='240'%3E%3Cfilter id='b' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0022 0.72' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 1.25 -0.12  0 0 0 1.25 -0.12  0 0 0 1.25 -0.1  0 0 0 0 0.11'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23b)'/%3E%3C/svg%3E");
 
   --lamp-amber: #ffb347;
   --led-red: #ff3b30;
@@ -371,6 +389,69 @@
   box-shadow: 0 0 6px rgba(255, 179, 71, 0.75);
 }
 
+/* Rubber, not plastic: every key gets the same matte top, the lit front
+   edge, a black gasket where it meets the plate, and a shadow cast down. */
+[data-skin='tuner'] .tactile,
+[data-skin='tuner'] .mod {
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 38%),
+    linear-gradient(180deg, #34383e 0%, #272a2f 50%, #1c1f23 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.72),
+    0 2px 0 rgba(0, 0, 0, 0.55),
+    0 4px 9px rgba(0, 0, 0, 0.42);
+}
+
+[data-skin='tuner'] .tactile-lg:hover:not(:disabled),
+[data-skin='tuner'] .tactile:hover:not(:disabled),
+[data-skin='tuner'] .mod:hover:not(:disabled) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 38%),
+    linear-gradient(180deg, #3a3e45 0%, #2c3035 50%, #1f2226 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(0, 0, 0, 0.72),
+    0 2px 0 rgba(0, 0, 0, 0.55),
+    0 4px 9px rgba(0, 0, 0, 0.42);
+}
+
+[data-skin='tuner'] .tactile:active:not(:disabled),
+[data-skin='tuner'] .mod:active:not(:disabled) {
+  transform: translateY(1px);
+  background: linear-gradient(180deg, #1b1e22 0%, #23272c 60%, #282c31 100%);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 0, 0, 0.72), 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='tuner'] .tactile:disabled,
+[data-skin='tuner'] .mod:disabled {
+  background: linear-gradient(180deg, #22252a 0%, #1b1e22 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+/* A narrow chassis keeps all seven keys on one line: a little less rubber
+   per key rather than a key orphaned on a row of its own. */
+@container (max-width: 700px) {
+  html[data-skin='tuner']:not([data-shell='phone']) .tactile-sm {
+    width: 46px;
+  }
+
+  html[data-skin='tuner']:not([data-shell='phone']) .tactile-lg {
+    width: 58px;
+  }
+
+  html[data-skin='tuner']:not([data-shell='phone']) .tuner-controls .mod {
+    width: 34px;
+  }
+
+  html[data-skin='tuner']:not([data-shell='phone']) .tuner-controls .transport-mods-left {
+    margin-left: 4px;
+  }
+}
+
 /* ── Silkscreen under every key ────────────────────────────────────────── */
 
 [data-skin='tuner'] .transport-main .tactile::before,
@@ -462,11 +543,11 @@
   background: linear-gradient(90deg, rgba(217, 220, 223, 0.16), transparent);
 }
 
-/* ── The tuning knob: heavy black cap in a chrome ring ─────────────────── */
+/* ── The volume knob: a heavy machined cap on a chrome skirt ─────────── */
 
 [data-skin='tuner'] .knob {
-  width: 104px;
-  height: 104px;
+  width: 108px;
+  height: 108px;
 }
 
 [data-skin='tuner'] .knob-caption {
@@ -476,57 +557,108 @@
   color: var(--silk-dim);
 }
 
-[data-skin='tuner'] .knob-body {
-  inset: 12px;
+/* The skirt: a turned chrome collar that sits proud of the plate, wider than
+   the cap, catching the overhead light as a bright arc top-left and a sharp
+   one bottom-right — the way polished bar stock actually reflects. */
+[data-skin='tuner'] .knob::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
   background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.055), transparent 42%),
-    radial-gradient(circle at 38% 28%, #30343b, #15171a 58%, #0a0b0d 100%);
+    radial-gradient(circle closest-side, transparent 88%, rgba(0, 0, 0, 0.55) 94%, transparent 100%),
+    conic-gradient(
+      from 200deg,
+      #5d636a,
+      #e8edf1 8%,
+      #9aa1a8 15%,
+      #f7f9fb 24%,
+      #6f767d 36%,
+      #3c4146 48%,
+      #aab1b8 60%,
+      #eef2f5 66%,
+      #7a8189 76%,
+      #454a50 88%,
+      #5d636a
+    );
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -8px 16px rgba(0, 0, 0, 0.7),
-    0 8px 16px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(0, 0, 0, 0.6);
+    0 7px 14px rgba(0, 0, 0, 0.7),
+    0 2px 3px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.7);
 }
 
-/* The ring, turned from bar stock. */
+/* The cap: black anodised aluminium, its top face spun on a lathe — fine
+   concentric rings under a fixed sheen that does not turn with the knob. */
+[data-skin='tuner'] .knob-body {
+  inset: 13px;
+  background:
+    conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0.02),
+      rgba(255, 255, 255, 0.13) 12%,
+      rgba(255, 255, 255, 0.02) 25%,
+      rgba(0, 0, 0, 0.1) 37%,
+      rgba(255, 255, 255, 0.02) 50%,
+      rgba(255, 255, 255, 0.11) 62%,
+      rgba(255, 255, 255, 0.02) 75%,
+      rgba(0, 0, 0, 0.1) 87%,
+      rgba(255, 255, 255, 0.02)
+    ),
+    repeating-radial-gradient(circle, rgba(255, 255, 255, 0.035) 0 0.6px, transparent 0.6px 1.6px),
+    radial-gradient(circle at 50% 40%, #2a2d32, #16181b 70%, #0c0d0f 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6),
+    0 3px 5px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(0, 0, 0, 0.85);
+}
+
+/* The rim, lit from above: the fixed light over the flutes. */
 [data-skin='tuner'] .knob-body::before {
-  background: conic-gradient(
-    from 208deg,
-    #63696f,
-    #dae0e5 9%,
-    #7d848c 19%,
-    #eef2f5 30%,
-    #767d85 41%,
-    #c6ced5 52%,
-    #5c626a 63%,
-    #b7bfc7 76%,
-    #6b7178 88%,
-    #63696f
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, transparent 42%, rgba(0, 0, 0, 0.45) 100%);
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 80%, #000 82% 100%);
+  mask-image: radial-gradient(circle closest-side, transparent 0 80%, #000 82% 100%);
+}
+
+/* The knurled edge: sixty flutes cut round the rim, so they turn with it. */
+[data-skin='tuner'] .knob-face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    #3b3f45 0deg 1.2deg,
+    #1d2024 1.2deg 3deg,
+    #07080a 3deg 4.8deg,
+    #25282d 4.8deg 6deg
   );
-  /* closest-side, or the ring lands outside the cap and gets clipped away. */
-  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 84%, #000 86% 100%);
-  mask-image: radial-gradient(circle closest-side, transparent 0 84%, #000 86% 100%);
+  -webkit-mask-image: radial-gradient(circle closest-side, transparent 0 80%, #000 82% 100%);
+  mask-image: radial-gradient(circle closest-side, transparent 0 80%, #000 82% 100%);
 }
 
 [data-skin='tuner'] .knob:hover .knob-body,
 [data-skin='tuner'] .knob.is-dragging .knob-body {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -8px 16px rgba(0, 0, 0, 0.7),
-    0 8px 18px rgba(0, 0, 0, 0.65),
-    0 0 0 1px rgba(0, 0, 0, 0.6),
-    0 0 20px rgba(120, 255, 235, 0.14);
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.6),
+    0 3px 5px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(0, 0, 0, 0.85),
+    0 0 22px rgba(120, 255, 235, 0.12);
 }
 
-/* One line, machined into the cap. */
+/* One engraved line, filled white, running in from the flutes. */
 [data-skin='tuner'] .knob-pointer {
-  top: 9px;
+  top: 11%;
   width: 2px;
-  height: 15px;
+  height: 15%;
   margin-left: -1px;
   border-radius: 0;
   background: #f2f5f7;
-  box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.6), 0 0 4px rgba(255, 255, 255, 0.25);
 }
 
 [data-skin='tuner'] .knob-value {
@@ -639,12 +771,19 @@
 
 /* ── Faceplate ─────────────────────────────────────────────────────────── */
 
+/* The amplifier section: the same brushed plate as the tuner above it, a
+   step darker, hung under a recessed seam. */
 [data-skin='tuner'] .faceplate {
   background:
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.015) 0 1px, rgba(0, 0, 0, 0.028) 1px 2px),
-    linear-gradient(180deg, #17191c 0%, #111315 55%, #0c0e10 100%);
-  border-top: 1px solid var(--chamfer-hi);
-  box-shadow: inset 0 -1px 0 var(--chamfer-lo), 0 -14px 30px rgba(0, 0, 0, 0.4);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.02) 18%, transparent 40%, rgba(0, 0, 0, 0.2) 100%),
+    var(--brush),
+    linear-gradient(180deg, #17191c 0%, #121417 55%, #0d0f11 100%);
+  background-size: auto, 900px 240px, auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.95);
+  box-shadow:
+    inset 0 1px 0 rgba(0, 0, 0, 0.5),
+    inset 0 2px 0 rgba(255, 255, 255, 0.09),
+    inset 0 -1px 0 var(--chamfer-lo);
 }
 
 [data-skin='tuner'] .faceplate::before {
@@ -927,4 +1066,193 @@
 [data-skin='tuner'] :focus-visible {
   outline: 1px solid var(--vfd-lit);
   outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   THE RAILS, AS PANEL
+
+   The side rails are the two cheeks of the same chassis: the same brushed
+   aluminium a shade darker, separated from the front panel by a recessed
+   seam. The live row in each list is not a highlight — it is a small window
+   of the same phosphor glass as the display, set into the metal.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin='tuner'] .rooms,
+[data-skin='tuner'] .right-rail {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.012) 22%, transparent 46%, rgba(0, 0, 0, 0.22) 100%),
+    var(--brush),
+    linear-gradient(180deg, #16181b 0%, #111316 50%, #0c0d0f 100%);
+  background-size: auto, 900px 240px, auto;
+}
+
+[data-skin='tuner'] .rooms {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset -1px 0 0 rgba(0, 0, 0, 0.9),
+    inset -2px 0 0 rgba(0, 0, 0, 0.5),
+    inset -3px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-skin='tuner'] .right-rail {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 1px 0 0 rgba(0, 0, 0, 0.9),
+    inset 2px 0 0 rgba(0, 0, 0, 0.5),
+    inset 3px 0 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Section heads are silkscreen: printed, with a hairline rule. */
+[data-skin='tuner'] .rooms-head,
+[data-skin='tuner'] .panel-head {
+  border-bottom: 0;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.7), 0 2px 0 rgba(255, 255, 255, 0.04);
+}
+
+[data-skin='tuner'] .label,
+[data-skin='tuner'] .right-tab {
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* Tabs: a source selector — an LED beside the word, not an underline. */
+[data-skin='tuner'] .right-tab {
+  padding-left: 17px;
+  color: var(--silk-dim);
+}
+
+[data-skin='tuner'] .right-tab.is-active {
+  color: var(--silk);
+}
+
+[data-skin='tuner'] .right-tab::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: #0a1113;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 1px 1px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='tuner'] .right-tab.is-active::before {
+  background: var(--vfd-lit);
+  box-shadow: 0 0 6px rgba(120, 255, 235, 0.8), 0 0 2px #d6fff8;
+}
+
+[data-skin='tuner'] .right-tab.is-active::after {
+  display: none;
+}
+
+/* ── Queue: the memory bank ────────────────────────────────────────────── */
+
+[data-skin='tuner'] .queue {
+  counter-reset: mem;
+}
+
+[data-skin='tuner'] .queue > li {
+  counter-increment: mem;
+}
+
+[data-skin='tuner'] .qrow {
+  border-bottom: 0;
+  border-radius: 2px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 2px 0 rgba(255, 255, 255, 0.022);
+  margin-bottom: 2px;
+}
+
+/* Each row carries its memory number, the way a preset bank is labelled. */
+[data-skin='tuner'] .qrow-main::before {
+  content: counter(mem, decimal-leading-zero);
+  flex: none;
+  width: 16px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: rgba(217, 220, 223, 0.3);
+}
+
+[data-skin='tuner'] .qrow-title {
+  color: #c3c7cb;
+}
+
+[data-skin='tuner'] .qrow-time {
+  font-variant-numeric: tabular-nums;
+  color: rgba(217, 220, 223, 0.4);
+}
+
+[data-skin='tuner'] .qrow:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* The current row: a slot of phosphor glass let into the rail. */
+[data-skin='tuner'] .qrow.is-current,
+[data-skin='tuner'] .room.is-selected {
+  position: relative;
+  background: var(--vfd-glass);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.9),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .qrow.is-current::after,
+[data-skin='tuner'] .room.is-selected::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--vfd-mesh);
+  mix-blend-mode: multiply;
+}
+
+[data-skin='tuner'] .qrow.is-current .qrow-main::before,
+[data-skin='tuner'] .qrow.is-current .qrow-time,
+[data-skin='tuner'] .qrow.is-current .qrow-artist {
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.4);
+}
+
+[data-skin='tuner'] .qrow.is-current .qrow-title {
+  color: var(--vfd-hot);
+  text-shadow: var(--vfd-bloom);
+}
+
+[data-skin='tuner'] .qrow.is-current .qrow-marker {
+  display: none;
+}
+
+/* Sleeves printed on the panel in the phosphor's own green-grey, the lit
+   one in full colour — it is the one on the air. */
+[data-skin='tuner'] .qrow-art img {
+  filter: grayscale(0.85) contrast(1.15) brightness(0.8) sepia(0.2) hue-rotate(120deg);
+}
+
+[data-skin='tuner'] .qrow.is-current .qrow-art img,
+[data-skin='tuner'] .qrow:hover .qrow-art img {
+  filter: grayscale(0.2) contrast(1.08) brightness(0.95);
+}
+
+/* ── Rooms: the source selector ────────────────────────────────────────── */
+
+[data-skin='tuner'] .room {
+  border-bottom: 0;
+  margin-bottom: 2px;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5), 0 2px 0 rgba(255, 255, 255, 0.022);
+}
+
+[data-skin='tuner'] .room.is-selected .room-name {
+  color: var(--vfd-hot);
+  text-shadow: var(--vfd-bloom);
+}
+
+[data-skin='tuner'] .room.is-selected .room-with {
+  color: var(--vfd-lit);
+  opacity: 0.7;
 }

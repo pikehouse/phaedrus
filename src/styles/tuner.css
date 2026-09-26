@@ -3,8 +3,9 @@
 
    Shared components are re-pointed in skin-tuner.css; this file owns the new
    structure: the plate, the screws, the badge, the VFD and everything behind
-   its glass. Every colour here comes from the [data-skin='tuner'] block, which
-   is the only place these classes are ever rendered.
+   its glass, the tuning scale, and the small window in the lower chassis.
+   Every colour here comes from the [data-skin='tuner'] block, which is the
+   only place these classes are ever rendered.
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* ── The stage becomes one wide panel ───────────────────────────────────── */
@@ -28,27 +29,51 @@
 /* ── The plate ─────────────────────────────────────────────────────────── */
 
 .tuner-face {
+  --tf-pad-x: clamp(22px, 3cqw, 46px);
   position: relative;
-  flex: 1;
+  /* Grows to its contents when the window is short, so the corner screws
+     stay at the real corners and the stage scrolls, not the plate. */
+  flex: 1 0 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   /* When the chassis is taller than its contents the block centres; when it
      is shorter, `safe` keeps the badge row from sliding off the top edge. */
+  justify-content: center;
   justify-content: safe center;
-  gap: clamp(11px, 2.6vh, 26px);
-  padding: clamp(14px, 2.6vh, 28px) clamp(22px, 3cqw, 46px) clamp(16px, 2.8vh, 30px);
+  gap: clamp(10px, 2.1vh, 22px);
+  padding: clamp(14px, 2.4vh, 26px) var(--tf-pad-x) clamp(12px, 2vh, 22px);
   border-radius: 0;
-  /* Brushed aluminium: a 1px horizontal pitch at almost no contrast, over a
-     panel that is very slightly lighter at the top than the bottom. */
+  /* Black anodised aluminium, brushed. Four layers, top down:
+       1. the light from above — a soft bright band a fifth of the way down,
+          which is what makes brushing read as metal rather than as stripes;
+       2. the same light falling off toward the two ends of the panel;
+       3. the brushing itself: stretched fractal noise, so no two scratches
+          repeat at the same pitch (see --brush in skin-tuner.css);
+       4. the anodised ground, very slightly lighter at the top. */
   background:
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.026) 0 1px, rgba(0, 0, 0, 0.05) 1px 2px),
-    linear-gradient(180deg, #212429 0%, #17191d 38%, #131518 72%, #0e1012 100%);
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.012) 0%,
+      rgba(255, 255, 255, 0.05) 9%,
+      rgba(255, 255, 255, 0.085) 17%,
+      rgba(255, 255, 255, 0.04) 27%,
+      rgba(255, 255, 255, 0.008) 44%,
+      transparent 60%,
+      rgba(0, 0, 0, 0.18) 100%
+    ),
+    radial-gradient(120% 70% at 50% 14%, transparent 40%, rgba(0, 0, 0, 0.32) 100%),
+    var(--brush),
+    linear-gradient(180deg, #1d2024 0%, #17191d 40%, #121417 76%, #0e1012 100%);
+  background-size: auto, auto, 900px 240px, auto;
   box-shadow:
-    inset 0 1px 0 var(--chamfer-hi),
+    /* The chamfer along the top edge: a bright 1px land, then the bevel. */
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 2px 0 rgba(255, 255, 255, 0.06),
+    inset 0 3px 6px -2px rgba(255, 255, 255, 0.05),
     inset 0 -1px 0 var(--chamfer-lo),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(0, 0, 0, 0.5),
     0 10px 26px rgba(0, 0, 0, 0.45);
 }
 
@@ -56,56 +81,67 @@
 
 .tuner-screw {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, #61666e, #2a2e33 55%, #0d0f11 100%);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 0 0 1px rgba(0, 0, 0, 0.62);
+  background: radial-gradient(circle at 36% 28%, #7a8088 0%, #3a3f45 38%, #16181b 78%, #0b0c0e 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.1),
+    0 -1px 1px rgba(0, 0, 0, 0.6),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55);
 }
 
 .tuner-screw::after {
   content: '';
   position: absolute;
-  inset: 1.4px;
+  inset: 1.5px;
   border-radius: 50%;
-  background: linear-gradient(90deg, transparent 43%, rgba(0, 0, 0, 0.7) 43% 57%, transparent 57%);
+  background:
+    linear-gradient(90deg, transparent 42%, rgba(0, 0, 0, 0.8) 42% 58%, transparent 58%),
+    linear-gradient(90deg, transparent 58%, rgba(255, 255, 255, 0.14) 58% 64%, transparent 64%);
 }
 
 /* No two screws were ever driven to the same angle. */
-.tuner-screw.is-tl { left: 13px; top: 13px; }
-.tuner-screw.is-tr { right: 13px; top: 13px; }
-.tuner-screw.is-bl { left: 13px; bottom: 13px; }
-.tuner-screw.is-br { right: 13px; bottom: 13px; }
+.tuner-screw.is-tl { left: 12px; top: 12px; }
+.tuner-screw.is-tr { right: 12px; top: 12px; }
+.tuner-screw.is-bl { left: 12px; bottom: 12px; }
+.tuner-screw.is-br { right: 12px; bottom: 12px; }
 .tuner-screw.is-tl::after { transform: rotate(26deg); }
 .tuner-screw.is-tr::after { transform: rotate(-52deg); }
 .tuner-screw.is-bl::after { transform: rotate(71deg); }
 .tuner-screw.is-br::after { transform: rotate(8deg); }
 
-/* A machined seam: the join between two pressings, and the thing that keeps
-   an empty stretch of panel reading as metal rather than as nothing. */
+/* A recessed seam between two pressings, run edge to edge: a hard black
+   gap, the shadowed wall under the upper plate, then the lit lip of the
+   lower one catching the same light as the chamfer. */
 .tuner-seam {
   flex: none;
-  height: 1px;
-  margin: 0 -6px;
-  background: rgba(0, 0, 0, 0.62);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.055);
+  height: 3px;
+  margin: 0 calc(-1 * var(--tf-pad-x));
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.92) 0 1px,
+    rgba(0, 0, 0, 0.55) 1px 2px,
+    rgba(255, 255, 255, 0.075) 2px 3px
+  );
 }
 
-/* Ventilation slots pressed into the lower panel — the honest way to use the
-   metal a rack unit has left over, and the first thing to give up its height
-   when the window gets short. */
+/* Ventilation: two staggered rows of oblong slots pressed into the lower
+   plate, each with a lit lower lip. Deliberately short — the lower chassis
+   is where the second window lives now, not a grille. */
 .tuner-vents {
-  flex: 0 1 42px;
+  flex: 0 0 18px;
   min-height: 0;
-  margin: clamp(4px, 1.4vh, 16px) 0 0;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0.66) 0 2px,
-    rgba(255, 255, 255, 0.05) 2px 3px,
-    transparent 3px 7px
-  );
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  margin: 2px 0 0;
+  background:
+    radial-gradient(ellipse 9px 1.7px at 50% 55%, rgba(255, 255, 255, 0.07) 60%, transparent 100%) 0 0 / 26px 9px,
+    radial-gradient(ellipse 9px 1.7px at 50% 45%, rgba(0, 0, 0, 0.92) 70%, transparent 100%) 0 0 / 26px 9px,
+    radial-gradient(ellipse 9px 1.7px at 50% 55%, rgba(255, 255, 255, 0.07) 60%, transparent 100%) 13px 0 / 26px 9px,
+    radial-gradient(ellipse 9px 1.7px at 50% 45%, rgba(0, 0, 0, 0.92) 70%, transparent 100%) 13px 0 / 26px 9px;
+  background-repeat: repeat-x, repeat-x, repeat-x, repeat-x;
+  background-position: 0 0, 0 0, 13px 9px, 13px 9px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
 }
 
 /* ── Badge row ─────────────────────────────────────────────────────────── */
@@ -128,7 +164,8 @@
   min-width: 0;
 }
 
-/* Extended, widely tracked — the Eurostile plate every Japanese deck wore. */
+/* Extended, widely tracked — the Eurostile plate every Japanese deck wore.
+   Silkscreen is printed ink: a hair of shadow beneath, never a glow. */
 .tuner-brand {
   font-family: var(--face);
   font-variation-settings: 'wdth' 125, 'wght' 500;
@@ -136,6 +173,7 @@
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: var(--silk);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
 .tuner-model {
@@ -144,6 +182,7 @@
   font-size: 11px;
   letter-spacing: 0.15em;
   color: var(--silk-dim);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.7);
 }
 
 .tuner-legend {
@@ -152,7 +191,7 @@
   font-size: 8.5px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(217, 220, 223, 0.32);
+  color: rgba(217, 220, 223, 0.36);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -161,6 +200,8 @@
 
 /* ── Soft-touch keys ───────────────────────────────────────────────────── */
 
+/* Rubber over a plastic plunger: a matte top that catches the light along
+   its front edge, rounded shoulders, and a shadow cast down onto the plate. */
 .tkey {
   position: relative;
   display: grid;
@@ -169,21 +210,27 @@
   min-width: 46px;
   padding: 0 11px;
   flex: none;
-  border-radius: 2px;
+  border-radius: 3px;
   color: var(--silk);
-  background: linear-gradient(180deg, #31353b 0%, #24282d 46%, #1a1d21 100%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 38%),
+    linear-gradient(180deg, #34383e 0%, #272a2f 50%, #1c1f23 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.11),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
-    0 1px 0 rgba(0, 0, 0, 0.8),
-    0 2px 5px rgba(0, 0, 0, 0.42);
-  transition: background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.45),
+    inset 1px 0 0 rgba(255, 255, 255, 0.03),
+    inset -1px 0 0 rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.72),
+    0 2px 0 rgba(0, 0, 0, 0.55),
+    0 4px 9px rgba(0, 0, 0, 0.42);
+  transition: background var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease),
+    transform var(--t-fast) var(--ease);
 }
 
 /* The silkscreen sits on the panel under the key, never on the rubber. */
 .tkey::before {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 7px);
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--face);
@@ -192,17 +239,24 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--silk-dim);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
   white-space: nowrap;
   pointer-events: none;
 }
 
 button.tkey:hover {
-  background: linear-gradient(180deg, #383d44 0%, #2a2e34 46%, #1d2125 100%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 38%),
+    linear-gradient(180deg, #3a3e45 0%, #2c3035 50%, #1f2226 100%);
 }
 
 button.tkey:active {
+  transform: translateY(1px);
   background: linear-gradient(180deg, #1c1f23 0%, #22262b 60%, #272b30 100%);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 0 0 rgba(0, 0, 0, 0.8);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.72),
+    0 1px 0 rgba(0, 0, 0, 0.5);
 }
 
 .tkey-power {
@@ -236,8 +290,8 @@ button.tkey:active {
 }
 
 .tuner-led.is-lit {
-  background: var(--led-red);
-  box-shadow: 0 0 7px rgba(255, 59, 48, 0.8), 0 0 2px #ff7b73;
+  background: radial-gradient(circle at 40% 35%, #ffb3ad, var(--led-red) 55%);
+  box-shadow: 0 0 7px rgba(255, 59, 48, 0.8), 0 0 16px rgba(255, 59, 48, 0.25);
 }
 
 /* ── Controls row ──────────────────────────────────────────────────────── */
@@ -248,8 +302,8 @@ button.tkey:active {
   align-items: center;
   gap: 30px clamp(13px, 1.7cqw, 22px);
   /* The silkscreen hangs below each key — the box has to own that space or
-     it collides with the preset row underneath. */
-  padding: 2px 8px 17px 4px;
+     it collides with the seam underneath. */
+  padding: 2px 8px 18px 4px;
   flex: none;
 }
 
@@ -266,7 +320,7 @@ button.tkey:active {
 .tuner-progress::after {
   content: 'Tuning';
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 7px);
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--face);
@@ -275,17 +329,27 @@ button.tkey:active {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--silk-dim);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
   white-space: nowrap;
   pointer-events: none;
 }
 
-/* ── Presets: six numbered keys onto the head of the queue ─────────────── */
+/* ── Lower chassis: memory keys and the second window ──────────────────── */
+
+.tuner-lower {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px clamp(18px, 3cqw, 40px);
+  padding: 0 4px;
+  flex: none;
+  min-width: 0;
+}
 
 .tuner-presets {
   display: flex;
   align-items: center;
   gap: 7px;
-  padding: 0 8px 4px 4px;
   min-width: 0;
   flex: none;
 }
@@ -298,12 +362,13 @@ button.tkey:active {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--silk-dim);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
   flex: none;
 }
 
 .tkey-preset {
   min-width: 36px;
-  height: 28px;
+  height: 30px;
   padding: 0;
 }
 
@@ -314,6 +379,25 @@ button.tkey:active {
   letter-spacing: 0;
 }
 
+/* The key that is "on the air" gets the little lamp above its number. */
+.tkey-preset::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  width: 8px;
+  height: 2px;
+  margin-left: -4px;
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.tkey-preset.is-on::after {
+  background: var(--lamp-amber);
+  box-shadow: 0 0 6px rgba(255, 179, 71, 0.7);
+}
+
 .tkey-preset.is-on .tkey-face {
   color: var(--vfd-lit);
   text-shadow: 0 0 6px rgba(120, 255, 235, 0.55);
@@ -321,47 +405,179 @@ button.tkey:active {
 
 .tkey-preset:disabled {
   background: linear-gradient(180deg, #22252a 0%, #1a1d21 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 0 rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(0, 0, 0, 0.6);
 }
 
 .tkey-preset:disabled .tkey-face {
   color: rgba(217, 220, 223, 0.14);
 }
 
-.tuner-presets-name {
-  margin-left: 12px;
+/* The small window. Same glass as the main one, a third of the height. */
+.tsub {
+  flex: 1 1 300px;
   min-width: 0;
+  padding: 3px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #0b0c0e, #1a1c20);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.tsub-glass {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2.4cqw, 28px);
+  overflow: hidden;
+  padding: 8px 14px 7px;
+  border-radius: 1px;
+  background: var(--vfd-glass);
+  box-shadow: inset 0 2px 7px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(0, 0, 0, 0.9);
+}
+
+.tsub-glass::after,
+.tvfd-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--vfd-mesh);
+  mix-blend-mode: multiply;
+}
+
+.tsub-meter {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  column-gap: 9px;
+  row-gap: 3px;
+  align-items: center;
+  flex: none;
+}
+
+.tsub-cap {
+  grid-row: 1 / span 2;
   font-family: var(--face);
-  font-variation-settings: 'wdth' 78, 'wght' 500;
-  font-size: 9px;
-  letter-spacing: 0.14em;
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(217, 220, 223, 0.34);
+  color: var(--vfd-dim);
+}
+
+.tsub-bars {
+  display: flex;
+  gap: 2px;
+}
+
+.tsub-bars i {
+  display: block;
+  width: 7px;
+  height: 9px;
+  border-radius: 0.5px;
+  background: var(--vfd-dot);
+}
+
+.tsub-bars i.is-on {
+  background: var(--vfd-lit);
+  box-shadow: 0 0 4px rgba(120, 255, 235, 0.5);
+}
+
+.tsub-bars i.is-peak {
+  background: var(--lamp-amber);
+  box-shadow: 0 0 5px rgba(255, 179, 71, 0.55);
+}
+
+.tsub-bars i.is-muted {
+  background: rgba(255, 59, 48, 0.55);
+  box-shadow: none;
+}
+
+.tsub-scale {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1px;
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: 8px;
+  color: var(--vfd-dim);
+}
+
+.tsub-scale b {
+  font-weight: inherit;
+}
+
+.tsub-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.tsub-name {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: var(--vfd-lit);
+  text-shadow: var(--vfd-bloom);
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: clip;
+}
+
+.tsub-lamps {
+  display: flex;
+  gap: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tsub-lamp {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  color: var(--vfd-dim);
+}
+
+.tsub-lamp.is-on {
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.5);
+}
+
+.tsub-lamp.is-amber.is-on {
+  color: var(--lamp-amber);
+  text-shadow: 0 0 6px rgba(255, 179, 71, 0.55);
+}
+
+.tsub-lamp.is-red.is-on {
+  color: var(--led-red);
+  text-shadow: 0 0 6px rgba(255, 59, 48, 0.6);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    THE VACUUM-FLUORESCENT DISPLAY
    ══════════════════════════════════════════════════════════════════════════ */
 
+/* The bezel: a milled pocket in the plate, lit along its lower lip and in
+   shadow along its upper one, with the glass set a couple of mm back. */
 .tvfd {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* The window takes whatever height the chassis has left, up to the size a
-     real one was ever built at. */
   flex: 1 1 auto;
-  max-height: 400px;
-  border-radius: 2px;
-  padding: 4px;
-  background: linear-gradient(180deg, #26292e, #111315 58%, #0b0c0e);
+  max-height: 360px;
+  border-radius: 3px;
+  padding: 5px;
+  background: linear-gradient(180deg, #08090a 0%, #121417 30%, #1b1e22 100%);
   box-shadow:
-    inset 0 1px 0 var(--chamfer-hi),
-    inset 0 -1px 0 var(--chamfer-lo),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
-    0 3px 10px rgba(0, 0, 0, 0.45);
+    inset 0 2px 3px rgba(0, 0, 0, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.1),
+    0 -1px 0 rgba(0, 0, 0, 0.6);
 }
 
 .tvfd-glass {
@@ -370,32 +586,32 @@ button.tkey:active {
   flex: 1;
   overflow: hidden;
   border-radius: 1px;
-  min-height: 180px;
-  background: radial-gradient(122% 132% at 26% -12%, #0a1f19 0%, #061410 46%, #03100c 100%);
-  box-shadow: inset 0 2px 9px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(0, 0, 0, 0.9);
+  min-height: 200px;
+  background: var(--vfd-glass);
+  box-shadow: inset 0 3px 12px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(0, 0, 0, 0.9);
 }
 
 .tvfd-inner {
   flex: 1;
   min-width: 0;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-rows: auto minmax(0, 1fr) auto;
   grid-template-areas:
-    'clock  .      spec   signal'
-    'centre centre centre centre'
-    'strip  strip  strip  strip';
-  gap: clamp(9px, 1.5vh, 18px) clamp(14px, 2cqw, 28px);
-  padding: clamp(11px, 1.7vh, 17px) clamp(14px, 1.8cqw, 22px) 0;
+    'clock  prog   spec'
+    'centre centre centre'
+    'strip  strip  strip';
+  gap: clamp(8px, 1.4vh, 16px) clamp(16px, 2.4cqw, 32px);
+  padding: clamp(11px, 1.7vh, 16px) clamp(14px, 1.8cqw, 22px) 0;
   /* A filament never sits perfectly still. ±2% over seven seconds. */
   animation: vfd-flutter 7s ease-in-out infinite;
 }
 
 .tvfd[data-mode='spectrum'] .tvfd-inner {
   grid-template-areas:
-    'clock  .      .      signal'
-    'centre centre centre centre'
-    'strip  strip  strip  strip';
+    'clock  prog   prog'
+    'centre centre centre'
+    'strip  strip  strip';
 }
 
 @keyframes vfd-flutter {
@@ -405,19 +621,23 @@ button.tkey:active {
   73% { opacity: 0.991; }
 }
 
-/* The only light in this skin: one soft diagonal off the smoked glass. */
+/* The only light in this skin: one soft diagonal off the smoked glass, and
+   the faint grey of the glass itself picking up the room at the top. */
 .tvfd-reflect {
   position: absolute;
   inset: 0;
+  z-index: 1;
   pointer-events: none;
-  background: linear-gradient(
-    114deg,
-    transparent 24%,
-    rgba(198, 255, 248, 0.028) 35%,
-    rgba(198, 255, 248, 0.055) 43%,
-    rgba(198, 255, 248, 0.016) 51%,
-    transparent 63%
-  );
+  background:
+    linear-gradient(180deg, rgba(210, 240, 240, 0.035), transparent 22%),
+    linear-gradient(
+      112deg,
+      transparent 22%,
+      rgba(198, 255, 248, 0.026) 33%,
+      rgba(198, 255, 248, 0.05) 41%,
+      rgba(198, 255, 248, 0.014) 50%,
+      transparent 62%
+    );
 }
 
 /* ── Segment glyphs ────────────────────────────────────────────────────── */
@@ -458,6 +678,13 @@ button.tkey:active {
   height: clamp(34px, 6.6vh, 56px);
 }
 
+.tvfd-clock-big .seg14-on polygon,
+.tvfd-clock-big .seg14-on circle,
+.tdial.is-lit .tdial-freq .seg14-on polygon,
+.tdial.is-lit .tdial-freq .seg14-on circle {
+  fill: var(--vfd-hot);
+}
+
 .tvfd-clock-sub {
   display: flex;
   align-items: center;
@@ -487,21 +714,320 @@ button.tkey:active {
   text-shadow: none;
 }
 
-/* ── Centre: the programme area ────────────────────────────────────────── */
+/* ── Top middle: the programme line ────────────────────────────────────── */
 
-/* The programme band: its own field, ruled off from the readouts above it.
-   Title at the top of the field, calendar sitting just over the lamp strip —
-   the air between them is the field, not a hole. */
+.tvfd-prog {
+  grid-area: prog;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(7px, 1.2vh, 12px);
+  min-width: 0;
+}
+
+.tvfd-rds {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.tvfd-rds-name {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 600;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.45);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ── Centre: the band under the readouts ───────────────────────────────── */
+
 .tvfd-centre {
   grid-area: centre;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: clamp(12px, 2.6vh, 26px);
   min-width: 0;
   min-height: 0;
-  padding-top: clamp(9px, 1.5vh, 16px);
+  padding-top: clamp(8px, 1.4vh, 14px);
   border-top: 1px solid rgba(141, 255, 240, 0.1);
+}
+
+/* IMAGE: the cover at the left of the band, the scale running on beside it. */
+.tvfd-split {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(16px, 2.6cqw, 32px);
+  min-height: 0;
+}
+
+.tvfd-split .tvfd-image-frame {
+  height: clamp(96px, 16vh, 150px);
+}
+
+.tvfd-split .tvfd-image.is-blank {
+  width: clamp(96px, 16vh, 150px);
+  aspect-ratio: 1;
+  box-shadow: inset 0 0 0 1px rgba(141, 255, 240, 0.12);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   THE TUNING SCALE
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.tdial {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: clamp(8px, 1.5vh, 14px);
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding-bottom: 4px;
+}
+
+.tvfd-split .tdial {
+  align-self: stretch;
+}
+
+.tdial-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+}
+
+.tdial-mode {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 1.1cqw, 14px);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tdial-tag {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  color: var(--vfd-dim);
+  white-space: nowrap;
+}
+
+.tdial-tag.is-on {
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.5);
+}
+
+.tdial-tag.is-amber.is-on {
+  color: var(--lamp-amber);
+  text-shadow: 0 0 6px rgba(255, 179, 71, 0.55);
+}
+
+.tdial-rule {
+  width: 1px;
+  height: 10px;
+  background: rgba(141, 255, 240, 0.16);
+}
+
+.tdial-readout {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+}
+
+.tdial-freq {
+  height: 17px;
+}
+
+.tdial-unit {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  color: var(--vfd-dim);
+  padding-bottom: 1px;
+}
+
+/* Band caption | the scale | unit, twice, one cursor across both. */
+.tdial-scale {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 26px;
+  grid-template-rows: auto auto;
+  column-gap: 12px;
+  align-items: stretch;
+  /* The printed scale stops short of the glass edge either side. */
+  padding: 0 2px;
+}
+
+.tdial-track {
+  position: relative;
+  min-width: 0;
+}
+
+.tdial-track.is-fm {
+  grid-column: 2;
+  grid-row: 1;
+  height: clamp(44px, 8vh, 68px);
+  border-bottom: 1px solid rgba(141, 255, 240, 0.34);
+}
+
+.tdial-track.is-am {
+  grid-column: 2;
+  grid-row: 2;
+  height: clamp(28px, 4.6vh, 40px);
+  margin-top: 5px;
+  border-top: 1px solid rgba(141, 255, 240, 0.13);
+}
+
+.tdial-band,
+.tdial-unit-end {
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 78, 'wght' 700;
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  color: var(--vfd-lit);
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.45);
+}
+
+.tdial-band.is-fm,
+.tdial-unit-end.is-fm {
+  grid-row: 1;
+  align-self: end;
+  margin-bottom: -4px;
+}
+
+.tdial-band.is-am,
+.tdial-unit-end.is-am {
+  grid-row: 2;
+  align-self: start;
+  margin-top: 1px;
+  color: var(--vfd-dim);
+  text-shadow: none;
+}
+
+.tdial-band { grid-column: 1; text-align: right; }
+.tdial-unit-end { grid-column: 3; }
+
+.tdial-tick {
+  position: absolute;
+  width: 1px;
+  margin-left: -0.5px;
+  background: rgba(141, 255, 240, 0.2);
+}
+
+.is-fm > .tdial-tick { bottom: 0; }
+.is-fm > .tdial-tick.is-minor { height: 6px; }
+.is-fm > .tdial-tick.is-mid { height: 10px; }
+.is-fm > .tdial-tick.is-major { height: 19px; width: 1.5px; margin-left: -0.75px; background: rgba(141, 255, 240, 0.3); }
+
+/* Everything the cursor has already swept is lit — the scale doubling as a
+   bar graph of how far into the track you are. */
+.is-fm > .tdial-tick.is-past {
+  background: var(--vfd-lit);
+  box-shadow: 0 0 3px rgba(120, 255, 235, 0.55);
+}
+
+.is-am > .tdial-tick { top: 0; background: rgba(141, 255, 240, 0.16); }
+.is-am > .tdial-tick.is-minor { height: 4px; }
+.is-am > .tdial-tick.is-mid { height: 6px; }
+.is-am > .tdial-tick.is-major { height: 9px; background: rgba(141, 255, 240, 0.24); }
+
+.tdial-tick b {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--face);
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+  font-weight: inherit;
+  font-size: clamp(10px, 1.55cqw, 14.5px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.is-fm > .tdial-tick b {
+  bottom: calc(100% + 5px);
+  color: rgba(141, 255, 240, 0.5);
+  text-shadow: 0 0 4px rgba(120, 255, 235, 0.18);
+}
+
+.is-fm > .tdial-tick b.is-hot {
+  color: var(--vfd-hot);
+  text-shadow: var(--vfd-bloom);
+}
+
+.is-am > .tdial-tick b {
+  top: calc(100% + 4px);
+  font-size: clamp(8.5px, 1.15cqw, 11px);
+  color: rgba(141, 255, 240, 0.24);
+}
+
+/* The cursor. The carriage is exactly as wide as the scale, so translating
+   it by --p of its own width puts the needle at --p along the scale — a
+   compositor-only move. */
+.tdial-rail {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  position: relative;
+  pointer-events: none;
+}
+
+.tdial-carriage {
+  position: absolute;
+  inset: 0;
+  transform: translateX(calc(var(--p, 0) * 100%));
+  will-change: transform;
+}
+
+/* One second, linear: exactly the gap between position updates, so a 1Hz
+   feed becomes a continuous slow slide — and a seek or a new track swings
+   the pointer across the scale the way the motor-driven ones did. */
+.tdial.is-glide .tdial-carriage {
+  transition: transform 1s linear;
+}
+
+.tdial.is-glide.is-radio .tdial-carriage {
+  transition: transform 1.6s cubic-bezier(0.3, 0.7, 0.2, 1);
+}
+
+.tdial-needle {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: -2px;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: rgba(141, 255, 240, 0.22);
+}
+
+/* The phosphor bleeding into the diffuser around the lit bar. */
+.tdial-needle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -16px;
+  right: -16px;
+  background: radial-gradient(closest-side, rgba(120, 255, 235, 0.16), transparent);
+  opacity: 0;
+}
+
+.tdial.is-lit .tdial-needle {
+  background: var(--vfd-hot);
+  box-shadow: 0 0 4px rgba(170, 255, 230, 0.9), 0 0 12px rgba(80, 230, 210, 0.45);
+}
+
+.tdial.is-lit .tdial-needle::before {
+  opacity: 1;
 }
 
 /* ── The music calendar ────────────────────────────────────────────────── */
@@ -608,48 +1134,13 @@ button.tkey:active {
 }
 
 .tsp-wide {
-  --tsp-w: clamp(5px, 1.05cqw, 12px);
+  --tsp-w: clamp(4px, 1.35cqw, 16px);
   --tsp-h: 5px;
-  --tsp-gap: clamp(3px, 0.4cqw, 6px);
+  --tsp-gap: clamp(2px, 0.5cqw, 6px);
   --tsp-row: 3px;
   width: 100%;
   justify-content: center;
   overflow: hidden;
-}
-
-/* ── The signal meter ──────────────────────────────────────────────────── */
-
-.tvfd-signal {
-  grid-area: signal;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-}
-
-.tvfd-signal-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.tvfd-signal-bars i {
-  display: block;
-  width: 20px;
-  height: 4px;
-  border-radius: 1px;
-  background: var(--vfd-dot);
-}
-
-.tvfd-signal-bars i.is-on {
-  background: var(--vfd-lit);
-  box-shadow: 0 0 4px rgba(120, 255, 235, 0.45);
-}
-
-.tvfd-signal-mode {
-  display: flex;
-  gap: 7px;
 }
 
 /* ── The lamp strip ────────────────────────────────────────────────────── */
@@ -829,7 +1320,15 @@ button.tkey:active {
     display: none;
   }
 
-  .tvfd-inner {
+  .tvfd .tvfd-inner,
+  .tvfd[data-mode='spectrum'] .tvfd-inner {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'clock  spec'
+      'prog   prog'
+      'centre centre'
+      'strip  strip';
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
     column-gap: 12px;
   }
 
@@ -837,8 +1336,8 @@ button.tkey:active {
     justify-content: flex-end;
   }
 
-  /* Finer dots, same eighteen rows: the analyzer keeps its resolution and
-     gives back the height instead. */
+  /* Finer dots, same rows: the analyzer keeps its resolution and gives back
+     the height instead. */
   .tvfd-spec .tsp {
     --tsp-w: 5px;
     --tsp-h: 3px;
@@ -851,23 +1350,53 @@ button.tkey:active {
     flex-basis: 100%;
   }
 
-  .tuner-presets-name {
+  .tuner-controls {
+    row-gap: 26px;
+  }
+
+  .tdial-mode .tdial-tag:nth-child(2),
+  .tdial-mode .tdial-rule {
     display: none;
   }
 
-  .tuner-controls {
-    row-gap: 26px;
+  .tdial-scale {
+    grid-template-columns: 16px minmax(0, 1fr) 22px;
+    column-gap: 9px;
+  }
+
+  .tvfd-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .tvfd-split .tdial {
+    display: none;
   }
 }
 
 @container (max-width: 520px) {
-  .tvfd-signal {
-    display: none;
-  }
-
   .tvfd-cal {
     max-height: 15px;
     overflow: hidden;
+  }
+
+  .tdial-tick b {
+    font-size: 8.5px;
+  }
+
+  .is-fm > .tdial-tick:nth-child(8n + 6) b,
+  .is-am > .tdial-tick:nth-child(1) b,
+  .is-am > .tdial-tick:nth-child(5) b {
+    display: none;
+  }
+}
+
+/* Narrow and short at once (the 940×640 floor): the calendar is the one
+   thing in the glass the queue beside it already says, so it goes first. */
+@container (max-width: 700px) {
+  @media (max-height: 740px) {
+    .tvfd-cal {
+      display: none;
+    }
   }
 }
 
@@ -878,7 +1407,7 @@ button.tkey:active {
   }
 
   .tvfd {
-    max-height: 300px;
+    max-height: 320px;
   }
 
   .tvfd-glass {
@@ -886,8 +1415,65 @@ button.tkey:active {
   }
 }
 
+/* ── Phone: clock and lamps, then programme, then the scale ────────────── */
+
+@media (max-width: 760px) {
+  html[data-shell='phone'][data-skin='tuner'] .tvfd .tvfd-inner,
+  html[data-shell='phone'][data-skin='tuner'] .tvfd[data-mode='spectrum'] .tvfd-inner {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'clock  lamps'
+      'prog   prog'
+      'centre centre'
+      'source source';
+  }
+
+  html[data-shell='phone'][data-skin='tuner'] .tuner-lower {
+    padding: 0;
+  }
+
+  /* Keep the power key clear of the corner screw. */
+  html[data-shell='phone'][data-skin='tuner'] .tuner-head {
+    padding-right: 18px;
+  }
+
+  /* Seven keys on one line needs every pixel of a 390pt screen. */
+  html[data-shell='phone'][data-skin='tuner'] .tuner-controls {
+    column-gap: 7px;
+  }
+
+  html[data-shell='phone'][data-skin='tuner'] .tsub {
+    flex-basis: 100%;
+  }
+
+  html[data-shell='phone'][data-skin='tuner'] .tsub-glass {
+    padding: 8px 10px 7px;
+    gap: 12px;
+  }
+
+  html[data-shell='phone'][data-skin='tuner'] .tsub-bars i {
+    width: 4px;
+  }
+
+  html[data-shell='phone'][data-skin='tuner'] .tdial-tick b {
+    font-size: 8.5px;
+  }
+
+  html[data-shell='phone'][data-skin='tuner'] .is-fm > .tdial-tick:nth-child(8n + 6) b,
+  html[data-shell='phone'][data-skin='tuner'] .is-am > .tdial-tick:nth-child(1) b,
+  html[data-shell='phone'][data-skin='tuner'] .is-am > .tdial-tick:nth-child(5) b {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tvfd-inner {
     animation: none;
+  }
+
+  .tdial .tdial-carriage,
+  .tdial.is-glide .tdial-carriage {
+    transition: none;
   }
 }
