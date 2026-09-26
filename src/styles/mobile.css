@@ -643,17 +643,6 @@ html[data-shell='phone'] .mod {
     font-size: 17px;
   }
 
-  /* Board: the panel sits above the departure line, not beside it. */
-  html[data-shell='phone'] .board-head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  html[data-shell='phone'] .stage-board .artpanel {
-    --panel: min(46vw, 24vh);
-  }
-
   html[data-shell='phone'] .stage-board .stage-scroll {
     gap: 12px;
     padding: 12px 22px;
@@ -661,12 +650,6 @@ html[data-shell='phone'] .mod {
 
   html[data-shell='phone'] .stage-board .stage-body {
     gap: 12px;
-  }
-
-  html[data-shell='phone'] .board-artist {
-    --flap-w: 17px;
-    --flap-h: 25px;
-    --flap-fs: 17px;
   }
 
   /* Tuner: the display becomes two rows — clock and lamps, then programme —
@@ -766,32 +749,10 @@ html[data-shell='phone'] .mod {
     height: 40px;
   }
 
-  /* Drive: the sun and the road stay full-bleed; the cover floats in front
-     of the sun, and the sign hangs under it over the wet ground. */
-  html[data-shell='phone'] .drive {
-    --vp: 50%;
-    --horizon: 44%;
-    --cover: min(46vw, 24vh);
-    --sun: min(72vw, 34vh);
-  }
-
+  /* Drive: the skin sizes its own scene on phones (drive.css); these only
+     tune the view height and the dash. */
   html[data-shell='phone'] .drive-view {
     min-height: 300px;
-  }
-
-  html[data-shell='phone'] .drive-cover {
-    left: calc(50% - var(--cover) / 2);
-    bottom: calc(100% - var(--horizon) - 3%);
-  }
-
-  html[data-shell='phone'] .drive-lockup {
-    left: 16px;
-    right: 16px;
-    top: calc(var(--horizon) + 10%);
-    bottom: 4%;
-    align-items: center;
-    justify-content: flex-start;
-    text-align: center;
   }
 
   html[data-shell='phone'] .drive-over {
@@ -905,18 +866,6 @@ html[data-shell='phone'] .mod {
     align-self: stretch;
   }
 
-  html[data-shell='phone'] .pads-row {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px 10px;
-    padding-bottom: 12px;
-  }
-
-  html[data-shell='phone'] .pad {
-    width: auto;
-    aspect-ratio: 2 / 1;
-  }
-
   /* The scrub field is 32px of glass; the finger gets the whole strip. The
      seek maths reads the field's horizontal extent only, so this is safe. */
   html[data-shell='phone'] .dwave-field[role='slider']::before {
@@ -926,10 +875,6 @@ html[data-shell='phone'] .mod {
     right: 0;
     bottom: -8px;
     left: 0;
-  }
-
-  html[data-shell='phone'] .pad:nth-child(n + 7) {
-    display: block;
   }
 
   html[data-shell='phone'] .dwave-a .dwave-glass {
