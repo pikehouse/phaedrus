@@ -12,6 +12,18 @@
 
 @import '@fontsource-variable/inter';
 
+/* The cover's colour, published on the root by DaylightStage. Registered so a
+   change of track eases across a second instead of snapping. */
+@property --dl-tint {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: rgb(17, 19, 24);
+}
+
+html[data-skin='daylight'] {
+  transition: --dl-tint 1100ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 [data-skin='daylight'] {
   color-scheme: light;
 
@@ -64,6 +76,9 @@
 
   --sink: inset 0 0 0 1px var(--hair);
   --lift: var(--card-shadow);
+
+  /* The cover's tint, made safe to draw small things in. */
+  --dl-tint-ui: color-mix(in srgb, var(--dl-tint) 82%, #111318);
 }
 
 [data-skin='daylight'] body {
@@ -102,8 +117,11 @@
   background: var(--ground);
 }
 
+/* Isolated, so the cover's wash (z -1, daylight.css) sits over this ground
+   and under everything else on the stage. */
 [data-skin='daylight'] .stage {
-  background: linear-gradient(180deg, #f7f8fa 0%, #eef0f3 100%);
+  isolation: isolate;
+  background: linear-gradient(180deg, #f8f9fa 0%, #eff1f4 100%);
 }
 
 [data-skin='daylight'] .rooms,
@@ -143,11 +161,12 @@
   padding: 8px 18px 10px;
 }
 
+/* "Rooms" speaks at the same size as the right rail's "Queue". */
 [data-skin='daylight'] .rooms-head .label {
-  font-weight: 600;
-  font-size: 12px;
-  letter-spacing: 0;
-  color: var(--ink-3);
+  font-weight: 650;
+  font-size: 14px;
+  letter-spacing: -0.012em;
+  color: var(--ink);
 }
 
 [data-skin='daylight'] .rooms-arrange {
@@ -172,17 +191,19 @@
 }
 
 [data-skin='daylight'] .room {
-  padding: 10px 12px 11px 30px;
+  min-height: 44px;
+  padding: 11px 12px 12px 30px;
   border-radius: 12px;
+  transition: background 200ms var(--ease), box-shadow 200ms var(--ease);
 }
 
 [data-skin='daylight'] .room:hover {
-  background: #f7f8fa;
+  background: #f6f7f9;
 }
 
 [data-skin='daylight'] .room.is-selected {
-  background: var(--pill);
-  box-shadow: none;
+  background: color-mix(in srgb, var(--dl-tint) 9%, #f3f4f6);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--dl-tint) 10%, rgba(17, 19, 24, 0.04));
 }
 
 [data-skin='daylight'] .room-marker {
@@ -197,8 +218,8 @@
 }
 
 [data-skin='daylight'] .room.is-selected .room-marker {
-  background: var(--ink);
-  box-shadow: none;
+  background: var(--dl-tint-ui);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--dl-tint-ui) 16%, transparent);
 }
 
 [data-skin='daylight'] .room-name {
@@ -498,127 +519,257 @@
   color: #dfe2e7;
 }
 
-/* ── Faceplate: a white card ───────────────────────────────────────────── */
+/* ── Faceplate: a frosted white card, only as wide as its rooms need ──── */
 
-/* The card floats clear of the window's bottom edge, shadow and all: the
-   shadow is pulled in a little so twenty pixels of margin hold all of it. */
+/* The card floats clear of the window's bottom edge, shadow and all. With
+   three rooms or fewer it narrows to its content and centres; with four or
+   more it widens and the faders fall into two columns. */
 [data-skin='daylight'] .faceplate {
-  margin: 0 clamp(14px, 3cqw, 32px) 20px;
-  padding: 14px clamp(18px, 4cqw, 36px) 16px;
-  gap: clamp(18px, 4cqw, 40px);
+  --dl-gutter: clamp(14px, 3cqw, 32px);
+  align-self: center;
+  width: min(calc(100% - 2 * var(--dl-gutter)), 640px);
+  margin: 0 auto 18px;
+  padding: 14px 28px 16px 22px;
+  gap: clamp(20px, 3.4cqw, 34px);
   border-top: none;
-  border-radius: 20px;
-  background: var(--paper);
-  box-shadow: 0 2px 6px rgba(17, 19, 24, 0.06), 0 10px 24px -6px rgba(17, 19, 24, 0.12);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(17, 19, 24, 0.04),
+    0 2px 6px rgba(17, 19, 24, 0.04),
+    0 18px 40px -16px rgba(17, 19, 24, 0.16);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
+  transition: width 300ms var(--ease);
+}
+
+html[data-skin='daylight']:not([data-shell='phone']) .faceplate:not(:has(.fader:nth-child(2))) {
+  width: min(calc(100% - 2 * var(--dl-gutter)), 540px);
+}
+
+html[data-skin='daylight']:not([data-shell='phone']) .faceplate:has(.fader:nth-child(4)) {
+  width: min(calc(100% - 2 * var(--dl-gutter)), 900px);
 }
 
 [data-skin='daylight'] .faceplate::before {
   display: none;
 }
 
+/* The wordmark sits on the caption line, top right, clear of every fader. */
 [data-skin='daylight'] .faceplate-brand {
+  top: 15px;
+  right: 26px;
+  bottom: auto;
+  gap: 6px;
   font-weight: 600;
-  font-size: 9.5px;
-  letter-spacing: 0.22em;
+  font-size: 9px;
+  letter-spacing: 0.24em;
   color: var(--ink-4);
 }
 
 [data-skin='daylight'] .faceplate-led {
+  width: 5px;
+  height: 5px;
   background: var(--hair);
   box-shadow: none;
 }
 
 [data-skin='daylight'] .faceplate-led.is-lit {
-  background: var(--ink);
+  background: var(--dl-tint-ui);
   box-shadow: none;
 }
 
-/* ── The knob: a white puck in a hairline ring ─────────────────────────── */
+/* ── Volume: a ring slider ─────────────────────────────────────────────── */
+
+/* The shared knob's tick scale and pointer are set aside. A grey track ring
+   runs the knob's 270° sweep; an ink arc fills it to the volume (--dl-vol,
+   published by DaylightStage); a white handle rides the arc's end on the
+   rotating face; the number sits alone in the middle. */
+[data-skin='daylight'] .knob-block {
+  gap: 8px;
+}
 
 [data-skin='daylight'] .knob {
-  width: 104px;
-  height: 104px;
+  --dl-ring: 5px;
+  width: 98px;
+  height: 98px;
+  border-radius: 50%;
 }
 
-[data-skin='daylight'] .knob-caption,
-[data-skin='daylight'] .faders-caption {
-  font-weight: 500;
-  font-size: 12px;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--ink-3);
+[data-skin='daylight'] .knob-scale {
+  display: none;
 }
 
-[data-skin='daylight'] .knob-tick {
-  stroke: #e5e7eb;
+[data-skin='daylight'] .knob::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -135deg,
+    var(--ink) 0deg calc(var(--dl-vol, 0) * 2.7deg),
+    #e6e8ec calc(var(--dl-vol, 0) * 2.7deg) 270deg,
+    transparent 270deg
+  );
+  -webkit-mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--dl-ring) - 0.5px),
+    #000 calc(100% - var(--dl-ring)) calc(100% - 0.5px),
+    transparent 100%
+  );
+  mask: radial-gradient(
+    farthest-side,
+    transparent calc(100% - var(--dl-ring) - 0.5px),
+    #000 calc(100% - var(--dl-ring)) calc(100% - 0.5px),
+    transparent 100%
+  );
+  transition: filter 200ms var(--ease);
 }
 
-[data-skin='daylight'] .knob-tick.is-major {
-  stroke: #d1d5db;
+/* Round caps: ink where the arc starts, grey where the track ends. */
+[data-skin='daylight'] .knob::after,
+[data-skin='daylight'] .knob-body::before {
+  content: '';
+  display: block;
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  mask: none;
+  -webkit-mask: none;
 }
 
-[data-skin='daylight'] .knob-tick.is-lit,
-[data-skin='daylight'] .knob-tick.is-major.is-lit {
-  stroke: var(--ink);
-}
-
-[data-skin='daylight'] .knob-body {
-  inset: 13px;
-  background: var(--paper);
-  box-shadow:
-    inset 0 0 0 1px var(--hair),
-    0 2px 6px rgba(17, 19, 24, 0.06),
-    0 10px 24px rgba(17, 19, 24, 0.1);
+[data-skin='daylight'] .knob::after {
+  inset: 0;
+  transform: rotate(-135deg);
+  background: radial-gradient(
+    circle at 50% calc(var(--dl-ring) / 2),
+    var(--ink) calc(var(--dl-ring) / 2 - 0.25px),
+    transparent calc(var(--dl-ring) / 2 + 0.25px)
+  );
 }
 
 [data-skin='daylight'] .knob-body::before {
-  display: none;
+  inset: calc(-1 * var(--dl-body-inset));
+  transform: rotate(135deg);
+  background: radial-gradient(
+    circle at 50% calc(var(--dl-ring) / 2),
+    #e6e8ec calc(var(--dl-ring) / 2 - 0.25px),
+    transparent calc(var(--dl-ring) / 2 + 0.25px)
+  );
+}
+
+[data-skin='daylight'] .knob-body {
+  --dl-body-inset: 15px;
+  z-index: 1;
+  inset: var(--dl-body-inset);
+  background: none;
+  box-shadow: none;
 }
 
 [data-skin='daylight'] .knob:hover .knob-body,
 [data-skin='daylight'] .knob.is-dragging .knob-body {
-  box-shadow:
-    inset 0 0 0 1px #d1d5db,
-    0 2px 6px rgba(17, 19, 24, 0.08),
-    0 14px 30px rgba(17, 19, 24, 0.14);
+  box-shadow: none;
 }
 
+[data-skin='daylight'] .knob:hover::before,
+[data-skin='daylight'] .knob.is-dragging::before {
+  filter: brightness(0.97);
+}
+
+/* The handle: centred on the ring's midline at the face's 12 o'clock. */
 [data-skin='daylight'] .knob-pointer {
-  top: 8px;
-  width: 3px;
-  height: 14px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: var(--ink);
-  box-shadow: none;
+  top: calc(-1 * (var(--dl-body-inset) - var(--dl-ring) / 2) - 8px);
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 0.5px rgba(17, 19, 24, 0.08),
+    0 1px 2px rgba(17, 19, 24, 0.16),
+    0 3px 8px rgba(17, 19, 24, 0.18);
+  transition:
+    box-shadow 200ms var(--ease),
+    scale 200ms var(--ease);
+}
+
+[data-skin='daylight'] .knob:hover .knob-pointer,
+[data-skin='daylight'] .knob.is-dragging .knob-pointer {
+  scale: 1.12;
+  box-shadow:
+    0 0 0 0.5px rgba(17, 19, 24, 0.1),
+    0 1px 2px rgba(17, 19, 24, 0.18),
+    0 4px 12px rgba(17, 19, 24, 0.24);
 }
 
 [data-skin='daylight'] .knob-value {
   font-weight: 600;
-  font-size: 19px;
-  letter-spacing: -0.01em;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
   color: var(--ink);
   text-shadow: none;
 }
 
+[data-skin='daylight'] .knob-caption,
+[data-skin='daylight'] .faders-caption {
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--ink-3);
+}
+
 /* ── Faders: thin grey tracks, a black fill, a white round handle ──────── */
 
+/* The caption sits level with "Volume"; the rows centre on the ring below it. */
+[data-skin='daylight'] .faders {
+  flex: 1;
+  max-width: none;
+  gap: 8px;
+  align-self: stretch;
+}
+
+[data-skin='daylight'] .faders-caption {
+  padding-left: 2px;
+}
+
+[data-skin='daylight'] .faders-list {
+  flex: 1;
+  justify-content: safe center;
+  align-content: safe center;
+  gap: 0;
+  padding-right: 4px;
+}
+
+html[data-skin='daylight']:not([data-shell='phone']) .faders-list:has(> .fader:nth-child(4)) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(20px, 3.6cqw, 40px);
+  row-gap: 0;
+}
+
 [data-skin='daylight'] .fader {
-  min-height: 30px;
+  min-height: 32px;
   gap: 10px;
+  min-width: 0;
 }
 
 [data-skin='daylight'] .fader-name {
+  width: clamp(76px, 15cqw, 112px);
   font-weight: 500;
-  font-size: 12.5px;
-  letter-spacing: 0;
+  font-size: 13px;
+  letter-spacing: -0.01em;
   text-transform: none;
   color: var(--ink);
 }
 
 [data-skin='daylight'] .fader-value {
+  width: 24px;
   font-weight: 500;
   font-size: 12px;
+  font-variant-numeric: tabular-nums;
   color: var(--ink-3);
 }
 
@@ -628,7 +779,12 @@
 }
 
 [data-skin='daylight'] .fader-mute {
+  width: 24px;
+  height: 24px;
   color: var(--ink-4);
+  transition:
+    color 200ms var(--ease),
+    background 200ms var(--ease);
 }
 
 [data-skin='daylight'] .fader-mute:hover {
@@ -647,7 +803,7 @@
 [data-skin='daylight'] .fader-slot {
   inset: 10px 0;
   border-radius: 2px;
-  background: var(--hair);
+  background: #e6e8ec;
   box-shadow: none;
 }
 
@@ -664,15 +820,18 @@
 }
 
 [data-skin='daylight'] .fader-cap {
-  width: 18px;
-  height: 18px;
-  margin-left: -9px;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
   border-radius: 50%;
   background: #fff;
   box-shadow:
-    0 1px 2px rgba(17, 19, 24, 0.14),
-    0 3px 8px rgba(17, 19, 24, 0.16),
-    0 0 0 0.5px rgba(17, 19, 24, 0.06);
+    0 0 0 0.5px rgba(17, 19, 24, 0.08),
+    0 1px 2px rgba(17, 19, 24, 0.16),
+    0 3px 8px rgba(17, 19, 24, 0.16);
+  transition:
+    box-shadow 200ms var(--ease),
+    scale 200ms var(--ease);
 }
 
 [data-skin='daylight'] .fader-cap::after {
@@ -681,10 +840,11 @@
 
 [data-skin='daylight'] .fader-rail:hover .fader-cap,
 [data-skin='daylight'] .fader-rail.is-dragging .fader-cap {
+  scale: 1.12;
   box-shadow:
-    0 1px 2px rgba(17, 19, 24, 0.16),
-    0 4px 12px rgba(17, 19, 24, 0.22),
-    0 0 0 0.5px rgba(17, 19, 24, 0.08);
+    0 0 0 0.5px rgba(17, 19, 24, 0.1),
+    0 1px 2px rgba(17, 19, 24, 0.18),
+    0 4px 12px rgba(17, 19, 24, 0.24);
 }
 
 [data-skin='daylight'] .fader.is-muted .fader-cap {
@@ -788,14 +948,17 @@
 
 [data-skin='daylight'] .qrow {
   border-radius: 12px;
+  transition: background 200ms var(--ease), box-shadow 200ms var(--ease);
 }
 
 [data-skin='daylight'] .qrow:hover {
-  background: #f7f8fa;
+  background: #f6f7f9;
 }
 
+/* The playing row: a pill washed with the cover's colour, and a hairline. */
 [data-skin='daylight'] .qrow.is-current {
-  background: var(--pill);
+  background: color-mix(in srgb, var(--dl-tint) 11%, #f3f4f6);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--dl-tint) 10%, rgba(17, 19, 24, 0.04));
 }
 
 [data-skin='daylight'] .qrow-marker,
@@ -836,10 +999,10 @@
   width: 14px;
   height: 14px;
   background:
-    linear-gradient(var(--ink), var(--ink)) 0 100% / 2px 6px no-repeat,
-    linear-gradient(var(--ink), var(--ink)) 4px 100% / 2px 12px no-repeat,
-    linear-gradient(var(--ink), var(--ink)) 8px 100% / 2px 9px no-repeat,
-    linear-gradient(var(--ink), var(--ink)) 12px 100% / 2px 5px no-repeat;
+    linear-gradient(var(--dl-tint-ui), var(--dl-tint-ui)) 0 100% / 2px 6px no-repeat,
+    linear-gradient(var(--dl-tint-ui), var(--dl-tint-ui)) 4px 100% / 2px 12px no-repeat,
+    linear-gradient(var(--dl-tint-ui), var(--dl-tint-ui)) 8px 100% / 2px 9px no-repeat,
+    linear-gradient(var(--dl-tint-ui), var(--dl-tint-ui)) 12px 100% / 2px 5px no-repeat;
   animation: dl-qbars 1.4s var(--ease-soft) infinite;
 }
 
@@ -861,7 +1024,8 @@
   grid-column: 2;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: 9px;
+  overflow: hidden;
   background: var(--pill);
   box-shadow: inset 0 0 0 1px rgba(17, 19, 24, 0.06);
 }
@@ -1293,9 +1457,9 @@
   }
 
   [data-skin='daylight'] .faceplate {
-    margin-bottom: 16px;
-    padding-top: 10px;
-    padding-bottom: 12px;
+    margin-bottom: 14px;
+    padding-top: 12px;
+    padding-bottom: 14px;
   }
 
   [data-skin='daylight'] .knob {
@@ -1303,7 +1467,36 @@
     height: 92px;
   }
 
-  [data-skin='daylight'] .knob-value {
-    font-size: 17px;
+  [data-skin='daylight'] .knob-body {
+    --dl-body-inset: 13px;
   }
+
+  [data-skin='daylight'] .knob-value {
+    font-size: 21px;
+  }
+
+  [data-skin='daylight'] .faceplate-brand {
+    top: 13px;
+  }
+}
+
+/* ── Phone: the card spans the column; the knob keeps its ring ─────────── */
+
+html[data-skin='daylight'][data-shell='phone'] .faceplate {
+  align-self: stretch;
+  width: auto;
+  margin: 0 14px 14px;
+  padding: 12px 16px 14px;
+}
+
+html[data-skin='daylight'][data-shell='phone'] .faceplate-brand {
+  display: none;
+}
+
+html[data-skin='daylight'][data-shell='phone'] .knob-body {
+  --dl-body-inset: 13px;
+}
+
+html[data-skin='daylight'][data-shell='phone'] .knob-value {
+  font-size: 21px;
 }
