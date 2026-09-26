@@ -78,12 +78,12 @@ export default function PrismStage() {
         </div>
       </PrismWall>
 
-      <PrismComb seed={seed} playing={playing} loaded={!idle} rooms={rooms} more={more} />
-
-      <div className="prism-dash">
-        <Progress />
-        <Transport />
-      </div>
+      <PrismComb seed={seed} playing={playing} loaded={!idle} rooms={rooms} more={more}>
+        <div className="prism-dash">
+          <Progress />
+          <Transport />
+        </div>
+      </PrismComb>
     </div>
   );
 }

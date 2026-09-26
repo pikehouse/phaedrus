@@ -935,7 +935,8 @@ html[data-shell='phone'][data-skin='prism'] .pw-album {
 }
 
 html[data-shell='phone'][data-skin='prism'] .pc {
-  height: 118px;
+  height: 132px;
+  padding-top: 10px;
 }
 
 html[data-shell='phone'][data-skin='prism'] .pc-rooms {
@@ -943,14 +944,14 @@ html[data-shell='phone'][data-skin='prism'] .pc-rooms {
 }
 
 html[data-shell='phone'][data-skin='prism'] .pf {
-  height: 40px;
+  min-height: 0;
 }
 
 html[data-shell='phone'][data-skin='prism'] .prism-dash {
   flex-direction: column;
   align-items: stretch;
   gap: 2px;
-  padding: 6px 16px 14px;
+  padding: 22px 16px 14px;
 }
 
 html[data-shell='phone'][data-skin='prism'] .prism-dash .transport {
