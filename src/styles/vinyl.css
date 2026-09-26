@@ -17,8 +17,8 @@
     radial-gradient(circle at 38% 30%, rgba(255, 226, 180, 0.05), transparent 58%),
     radial-gradient(circle at 50% 50%, #17110c 0%, #100a07 55%, #0a0504 84%, #140c08 100%);
   box-shadow:
-    0 22px 50px rgba(4, 2, 1, 0.7),
-    0 0 0 1px rgba(242, 228, 201, 0.06),
+    10px 18px 40px rgba(3, 1, 0, 0.62),
+    0 0 0 1px rgba(242, 228, 201, 0.05),
     inset 0 0 44px rgba(0, 0, 0, 0.62);
   will-change: transform;
 }
@@ -31,17 +31,17 @@
   background:
     repeating-radial-gradient(
       circle at 50% 50%,
-      rgba(242, 228, 201, 0.07) 0px,
-      rgba(242, 228, 201, 0.07) 0.5px,
-      rgba(0, 0, 0, 0.36) 1.1px,
-      rgba(0, 0, 0, 0.36) 2.6px
+      rgba(242, 228, 201, 0.06) 0px,
+      rgba(242, 228, 201, 0.06) 0.4px,
+      rgba(0, 0, 0, 0.34) 0.9px,
+      rgba(0, 0, 0, 0.34) 1.9px
     ),
     repeating-radial-gradient(
       circle at 50% 50%,
-      rgba(255, 214, 160, 0.055) 0px,
-      rgba(255, 214, 160, 0.055) 1px,
+      rgba(255, 214, 160, 0.035) 0px,
+      rgba(255, 214, 160, 0.035) 1px,
       transparent 1px,
-      transparent 11px
+      transparent 13px
     );
   -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 19.5%, #000 20.5% 96.5%, transparent 98%);
   mask-image: radial-gradient(circle at 50% 50%, transparent 0 19.5%, #000 20.5% 96.5%, transparent 98%);
@@ -107,30 +107,69 @@
   height: 39.2%;
   border-radius: 50%;
   box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(242, 228, 201, 0.08),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.62),
+    0 0 0 0.75px rgba(255, 232, 196, 0.2),
+    0 0 0 2.5px rgba(0, 0, 0, 0.35),
     0 2px 8px rgba(0, 0, 0, 0.45);
   pointer-events: none;
 }
 
-/* Specular sheen. Fixed in the room, not on the record — the lamp doesn't spin. */
+/* Specular sheen. Fixed in the room, not on the record — the lamp doesn't spin.
+   Light raking across concentric grooves comes back as a radial bow-tie: a
+   bright blade on the line from the spindle toward the lamp (upper left, mostly
+   under the jacket) and its twin running away from it (lower right). */
 .vinyl-sheen {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: conic-gradient(
-    from 196deg at 58% 38%,
-    transparent 0deg,
-    rgba(255, 232, 190, 0.09) 26deg,
-    rgba(255, 214, 160, 0.17) 46deg,
-    rgba(255, 232, 190, 0.055) 74deg,
-    transparent 116deg,
-    transparent 214deg,
-    rgba(226, 154, 74, 0.08) 250deg,
-    rgba(255, 226, 180, 0.12) 272deg,
-    transparent 316deg
-  );
+  background:
+    conic-gradient(
+      from 0deg at 50% 50%,
+      transparent 0deg 104deg,
+      rgba(255, 206, 150, 0.04) 116deg,
+      rgba(255, 226, 186, 0.13) 128deg,
+      rgba(255, 240, 214, 0.3) 134deg,
+      rgba(255, 244, 222, 0.34) 136deg,
+      rgba(255, 240, 214, 0.3) 138deg,
+      rgba(255, 226, 186, 0.13) 144deg,
+      rgba(255, 206, 150, 0.04) 158deg,
+      transparent 172deg 290deg,
+      rgba(255, 214, 160, 0.05) 300deg,
+      rgba(255, 232, 196, 0.2) 313deg,
+      rgba(255, 240, 214, 0.26) 316deg,
+      rgba(255, 232, 196, 0.2) 319deg,
+      rgba(255, 214, 160, 0.05) 332deg,
+      transparent 344deg
+    ),
+    radial-gradient(circle at 30% 24%, rgba(255, 226, 180, 0.07), transparent 56%);
+  -webkit-mask-image: radial-gradient(circle, transparent 0 20%, rgba(0, 0, 0, 0.55) 22%, #000 40% 88%, rgba(0, 0, 0, 0.5) 96%, transparent 99%);
+  mask-image: radial-gradient(circle, transparent 0 20%, rgba(0, 0, 0, 0.55) 22%, #000 40% 88%, rgba(0, 0, 0, 0.5) 96%, transparent 99%);
   mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* The rim: lit where it faces the lamp, a hard black edge where it turns away. */
+.vinyl-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    inset 1.2px 1.2px 0 rgba(255, 228, 186, 0.2),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.6),
+    0 0 0 0.5px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+
+/* The lamp on the paper label: warm on the upper-left, shaded lower-right. */
+.vinyl-label-light {
+  position: absolute;
+  left: 31%;
+  top: 31%;
+  width: 38%;
+  height: 38%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255, 238, 210, 0.22), transparent 45%, rgba(8, 3, 1, 0.34));
+  mix-blend-mode: soft-light;
   pointer-events: none;
 }
 

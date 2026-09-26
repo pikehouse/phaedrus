@@ -1,0 +1,718 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   HI-FI — a listening room, late.
+
+   One lamp, up and to the left of the turntable. Its pool falls across the
+   stage; the jacket and the record throw their shadows down and to the right;
+   the shelves either side (the rails) sit back in the dark, in walnut. The
+   amplifier below catches the lamp along its top edge, and its two VU meters
+   glow ivory from behind.
+
+   Every rule is scoped to the hi-fi skin; the base stylesheets are the
+   foundation the other skins build on and stay untouched.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+html[data-skin='hifi'] {
+  /* Ink that can be read across the room: the same cream, more of it. */
+  --cream-faint: rgba(242, 228, 201, 0.6);
+  --cream-ghost: rgba(242, 228, 201, 0.19);
+  --hifi-ink-2: rgba(242, 228, 201, 0.74);
+  --hifi-shade: #0c0705;
+  --hifi-alu-hi: #d2c2a6;
+  --hifi-alu: #8c7e6a;
+  --hifi-alu-lo: #4d443a;
+  --hifi-vu-red: #b3352a;
+
+  /* Walnut, quarter-sawn: long streaks, running down the panel. */
+  --hifi-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='720'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55 0.0055' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.72 0 0 0 0 0.46 0 0 0 0 0.27 1.6 0 0 0 -0.72'/%3E%3C/filter%3E%3Crect width='240' height='720' filter='url(%23w)'/%3E%3C/svg%3E");
+}
+
+/* ── The room: move the light to the lamp ─────────────────────────────── */
+
+/* The leak becomes the lamp's own spill — high on the left, over the stage,
+   not a glow in the corner of the window. It breathes, barely. */
+html[data-skin='hifi'] .atmo-leak {
+  top: -38%;
+  left: 4%;
+  right: auto;
+  width: 64%;
+  height: 96%;
+  background:
+    radial-gradient(closest-side, rgba(255, 206, 140, 0.3), rgba(226, 154, 74, 0.1) 50%, transparent 76%);
+  filter: blur(70px);
+  opacity: 0.62;
+  animation: hifi-lamp 60s ease-in-out infinite alternate;
+}
+
+@keyframes hifi-lamp {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.56;
+  }
+  100% {
+    transform: translate3d(1.5%, 2%, 0) scale(1.05);
+    opacity: 0.66;
+  }
+}
+
+html[data-skin='hifi'] .atmo-vignette {
+  background:
+    radial-gradient(110% 92% at 40% 30%, transparent 30%, rgba(10, 5, 3, 0.4) 70%, rgba(6, 3, 2, 0.82) 100%),
+    radial-gradient(60% 46% at 88% 102%, rgba(74, 22, 32, 0.22), transparent 66%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-skin='hifi'] .atmo-leak {
+    animation: none;
+  }
+}
+
+/* ── The stage: the pool of lamp light ────────────────────────────────── */
+
+html[data-skin='hifi'] .stage {
+  background:
+    /* the hot spot, where the shade opens */
+    radial-gradient(34% 40% at 36% 6%, rgba(255, 214, 158, 0.16), transparent 72%),
+    /* the pool itself, long and soft, falling across the jacket and the lockup */
+    radial-gradient(64% 72% at 40% 22%, rgba(158, 98, 58, 0.5), rgba(96, 58, 36, 0.2) 48%, transparent 78%),
+    /* a cooler dark pooling low and to the right */
+    radial-gradient(60% 50% at 96% 100%, rgba(8, 4, 3, 0.55), transparent 70%),
+    linear-gradient(176deg, #22140e 0%, #170d09 58%, #100806 100%);
+}
+
+/* ── Rails: the shelves either side, back in the dark ─────────────────── */
+
+html[data-skin='hifi'] .rooms,
+html[data-skin='hifi'] .right-rail {
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3), transparent 240px),
+    linear-gradient(180deg, #120a07, #0d0705 70%, #0a0504);
+}
+
+html[data-skin='hifi'] .rooms {
+  box-shadow: inset -1px 0 0 rgba(242, 228, 201, 0.06), 16px 0 40px rgba(0, 0, 0, 0.5);
+}
+
+html[data-skin='hifi'] .right-rail {
+  box-shadow: inset 1px 0 0 rgba(242, 228, 201, 0.05), -16px 0 40px rgba(0, 0, 0, 0.5);
+}
+
+/* The grain, under everything on the rail. The rail is its own stacking
+   context, so a negative z-index lands between its ground and its contents. */
+html[data-skin='hifi'] .rooms::before,
+html[data-skin='hifi'] .right-rail::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--hifi-grain);
+  background-size: 240px 720px;
+  opacity: 0.055;
+  pointer-events: none;
+}
+
+/* Light from the stage reaching a little way onto each rail's inner edge. */
+html[data-skin='hifi'] .rooms::after,
+html[data-skin='hifi'] .right-rail::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+html[data-skin='hifi'] .rooms::after {
+  right: 0;
+  background: radial-gradient(100% 50% at 100% 22%, rgba(158, 98, 58, 0.1), transparent 80%);
+}
+
+html[data-skin='hifi'] .right-rail::after {
+  left: 0;
+  background: radial-gradient(100% 50% at 0% 22%, rgba(158, 98, 58, 0.07), transparent 80%);
+}
+
+html[data-skin='hifi'] .rooms-head .label,
+html[data-skin='hifi'] .panel-head .label {
+  color: var(--cream);
+  opacity: 0.86;
+}
+
+html[data-skin='hifi'] .rooms-arrange,
+html[data-skin='hifi'] .panel-action,
+html[data-skin='hifi'] .rooms-rescan,
+html[data-skin='hifi'] .rooms-status,
+html[data-skin='hifi'] .panel-count {
+  font-size: 10.5px;
+  color: var(--cream-faint);
+}
+
+html[data-skin='hifi'] .room-name {
+  color: rgba(242, 228, 201, 0.78);
+}
+
+html[data-skin='hifi'] .room.is-selected {
+  background: linear-gradient(90deg, rgba(90, 57, 38, 0.72) 0%, rgba(59, 36, 24, 0.22) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 228, 186, 0.07);
+}
+
+html[data-skin='hifi'] .room-with {
+  font-size: 10.5px;
+  color: var(--cream-faint);
+}
+
+html[data-skin='hifi'] .rooms-everywhere {
+  color: var(--cream-faint);
+}
+
+html[data-skin='hifi'] .right-tab {
+  color: rgba(242, 228, 201, 0.44);
+}
+
+html[data-skin='hifi'] .right-tab:hover {
+  color: var(--cream-dim);
+}
+
+html[data-skin='hifi'] .right-search {
+  color: var(--cream-faint);
+}
+
+/* ── Queue ────────────────────────────────────────────────────────────── */
+
+html[data-skin='hifi'] .qrow-title {
+  color: rgba(242, 228, 201, 0.82);
+}
+
+html[data-skin='hifi'] .qrow-artist {
+  font-size: 10.5px;
+  color: var(--cream-faint);
+}
+
+html[data-skin='hifi'] .qrow-time {
+  font-size: 10.5px;
+  color: rgba(242, 228, 201, 0.5);
+}
+
+/* The record on the platter: its row catches the lamp. */
+html[data-skin='hifi'] .qrow.is-current {
+  background:
+    linear-gradient(90deg, rgba(226, 154, 74, 0.2), rgba(226, 154, 74, 0.07) 62%, rgba(226, 154, 74, 0.02));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 214, 158, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+html[data-skin='hifi'] .qrow.is-current .qrow-title {
+  color: #fbeed6;
+}
+
+html[data-skin='hifi'] .qrow.is-current .qrow-artist,
+html[data-skin='hifi'] .qrow.is-current .qrow-time {
+  color: var(--amber-hot);
+}
+
+html[data-skin='hifi'] .qrow.is-current .qrow-marker {
+  width: 3px;
+  top: 6px;
+  bottom: 6px;
+  background: var(--amber-hot);
+}
+
+html[data-skin='hifi'] .qrow.is-current .qrow-art {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(240, 178, 94, 0.5);
+}
+
+/* ── The type lockup ──────────────────────────────────────────────────── */
+
+html[data-skin='hifi'] .meta-over {
+  color: var(--hifi-ink-2);
+}
+
+html[data-skin='hifi'] .meta-room {
+  color: var(--amber-hot);
+}
+
+html[data-skin='hifi'] .meta-sep {
+  background: rgba(242, 228, 201, 0.34);
+}
+
+html[data-skin='hifi'] .meta-title {
+  /* Lit from above-left: a warm lift on the glyphs, the shadow falling away. */
+  text-shadow:
+    1px 2px 1px rgba(6, 3, 2, 0.5),
+    4px 10px 30px rgba(6, 3, 2, 0.55);
+}
+
+html[data-skin='hifi'] .meta-artist {
+  color: #dcc7a4;
+}
+
+html[data-skin='hifi'] .meta-album {
+  color: var(--cream-faint);
+}
+
+/* ── Progress: a fine rule, a machined needle ─────────────────────────── */
+
+html[data-skin='hifi'] .progress-time {
+  color: var(--hifi-ink-2);
+  font-size: 11px;
+}
+
+html[data-skin='hifi'] .progress-groove {
+  inset: 10px 0;
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.62);
+  box-shadow:
+    0 1px 0 rgba(255, 228, 186, 0.09),
+    0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+html[data-skin='hifi'] .progress-played {
+  top: 10px;
+  height: 2px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, rgba(226, 154, 74, 0.35), var(--amber) 70%, var(--amber-hot));
+  box-shadow: 0 0 6px rgba(226, 154, 74, 0.3);
+}
+
+/* A turned brass pin: a round head, a fine shank, a point at the rule. */
+html[data-skin='hifi'] .progress-cap {
+  width: 2px;
+  height: 17px;
+  margin-left: -1px;
+  border-radius: 0 0 1px 1px;
+  background: linear-gradient(90deg, #7a4a1e, #f6cf8e 45%, #b87a36);
+  box-shadow: 2px 3px 3px rgba(0, 0, 0, 0.55);
+  transform: translateY(-58%);
+}
+
+html[data-skin='hifi'] .progress-cap::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #fff1d2, var(--amber-hot) 38%, #9c5f22 100%);
+  box-shadow:
+    1.5px 2px 3px rgba(0, 0, 0, 0.6),
+    0 0 8px rgba(240, 178, 94, 0.35);
+}
+
+html[data-skin='hifi'] .progress-track:hover .progress-cap,
+html[data-skin='hifi'] .progress-track.is-scrubbing .progress-cap {
+  width: 2px;
+  height: 20px;
+}
+
+html[data-skin='hifi'] .progress-live-rule {
+  background: linear-gradient(90deg, rgba(242, 228, 201, 0.3), transparent);
+}
+
+/* ── Transport: brushed aluminium bezels round walnut-black caps ──────── */
+
+html[data-skin='hifi'] .tactile {
+  position: relative;
+  isolation: isolate;
+  color: #f4e6cc;
+  /* The bezel: a turned aluminium ring, lit where it faces the lamp. */
+  background:
+    repeating-conic-gradient(from 8deg, rgba(255, 255, 255, 0.05) 0deg 1.5deg, rgba(0, 0, 0, 0.05) 1.5deg 3deg),
+    conic-gradient(
+      from 0deg,
+      var(--hifi-alu) 0deg,
+      var(--hifi-alu-lo) 70deg,
+      #4a4036 130deg,
+      var(--hifi-alu-lo) 180deg,
+      var(--hifi-alu) 250deg,
+      var(--hifi-alu-hi) 305deg,
+      #e8dbc2 318deg,
+      var(--hifi-alu-hi) 332deg,
+      var(--hifi-alu) 360deg
+    );
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    3px 5px 10px rgba(3, 1, 0, 0.62),
+    1px 2px 3px rgba(3, 1, 0, 0.5);
+}
+
+/* The cap, seated inside the bezel. */
+html[data-skin='hifi'] .tactile::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255, 222, 176, 0.2), transparent 46%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(255, 235, 200, 0.018) 0 1px, transparent 1px 2.5px),
+    radial-gradient(circle at 42% 36%, #3e281b 0%, #1f130c 52%, #0c0705 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    inset 1px 1px 0 rgba(255, 226, 184, 0.16),
+    inset -2px -3px 6px rgba(0, 0, 0, 0.6);
+}
+
+html[data-skin='hifi'] .tactile-lg::before {
+  inset: 6px;
+}
+
+html[data-skin='hifi'] .tactile:hover:not(:disabled),
+html[data-skin='hifi'] .tactile-lg:hover:not(:disabled) {
+  color: #fff3dc;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    3px 5px 12px rgba(3, 1, 0, 0.66),
+    1px 2px 3px rgba(3, 1, 0, 0.5),
+    0 0 20px rgba(226, 154, 74, 0.14);
+}
+
+html[data-skin='hifi'] .tactile:active:not(:disabled) {
+  transform: translate(0.5px, 1px);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    1px 2px 4px rgba(3, 1, 0, 0.6);
+}
+
+html[data-skin='hifi'] .tactile:active:not(:disabled)::before {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    inset 1px 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+html[data-skin='hifi'] .tactile svg {
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.55));
+}
+
+html[data-skin='hifi'] .tactile-lg.is-playing {
+  color: var(--amber-hot);
+}
+
+html[data-skin='hifi'] .tactile-lg.is-playing svg {
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.5)) drop-shadow(0 0 6px rgba(240, 178, 94, 0.45));
+}
+
+html[data-skin='hifi'] .tactile:disabled {
+  opacity: 0.55;
+  color: rgba(242, 228, 201, 0.4);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.7),
+    2px 3px 7px rgba(3, 1, 0, 0.5);
+}
+
+html[data-skin='hifi'] .mod {
+  color: rgba(242, 228, 201, 0.5);
+}
+
+html[data-skin='hifi'] .mod:hover:not(:disabled) {
+  color: var(--cream);
+}
+
+html[data-skin='hifi'] .mod.is-on {
+  color: var(--amber-hot);
+}
+
+html[data-skin='hifi'] .mod:disabled {
+  color: rgba(242, 228, 201, 0.16);
+}
+
+/* ── Faceplate: the amplifier, catching the lamp along its top ────────── */
+
+html[data-skin='hifi'] .faceplate {
+  background:
+    /* the lamp's spill along the top edge, strongest under the lamp */
+    radial-gradient(60% 120% at 30% 0%, rgba(255, 206, 150, 0.075), transparent 70%),
+    linear-gradient(180deg, #2a1911 0%, #1d110c 38%, #150c08 100%);
+  border-top: 1px solid rgba(255, 226, 184, 0.14);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 235, 200, 0.05),
+    inset 0 2px 0 rgba(0, 0, 0, 0.35),
+    0 -26px 50px rgba(4, 2, 1, 0.55);
+}
+
+/* Brushed lines, finer and quieter. */
+html[data-skin='hifi'] .faceplate::before {
+  background: repeating-linear-gradient(90deg, rgba(255, 235, 200, 0.011) 0 1px, transparent 1px 3px);
+}
+
+html[data-skin='hifi'] .faceplate .label,
+html[data-skin='hifi'] .knob-caption,
+html[data-skin='hifi'] .faders-caption {
+  font-size: 9.5px;
+  color: rgba(242, 228, 201, 0.66);
+}
+
+html[data-skin='hifi'] .fader-name {
+  font-size: 10.5px;
+  color: rgba(242, 228, 201, 0.8);
+}
+
+html[data-skin='hifi'] .fader-value {
+  font-size: 10.5px;
+  color: rgba(242, 228, 201, 0.64);
+}
+
+html[data-skin='hifi'] .fader-mute {
+  color: rgba(242, 228, 201, 0.56);
+}
+
+html[data-skin='hifi'] .fader-slot {
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.7),
+    0 1px 0 rgba(255, 228, 186, 0.07);
+}
+
+html[data-skin='hifi'] .knob-tick {
+  stroke: rgba(242, 228, 201, 0.24);
+}
+
+html[data-skin='hifi'] .knob-tick.is-major {
+  stroke: rgba(242, 228, 201, 0.42);
+}
+
+html[data-skin='hifi'] .knob-body {
+  box-shadow:
+    inset 1px 1px 1px rgba(242, 228, 201, 0.3),
+    inset -4px -6px 12px rgba(0, 0, 0, 0.55),
+    6px 10px 18px rgba(3, 1, 0, 0.65),
+    0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+html[data-skin='hifi'] .faceplate-brand {
+  color: rgba(242, 228, 201, 0.36);
+}
+
+/* ── VU meters ────────────────────────────────────────────────────────── */
+
+html[data-skin='hifi'] .hifi-meters {
+  --vu-w: clamp(112px, 13.4cqw, 156px);
+  position: relative;
+  display: flex;
+  gap: 12px;
+  flex: none;
+  margin-left: auto;
+  /* Clear the wordmark in the corner below. */
+  margin-bottom: 6px;
+}
+
+html[data-skin='hifi'] .hifi-vu {
+  width: var(--vu-w);
+}
+
+/* The window: a black bezel set into the panel, a thin bright chamfer where
+   the lamp catches its upper edge, the face lit from behind. */
+html[data-skin='hifi'] .hifi-vu-window {
+  position: relative;
+  aspect-ratio: 120 / 76;
+  border-radius: 3px;
+  overflow: hidden;
+  background:
+    radial-gradient(90% 80% at 50% 96%, #fff0cc 0%, #f5e0b0 38%, #e2c48e 72%, #c7a36c 100%);
+  box-shadow:
+    0 0 0 2.5px var(--hifi-shade),
+    -0.5px -0.5px 0 3px rgba(255, 228, 186, 0.2),
+    0 0 0 3.5px rgba(0, 0, 0, 0.6),
+    4px 7px 14px rgba(3, 1, 0, 0.62),
+    0 0 26px rgba(240, 190, 110, 0.12);
+  filter: brightness(0.8) saturate(0.86);
+  transition: filter 2.4s var(--ease-soft), box-shadow 2.4s var(--ease-soft);
+}
+
+html[data-skin='hifi'] .hifi-meters.is-live .hifi-vu-window {
+  filter: none;
+  box-shadow:
+    0 0 0 2.5px var(--hifi-shade),
+    -0.5px -0.5px 0 3px rgba(255, 228, 186, 0.2),
+    0 0 0 3.5px rgba(0, 0, 0, 0.6),
+    4px 7px 14px rgba(3, 1, 0, 0.62),
+    0 0 30px rgba(240, 190, 110, 0.2);
+}
+
+html[data-skin='hifi'] .hifi-vu-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+html[data-skin='hifi'] .hifi-vu-face text {
+  font-family: var(--face);
+  font-weight: 700;
+}
+
+html[data-skin='hifi'] .hifi-vu-scale {
+  fill: none;
+  stroke: #1d140d;
+  stroke-width: 0.75;
+}
+
+html[data-skin='hifi'] .hifi-vu-scale.is-red,
+html[data-skin='hifi'] .hifi-vu-ticks.is-red {
+  stroke: var(--hifi-vu-red);
+}
+
+html[data-skin='hifi'] .hifi-vu-redzone {
+  fill: none;
+  stroke: var(--hifi-vu-red);
+  stroke-width: 3;
+}
+
+html[data-skin='hifi'] .hifi-vu-ticks {
+  fill: none;
+  stroke: #1d140d;
+  stroke-width: 0.8;
+}
+
+html[data-skin='hifi'] .hifi-vu-ticks.is-minor {
+  stroke-width: 0.55;
+}
+
+html[data-skin='hifi'] .hifi-vu-scale-inner,
+html[data-skin='hifi'] .hifi-vu-scale-pct {
+  fill: none;
+  stroke: var(--olive);
+  stroke-width: 0.6;
+}
+
+html[data-skin='hifi'] .hifi-vu-num {
+  font-size: 6.4px;
+  fill: #1d140d;
+}
+
+html[data-skin='hifi'] .hifi-vu-num.is-red {
+  fill: var(--hifi-vu-red);
+}
+
+html[data-skin='hifi'] .hifi-vu-pct {
+  font-size: 4.4px;
+  fill: var(--olive);
+}
+
+html[data-skin='hifi'] .hifi-vu-face .hifi-vu-legend {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 36;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 11px;
+  fill: #2a1c12;
+}
+
+html[data-skin='hifi'] .hifi-vu-ch {
+  font-size: 6px;
+  letter-spacing: 0.1em;
+  fill: #8a6a1c;
+}
+
+html[data-skin='hifi'] .hifi-vu-peak {
+  fill: #4a1a14;
+  stroke: rgba(0, 0, 0, 0.4);
+  stroke-width: 0.4;
+}
+
+html[data-skin='hifi'] .hifi-vu-peak-lit {
+  fill: #ff6a44;
+  filter: drop-shadow(0 0 1.6px #ff5a36);
+}
+
+html[data-skin='hifi'] .hifi-vu-needle-blade {
+  stroke: #150e09;
+  stroke-width: 0.95;
+  stroke-linecap: round;
+}
+
+html[data-skin='hifi'] .hifi-vu-needle-shadow {
+  stroke: rgba(70, 36, 10, 0.2);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+html[data-skin='hifi'] .hifi-vu-hood {
+  fill: #1a100b;
+}
+
+html[data-skin='hifi'] .hifi-vu-hood-lip {
+  fill: none;
+  stroke: rgba(255, 228, 186, 0.22);
+  stroke-width: 0.6;
+}
+
+/* Glass: the lamp's reflection across the upper-left, the bezel's shadow
+   falling onto the face along the top. */
+html[data-skin='hifi'] .hifi-vu-glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(162deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.07) 30%, transparent 31%),
+    linear-gradient(180deg, rgba(40, 18, 6, 0.42), transparent 22%),
+    linear-gradient(90deg, rgba(40, 18, 6, 0.3), transparent 12%, transparent 88%, rgba(40, 18, 6, 0.3));
+  box-shadow: inset 0 0 12px rgba(90, 48, 14, 0.4);
+}
+
+/* Not enough panel for them: the faders need the room more. */
+@container (max-width: 780px) {
+  html[data-skin='hifi'] .hifi-meters {
+    display: none;
+  }
+}
+
+html[data-skin='hifi'][data-shell='phone'] .hifi-meters {
+  display: none;
+}
+
+/* ── Wide, short stages: the record beside its lockup ─────────────────────
+   Stacked, a landscape stage leaves the jacket small and a dead field to the
+   right of the record. Where the stage is clearly wider than tall, the jacket
+   and record take the left and grow into the height; the lockup, needle and
+   transport stand beside them, centred on the record. The jacket is still
+   sized from the stage's real height, so the faceplate never crowds it. */
+@container (min-width: 760px) and (min-aspect-ratio: 5 / 4) {
+  html[data-skin='hifi']:not([data-shell='phone']) .stage-body {
+    --hifi-sleeve: clamp(180px, min(calc(100cqh - 48px), calc((96cqw - 296px) / 1.62)), 440px);
+    display: grid;
+    grid-template-columns: auto minmax(280px, 360px);
+    grid-template-rows: 1fr auto auto auto 1fr;
+    column-gap: clamp(28px, 4cqw, 56px);
+    row-gap: clamp(14px, 2.4cqh, 24px);
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  html[data-skin='hifi']:not([data-shell='phone']) .stage-body > .hero {
+    grid-column: 1;
+    grid-row: 1 / -1;
+  }
+
+  html[data-skin='hifi']:not([data-shell='phone']) .stage-body > .meta {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  html[data-skin='hifi']:not([data-shell='phone']) .stage-body > .progress {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  html[data-skin='hifi']:not([data-shell='phone']) .stage-body > .transport {
+    grid-column: 2;
+    grid-row: 4;
+    margin-top: 4px;
+  }
+
+  html[data-skin='hifi']:not([data-shell='phone']) .stage-body .meta-title {
+    font-size: clamp(30px, 4.8cqw, 52px);
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+  }
+
+  html[data-skin='hifi']:not([data-shell='phone']) .stage-body .meta-artist {
+    font-size: clamp(16px, 2.2cqw, 22px);
+  }
+}

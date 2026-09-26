@@ -26,15 +26,15 @@
   bottom: -26%;
   border-radius: 50%;
   background: radial-gradient(closest-side at 46% 50%, var(--amber-glow), transparent 72%);
-  filter: blur(42px);
-  opacity: 0.5;
+  filter: blur(46px);
+  opacity: 0.34;
   transition: background 1.6s var(--ease), opacity 1.6s var(--ease);
   z-index: 0;
 }
 
 .hero-ambient.is-sampled {
   background: radial-gradient(closest-side at 46% 50%, var(--glow), transparent 70%);
-  opacity: 0.36;
+  opacity: 0.24;
 }
 
 .hero-disc {
@@ -50,6 +50,19 @@
 
 .hero-disc .vinyl {
   --disc: 100%;
+}
+
+/* The shadow the record throws onto the shelf: the lamp is up and to the left,
+   so it falls down and to the right, soft at the far edge. */
+.hero-disc::before {
+  content: '';
+  position: absolute;
+  inset: 1%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(3, 1, 0, 0.78) 58%, rgba(3, 1, 0, 0.36) 68%, transparent 72%);
+  transform: translate(5.5%, 7.5%);
+  filter: blur(9px);
+  pointer-events: none;
 }
 
 /* The jacket's shadow falling across the disc where it emerges. */
@@ -76,9 +89,11 @@
   border-radius: 1.5px;
   overflow: hidden;
   background: var(--walnut);
+  /* Key light from the upper left: the jacket's shadow falls down and right. */
   box-shadow:
-    0 34px 64px -12px rgba(4, 2, 1, 0.8),
-    0 10px 22px rgba(4, 2, 1, 0.5),
+    22px 34px 54px -6px rgba(3, 1, 0, 0.8),
+    8px 12px 18px rgba(3, 1, 0, 0.5),
+    2px 3px 3px rgba(3, 1, 0, 0.4),
     0 0 0 1px rgba(0, 0, 0, 0.55);
 }
 
@@ -136,14 +151,18 @@
   right: 0;
   top: 0;
   height: 1px;
-  background: linear-gradient(90deg, rgba(255, 235, 200, 0.4), rgba(255, 235, 200, 0.14) 60%, transparent);
+  background: linear-gradient(90deg, rgba(255, 235, 200, 0.55), rgba(255, 235, 200, 0.16) 60%, transparent);
 }
 
 .sleeve-edge::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(118deg, rgba(255, 240, 215, 0.11), transparent 46%);
+  /* The lamp falling across the jacket: bright at the top-left corner, the far
+     corner going over into shade. */
+  background:
+    linear-gradient(128deg, rgba(255, 238, 208, 0.34), rgba(255, 238, 208, 0.08) 38%, transparent 56%),
+    linear-gradient(128deg, transparent 52%, rgba(10, 4, 2, 0.4));
   mix-blend-mode: soft-light;
 }
 

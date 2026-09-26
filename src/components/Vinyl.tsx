@@ -81,6 +81,8 @@ export default function Vinyl({ art, playing, title, onArtError }: Props) {
         <div className="vinyl-label-ring" />
       </div>
       <div className="vinyl-sheen" aria-hidden="true" />
+      <div className="vinyl-label-light" aria-hidden="true" />
+      <div className="vinyl-rim" aria-hidden="true" />
       <div className="vinyl-spindle" aria-hidden="true" />
     </div>
   );

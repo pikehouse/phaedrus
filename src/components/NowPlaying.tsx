@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useSonos } from '../store/useSonos';
 import { useSkin } from '../store/skin';
 import Hero from './Hero';
+import HifiMeters from './HifiMeters';
 import BoardStage from './BoardStage';
 import Progress from './Progress';
 import Transport from './Transport';
@@ -141,6 +142,7 @@ export default function NowPlaying() {
     <div className="faceplate" role="group" aria-label="Volume">
       <VolumeKnob />
       <Faders />
+      {skin === 'hifi' && <HifiMeters playing={!!playing} />}
       <div className="faceplate-brand" aria-hidden="true">
         <i className={`faceplate-led${playing ? ' is-lit' : ''}`} />
         <span>Phædrus</span>
