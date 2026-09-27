@@ -518,6 +518,110 @@ html[data-shell='phone'] .sresult-tool:first-child {
   display: none;
 }
 
+/* Kinds scroll sideways under the thumb; the service switch drops beneath them. */
+html[data-shell='phone'] .search-kinds {
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+html[data-shell='phone'] .search-chips {
+  flex: 1 0 100%;
+}
+
+html[data-shell='phone'] .search-chip {
+  padding-top: 13px;
+  padding-bottom: 9px;
+}
+
+html[data-shell='phone'] .search-svc-opt {
+  padding: 8px 11px 7px;
+}
+
+/* The switch stays put: the tools are always out on a phone. */
+html[data-shell='phone'] .sresult-pick,
+html[data-shell='phone'] .sresult.has-pick:hover .sresult-pick,
+html[data-shell='phone'] .sresult.has-pick:focus-within .sresult-pick {
+  margin-right: 2px;
+}
+
+html[data-shell='phone'] .sresult-pick-opt {
+  padding: 7px 6px 6px;
+}
+
+html[data-shell='phone'] .sresult-pick-long {
+  display: none;
+}
+
+html[data-shell='phone'] .sresult-pick-short {
+  display: inline;
+}
+
+html[data-shell='phone'] .stop {
+  gap: 14px;
+  padding: 12px;
+}
+
+html[data-shell='phone'] .stop-art {
+  width: 88px;
+  height: 88px;
+}
+
+html[data-shell='phone'] .stop-title {
+  font-size: 22px;
+}
+
+html[data-shell='phone'] .stop-actions {
+  margin-top: 8px;
+}
+
+html[data-shell='phone'] .stop-actions .sresult-tool {
+  width: 36px;
+  height: 36px;
+}
+
+html[data-shell='phone'] .sgrid {
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 18px 12px;
+}
+
+/* The overview's rows become a sideways shelf. */
+html[data-shell='phone'] .sgrid.is-row {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 24px) / 2.6);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px 2px 2px;
+  scroll-snap-type: x proximity;
+}
+
+html[data-shell='phone'] .sgrid.is-row > .stile {
+  scroll-snap-align: start;
+}
+
+html[data-shell='phone'] .stile-more {
+  display: grid;
+}
+
+html[data-shell='phone'] .stile:not(.is-open) .stile-tools {
+  opacity: 0;
+}
+
+html[data-shell='phone'] .stile:not(.is-open) .stile-tools .sresult-tool {
+  pointer-events: none;
+}
+
+html[data-shell='phone'] .stile-tools .sresult-tool {
+  width: 34px;
+  height: 34px;
+}
+
+/* The row rule above hides a row's Play (the row is Play); a tile's tray keeps it. */
+html[data-shell='phone'] .stile-tools .sresult-tool:first-child {
+  display: grid;
+}
+
 /* ── The stage in one column ───────────────────────────────────────────── */
 
 /* The whole column scrolls if it must — the faceplate goes with it. */

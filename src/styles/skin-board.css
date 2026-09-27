@@ -716,6 +716,153 @@
   font-style: normal;
 }
 
+/* ── Search kinds: flap tabs ───────────────────────────────────────────────
+   The kind you're on is a split-flap card; the rest are ruled tabs waiting
+   to flip. Covers are pasted-up bills, like the crate. */
+
+[data-skin='board'] .search-chips {
+  gap: 4px;
+}
+
+[data-skin='board'] .search-chip {
+  padding: 7px 9px 6px;
+  border-radius: 0;
+  color: var(--ink-soft);
+  box-shadow: inset 0 0 0 1px var(--rule-strong);
+  font-variation-settings: 'wdth' 92, 'wght' 700;
+}
+
+[data-skin='board'] .search-chip::before {
+  display: none;
+}
+
+[data-skin='board'] .search-chip:hover {
+  color: var(--ink);
+  background: var(--paper-sunk);
+}
+
+[data-skin='board'] .search-chip.is-on {
+  color: var(--flap-ink);
+  background-image: var(--flap-face-top), var(--flap-face-bottom);
+  background-size: 100% 50%;
+  background-position: top, bottom;
+  background-repeat: no-repeat;
+  box-shadow: var(--flap-shadow);
+}
+
+/* The hinge across the middle of the card. */
+[data-skin='board'] .search-chip.is-on::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--flap-seam);
+  box-shadow: 0 1px 0 var(--flap-seam-light);
+}
+
+[data-skin='board'] .search-chip-count {
+  font-family: var(--flap-font);
+  font-style: normal;
+  font-variation-settings: 'wdth' var(--flap-wdth), 'wght' var(--flap-wght);
+  font-size: 11px;
+  color: var(--ink-mid);
+}
+
+[data-skin='board'] .search-chip.is-on .search-chip-count {
+  color: var(--flap-ink);
+  opacity: 0.72;
+}
+
+[data-skin='board'] .search-svc,
+[data-skin='board'] .sresult-pick {
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px var(--rule-strong);
+}
+
+[data-skin='board'] .search-svc-opt,
+[data-skin='board'] .sresult-pick-opt {
+  border-radius: 0;
+  color: var(--ink-mid);
+}
+
+[data-skin='board'] .search-svc-opt.is-on,
+[data-skin='board'] .sresult-pick-opt.is-on {
+  color: var(--paper-lit);
+  background: var(--ink);
+}
+
+[data-skin='board'] .search-more:hover {
+  color: var(--signal);
+}
+
+[data-skin='board'] .stop {
+  background: var(--paper-lit);
+  box-shadow: 0 0 0 1px var(--ink), 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .stop-title,
+[data-skin='board'] .stile-title,
+[data-skin='board'] .stile-mono,
+[data-skin='board'] .search-empty {
+  font-variation-settings: 'wdth' 82, 'wght' 700;
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+[data-skin='board'] .stile-title {
+  font-size: 12.5px;
+}
+
+[data-skin='board'] .stile-sub,
+[data-skin='board'] .stile-meta,
+[data-skin='board'] .stop-sub {
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  font-variation-settings: 'wdth' 90, 'wght' 500;
+  font-size: 9.5px;
+}
+
+[data-skin='board'] .stile-cover,
+[data-skin='board'] .stop-art {
+  border-radius: 0;
+  background: var(--paper-sunk);
+  box-shadow: 0 0 0 1px var(--ink), 4px 4px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .stile:hover .stile-cover {
+  transform: translate(-2px, -2px);
+  box-shadow: 0 0 0 1px var(--ink), 6px 6px 0 var(--hard-shadow);
+}
+
+/* The board has no curves: artists get a square card like everyone else. */
+[data-skin='board'] .stile-cover.is-round,
+[data-skin='board'] .stop-art.is-round {
+  border-radius: 0;
+}
+
+[data-skin='board'] .stile-cover img,
+[data-skin='board'] .stop-art img {
+  filter: grayscale(0.14) contrast(1.16) saturate(1.02);
+}
+
+[data-skin='board'] .stile:hover .stile-tools {
+  transform: translate(-2px, -2px);
+}
+
+[data-skin='board'] .stile-tools {
+  border-radius: 0;
+  background: linear-gradient(180deg, transparent 58%, rgba(22, 24, 28, 0.35));
+}
+
+[data-skin='board'] .stile-more {
+  border-radius: 0;
+  background: var(--ink);
+  color: var(--paper-lit);
+}
+
 /* ── Status strip: a board announcement ────────────────────────────────── */
 
 [data-skin='board'] .status-pill {

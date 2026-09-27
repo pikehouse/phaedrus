@@ -13,6 +13,7 @@ const GROUNDS = ['walnut', 'burgundy', 'olive', 'mustard', 'wine'] as const;
 export default function Crate() {
   const favorites = useSonos((s) => s.favorites);
   const playFavorite = useSonos((s) => s.playFavorite);
+  const playFavoriteTap = useSonos((s) => s.playFavoriteTap);
 
   return (
     <div className="panel">
@@ -24,7 +25,11 @@ export default function Crate() {
 
       <div className="crate scroll">
         {favorites.map((f) => (
-          <Sleeve key={f.id} fav={f} onPlay={(action) => void playFavorite(f, action)} />
+          <Sleeve
+            key={f.id}
+            fav={f}
+            onPlay={(action) => void (action === 'replace' ? playFavoriteTap(f) : playFavorite(f, action))}
+          />
         ))}
         {favorites.length === 0 && (
           <p className="panel-empty-line crate-empty">No Sonos favourites yet.</p>

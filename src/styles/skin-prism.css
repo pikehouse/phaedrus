@@ -213,6 +213,9 @@ html[data-skin='prism'] body::after {
 [data-skin='prism'] .room-with,
 [data-skin='prism'] .qrow-artist,
 [data-skin='prism'] .sresult-sub,
+[data-skin='prism'] .stile-sub,
+[data-skin='prism'] .stile-meta,
+[data-skin='prism'] .stop-sub,
 [data-skin='prism'] .crate-caption-sub {
   letter-spacing: 0.04em;
   color: var(--pr-dim);
@@ -807,6 +810,108 @@ html[data-skin='prism'] body::after {
 
 [data-skin='prism'] .linkcard-dot {
   background: var(--pr-blue);
+}
+
+/* ── Search kinds: light through glass ─────────────────────────────────────
+   Thin white type, no lamps; the chosen kind catches a spectrum along its
+   foot. */
+
+[data-skin='prism'] .search-chip {
+  font-weight: 500;
+  letter-spacing: 0.16em;
+}
+
+[data-skin='prism'] .search-chip::before {
+  top: auto;
+  bottom: 0;
+  left: 11px;
+  right: 11px;
+  width: auto;
+  height: 1px;
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-skin='prism'] .search-chip.is-on {
+  color: var(--pr-ink);
+}
+
+[data-skin='prism'] .search-chip.is-on::before {
+  background: var(--pr-spectrum);
+  box-shadow: none;
+}
+
+[data-skin='prism'] .search-chip-count,
+[data-skin='prism'] .search-empty,
+[data-skin='prism'] .stile-mono {
+  font-style: normal;
+  font-variation-settings: normal;
+  font-weight: 300;
+}
+
+[data-skin='prism'] .search-chip.is-on .search-chip-count {
+  color: var(--pr-blue);
+}
+
+[data-skin='prism'] .search-svc,
+[data-skin='prism'] .sresult-pick {
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px var(--pr-hair), inset 0 0 0 1px rgba(233, 228, 222, 0.05);
+}
+
+[data-skin='prism'] .search-svc-opt.is-on {
+  color: #0a0807;
+  background: var(--pr-blue);
+}
+
+[data-skin='prism'] .sresult-pick-opt.is-on {
+  color: var(--pr-blue);
+  background: rgba(234, 242, 255, 0.08);
+}
+
+[data-skin='prism'] .search-more:hover {
+  color: var(--pr-blue);
+}
+
+[data-skin='prism'] .stop {
+  background: #13100e;
+  box-shadow: inset 0 0 0 1px var(--pr-hair), 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='prism'] .stop-kind {
+  color: var(--pr-blue);
+}
+
+[data-skin='prism'] .stop-title {
+  font-variation-settings: normal;
+  font-weight: 300;
+}
+
+[data-skin='prism'] .stile-title {
+  font-variation-settings: normal;
+  font-weight: 400;
+  font-size: 13px;
+}
+
+[data-skin='prism'] .stile-cover,
+[data-skin='prism'] .stop-art {
+  border-radius: 0;
+  background: #120f0d;
+  box-shadow: 0 0 0 1px rgba(233, 228, 222, 0.07), 0 8px 22px -10px rgba(0, 0, 0, 0.8);
+}
+
+[data-skin='prism'] .stile-cover.is-round,
+[data-skin='prism'] .stop-art.is-round {
+  border-radius: 50%;
+}
+
+[data-skin='prism'] .stile:hover .stile-cover {
+  box-shadow: 0 0 0 1px rgba(234, 242, 255, 0.3), 0 10px 26px -10px rgba(0, 0, 0, 0.85);
+}
+
+[data-skin='prism'] .stile-cover img,
+[data-skin='prism'] .stop-art img {
+  filter: none;
 }
 
 /* ── Status, curtains, boundary ────────────────────────────────────────── */

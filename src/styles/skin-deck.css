@@ -224,6 +224,9 @@
 [data-skin='deck'] .room-with,
 [data-skin='deck'] .qrow-artist,
 [data-skin='deck'] .sresult-sub,
+[data-skin='deck'] .stile-sub,
+[data-skin='deck'] .stile-meta,
+[data-skin='deck'] .stop-sub,
 [data-skin='deck'] .crate-caption-sub {
   font-variation-settings: 'wdth' 78, 'wght' 500;
   font-size: 9px;
@@ -1096,6 +1099,101 @@
 
 [data-skin='deck'] .linkcard-dot {
   background: var(--led);
+}
+
+/* ── Search kinds: quiet pads ──────────────────────────────────────────────
+   Dark rubber pads; the chosen one lights an LED strip along its lip. */
+
+[data-skin='deck'] .search-chips {
+  gap: 5px;
+}
+
+[data-skin='deck'] .search-chip {
+  padding: 8px 11px 8px;
+  border-radius: 4px;
+  font-variation-settings: 'wdth' 85, 'wght' 650;
+  color: var(--silk-dim);
+  background: var(--panel-raised);
+  box-shadow: var(--lift);
+}
+
+[data-skin='deck'] .search-chip::before {
+  top: auto;
+  bottom: 3px;
+  left: 9px;
+  right: 9px;
+  width: auto;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--led-off);
+}
+
+[data-skin='deck'] .search-chip:hover {
+  color: var(--silk);
+}
+
+[data-skin='deck'] .search-chip.is-on {
+  color: var(--silk);
+}
+
+[data-skin='deck'] .search-chip.is-on::before {
+  background: var(--led);
+  box-shadow: var(--led-bloom);
+}
+
+[data-skin='deck'] .search-chip-count,
+[data-skin='deck'] .stop-title,
+[data-skin='deck'] .stile-title,
+[data-skin='deck'] .stile-mono,
+[data-skin='deck'] .search-empty {
+  font-style: normal;
+  font-variation-settings: 'wdth' 90, 'wght' 550;
+}
+
+[data-skin='deck'] .search-chip.is-on .search-chip-count {
+  color: var(--led);
+}
+
+[data-skin='deck'] .search-svc,
+[data-skin='deck'] .sresult-pick {
+  background: var(--panel-well);
+  box-shadow: var(--sink);
+}
+
+[data-skin='deck'] .search-svc-opt.is-on {
+  color: #0b0c0e;
+  background: var(--led);
+}
+
+[data-skin='deck'] .sresult-pick-opt.is-on {
+  color: var(--led);
+  background: rgba(255, 159, 28, 0.1);
+  text-shadow: 0 0 5px rgba(255, 159, 28, 0.35);
+}
+
+[data-skin='deck'] .stop {
+  background: var(--panel-raised);
+  box-shadow: inset 0 1px 0 var(--chamfer-hi), 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .stile-title {
+  font-size: 13px;
+}
+
+[data-skin='deck'] .stile-cover,
+[data-skin='deck'] .stop-art {
+  background: #0d0f11;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.9), 0 1px 0 var(--chamfer-hi), 0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
+[data-skin='deck'] .stile-cover.is-round,
+[data-skin='deck'] .stop-art.is-round {
+  border-radius: 50%;
+}
+
+[data-skin='deck'] .stile-cover img,
+[data-skin='deck'] .stop-art img {
+  filter: saturate(0.92) contrast(1.08) brightness(0.94);
 }
 
 /* ── Status, curtains, boundary ────────────────────────────────────────── */

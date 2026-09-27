@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { useSettings } from './settings';
 import { api } from '../api';
 import type {
   Favorite,
@@ -274,6 +275,9 @@ interface SonosStore {
   clearQueue: () => Promise<void>;
   playFavorite: (f: Favorite, action: PlayAction) => Promise<void>;
   playItem: (item: MediaItem, action: PlayAction) => Promise<void>;
+  /** A plain tap: does whatever Settings says a tap does (by default, replace the queue). */
+  playItemTap: (item: MediaItem) => Promise<void>;
+  playFavoriteTap: (f: Favorite) => Promise<void>;
   everywhere: () => Promise<void>;
   joinRoom: (zoneIp: string) => Promise<void>;
   leaveRoom: (zoneIp: string) => Promise<void>;
@@ -700,6 +704,14 @@ export const useSonos = create<SonosStore>((set, get) => {
       if (!ok) return;
       get().say(actionWord(action, f.title, group.name));
       await Promise.all([get().pollState(), get().refreshQueue()]);
+    },
+
+    playItemTap(item) {
+      return get().playItem(item, useSettings.getState().tapAction);
+    },
+
+    playFavoriteTap(f) {
+      return get().playFavorite(f, useSettings.getState().tapAction);
     },
 
     async playItem(item, action) {

@@ -1350,6 +1350,209 @@ html[data-skin='daylight']:not([data-shell='phone']) .faders-list:has(> .fader:n
   background: var(--ink);
 }
 
+/* ── Search kinds: pills ───────────────────────────────────────────────────
+   Grey pills in sentence case; the chosen one goes black. The service
+   switch is a segmented control with a white thumb. */
+
+[data-skin='daylight'] .search-chips {
+  gap: 6px;
+}
+
+[data-skin='daylight'] .search-chip {
+  align-items: center;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  color: var(--ink);
+  background: var(--pill);
+}
+
+[data-skin='daylight'] .search-chip::before {
+  display: none;
+}
+
+[data-skin='daylight'] .search-chip:hover {
+  color: var(--ink);
+  background: #e7e9ed;
+}
+
+[data-skin='daylight'] .search-chip.is-on {
+  color: #fff;
+  background: var(--ink);
+}
+
+[data-skin='daylight'] .search-chip-count {
+  font-family: var(--face);
+  font-style: normal;
+  font-variation-settings: normal;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-3);
+}
+
+[data-skin='daylight'] .search-chip.is-on .search-chip-count {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-skin='daylight'] .search-svc,
+[data-skin='daylight'] .sresult-pick {
+  border-radius: 999px;
+  background: var(--pill);
+  box-shadow: none;
+}
+
+[data-skin='daylight'] .search-svc {
+  padding: 3px;
+}
+
+[data-skin='daylight'] .search-svc-opt,
+[data-skin='daylight'] .sresult-pick-opt {
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-2);
+}
+
+[data-skin='daylight'] .search-svc-opt {
+  padding: 5px 12px;
+  font-size: 12px;
+}
+
+[data-skin='daylight'] .sresult-pick-opt {
+  padding: 3px 9px;
+  font-size: 11px;
+}
+
+[data-skin='daylight'] .search-svc-opt.is-on,
+[data-skin='daylight'] .sresult-pick-opt.is-on {
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 1px 3px rgba(17, 19, 24, 0.12);
+}
+
+[data-skin='daylight'] .search-more {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink-2);
+}
+
+[data-skin='daylight'] .search-more:hover {
+  color: var(--ink);
+}
+
+[data-skin='daylight'] .search-empty {
+  font-style: normal;
+  font-variation-settings: normal;
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--ink-3);
+}
+
+[data-skin='daylight'] .stop {
+  gap: 24px;
+  padding: 18px;
+  border-radius: 18px;
+  background: var(--paper);
+  box-shadow: var(--card-shadow);
+}
+
+[data-skin='daylight'] .stop-art {
+  border-radius: 12px;
+  background: var(--pill);
+  box-shadow: 0 12px 28px -10px rgba(17, 19, 24, 0.35);
+}
+
+[data-skin='daylight'] .stop-art.is-round {
+  border-radius: 50%;
+}
+
+[data-skin='daylight'] .stop-kind {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ink);
+}
+
+[data-skin='daylight'] .stop-svc {
+  color: var(--ink-3);
+}
+
+[data-skin='daylight'] .stop-title {
+  font-variation-settings: normal;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+[data-skin='daylight'] .stop-sub {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
+
+[data-skin='daylight'] .stop-play {
+  padding: 10px 18px;
+}
+
+[data-skin='daylight'] .stile-cover {
+  border-radius: 10px;
+  background: var(--pill);
+  box-shadow: 0 1px 2px rgba(17, 19, 24, 0.06), 0 10px 24px -12px rgba(17, 19, 24, 0.3);
+}
+
+[data-skin='daylight'] .stile-cover.is-round {
+  border-radius: 50%;
+}
+
+[data-skin='daylight'] .stile:hover .stile-cover {
+  box-shadow: 0 2px 4px rgba(17, 19, 24, 0.08), 0 18px 34px -14px rgba(17, 19, 24, 0.4);
+}
+
+[data-skin='daylight'] .stile-cover img,
+[data-skin='daylight'] .stop-art img {
+  filter: none;
+}
+
+[data-skin='daylight'] .stile-tools {
+  border-radius: 10px;
+  background: linear-gradient(180deg, transparent 55%, rgba(17, 19, 24, 0.28));
+}
+
+[data-skin='daylight'] .stile-title {
+  font-variation-settings: normal;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+[data-skin='daylight'] .stile-sub,
+[data-skin='daylight'] .stile-meta {
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
+
+[data-skin='daylight'] .stile-meta {
+  color: var(--ink-3);
+  opacity: 1;
+}
+
+[data-skin='daylight'] .stile-mono {
+  font-variation-settings: normal;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
 /* ── Status, curtains, boundary ────────────────────────────────────────── */
 
 [data-skin='daylight'] .status-pill {

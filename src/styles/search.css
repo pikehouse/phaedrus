@@ -31,7 +31,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  width: min(760px, 100%);
+  width: min(820px, 100%);
   min-height: 0;
   animation: panel-in 380ms var(--ease) both;
 }
@@ -258,6 +258,7 @@
 
 .sresult-badge {
   flex: none;
+  margin-right: 10px;
   font-size: 9px;
   letter-spacing: 0.16em;
   color: rgba(242, 228, 201, 0.3);
@@ -299,6 +300,506 @@
 .sresult-tool:hover {
   background: var(--amber);
   color: #1b0f08;
+}
+
+/* ── Kind chips and the service switch ───────────────────────────────────
+   A receiver's input selector: each position is a silkscreened word with a
+   pilot lamp above it, and the one you're on is lit. Everything here speaks
+   only in tokens, so each skin gets it in its own colours before it adds
+   anything of its own. */
+
+.search-kinds {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-top: 10px;
+  flex: none;
+}
+
+.search-chips {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Room for a focus ring that the sideways scroll would otherwise clip. */
+  margin: -4px;
+  padding: 4px;
+}
+
+.search-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.search-chip {
+  position: relative;
+  flex: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 11px 11px 7px;
+  border-radius: var(--radius);
+  font-family: var(--face);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--cream-faint);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease), opacity var(--t) var(--ease);
+}
+
+/* The pilot lamp. */
+.search-chip::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 11px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--cream-ghost);
+  transition: background var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+
+.search-chip:hover {
+  color: var(--cream-dim);
+}
+
+.search-chip.is-on {
+  color: var(--amber);
+}
+
+.search-chip.is-on::before {
+  background: var(--amber);
+  box-shadow: 0 0 3px var(--amber), 0 0 9px var(--amber-glow);
+}
+
+.search-chip.is-empty:not(.is-on) {
+  opacity: 0.42;
+}
+
+.search-chip-count {
+  font-family: var(--display);
+  font-style: italic;
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 14;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--cream-faint);
+}
+
+.search-chip.is-on .search-chip-count {
+  color: var(--cream-dim);
+}
+
+.search-chip:focus-visible,
+.search-svc-opt:focus-visible,
+.sresult-pick-opt:focus-visible,
+.search-more:focus-visible,
+.stile-face:focus-visible {
+  outline: 1px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.search-svc {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  padding: 2px;
+  border-radius: calc(var(--radius) + 2px);
+  box-shadow: inset 0 0 0 1px var(--cream-ghost);
+}
+
+.search-svc-opt {
+  padding: 6px 10px 5px;
+  border-radius: var(--radius);
+  font-family: var(--face);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--cream-faint);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.search-svc-opt:hover {
+  color: var(--cream-dim);
+}
+
+.search-svc-opt.is-on {
+  color: var(--cream);
+  background: var(--cream-ghost);
+}
+
+/* ── Section heads with a way in ─────────────────────────────────────────── */
+
+.search-section-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.search-more {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 2px 2px 8px;
+  font-family: var(--face);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  transition: color var(--t) var(--ease);
+}
+
+.search-more:hover {
+  color: var(--amber);
+}
+
+.search-more-n {
+  display: none;
+}
+
+.search-empty {
+  padding: 40px 4px;
+  font-family: var(--display);
+  font-style: italic;
+  font-variation-settings: 'SOFT' 80, 'WONK' 1, 'opsz' 40;
+  font-size: 17px;
+  color: var(--cream-faint);
+}
+
+/* ── Top result ──────────────────────────────────────────────────────────── */
+
+.search-top {
+  margin-bottom: 26px;
+}
+
+.stop {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  padding: 16px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--cream) 4%, transparent);
+  box-shadow: inset 0 0 0 1px var(--cream-ghost);
+}
+
+.stop-art {
+  position: relative;
+  width: 124px;
+  height: 124px;
+  flex: none;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--walnut);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.stop-art.is-round {
+  border-radius: 50%;
+}
+
+.stop-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stop-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.stop-kind {
+  color: var(--amber);
+  letter-spacing: 0.22em;
+}
+
+.stop-svc {
+  color: var(--cream-faint);
+}
+
+.stop-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 96;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.1;
+  color: var(--cream);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+.stop-sub {
+  font-family: var(--face);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--cream-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stop-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.stop-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-right: 4px;
+}
+
+/* ── Songs: the service badge that becomes a switch ──────────────────────── */
+
+.sresult-pick {
+  flex: none;
+  display: flex;
+  margin-right: 10px;
+  padding: 1px;
+  border-radius: calc(var(--radius) + 1px);
+  box-shadow: inset 0 0 0 1px var(--cream-ghost);
+  transition: margin-right var(--t) var(--ease);
+}
+
+/* The tools slide in at the right; the switch steps aside for them. */
+.sresult.has-pick:hover .sresult-pick,
+.sresult.has-pick:focus-within .sresult-pick {
+  margin-right: 106px;
+}
+
+.sresult-pick-opt {
+  padding: 4px 7px 3px;
+  border-radius: var(--radius);
+  font-family: var(--face);
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cream-faint);
+  transition: color var(--t) var(--ease), background var(--t) var(--ease);
+}
+
+.sresult-pick-short {
+  display: none;
+}
+
+.sresult-pick-opt:hover {
+  color: var(--cream-dim);
+}
+
+.sresult-pick-opt.is-on {
+  color: var(--cream);
+  background: var(--cream-ghost);
+}
+
+/* ── Cover grids ─────────────────────────────────────────────────────────── */
+
+.sgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: 22px 16px;
+  padding: 4px 2px 0;
+}
+
+/* The overview's single row: six across, and fewer stay tile-sized. */
+.sgrid.is-row {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px 14px;
+}
+
+.stile {
+  position: relative;
+  min-width: 0;
+}
+
+.stile-face {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  width: 100%;
+  text-align: left;
+  border-radius: var(--radius);
+}
+
+.stile-cover {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--walnut);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.42), inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+  transition: transform 320ms var(--ease), box-shadow 320ms var(--ease);
+}
+
+.stile-cover.is-round {
+  border-radius: 50%;
+}
+
+.stile-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.18) saturate(1.08) contrast(1.03);
+}
+
+.stile:hover .stile-cover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+
+.stile-cover .sresult-art-blank,
+.stop-art .sresult-art-blank {
+  display: grid;
+  place-items: center;
+}
+
+.stile-mono {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 100, 'WONK' 1, 'opsz' 72;
+  font-size: clamp(22px, 3vw, 34px);
+  color: var(--cream-faint);
+  letter-spacing: 0.02em;
+}
+
+.stile-cap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+  padding: 0 1px;
+}
+
+.stile.is-artist .stile-cap {
+  align-items: center;
+  text-align: center;
+}
+
+.stile-title {
+  font-family: var(--display);
+  font-variation-settings: 'SOFT' 30, 'WONK' 0, 'opsz' 24;
+  font-size: 14px;
+  line-height: 1.22;
+  color: var(--cream-dim);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color var(--t) var(--ease);
+}
+
+.stile:hover .stile-title {
+  color: var(--cream);
+}
+
+.stile-sub,
+.stile-meta {
+  font-family: var(--face);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: var(--cream-faint);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stile-meta {
+  opacity: 0.75;
+}
+
+/* Play / next / add, sitting on the lower edge of the sleeve. */
+.stile-tools {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, transparent 52%, rgba(0, 0, 0, 0.5));
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--t) var(--ease), transform 320ms var(--ease);
+}
+
+@media (hover: hover) {
+  .stile:hover .stile-tools {
+    transform: translateY(-2px);
+  }
+}
+
+.stile:hover .stile-tools,
+.stile-tools:focus-within,
+.stile.is-open .stile-tools {
+  opacity: 1;
+}
+
+.stile:hover .stile-tools .sresult-tool,
+.stile-tools:focus-within .sresult-tool,
+.stile.is-open .stile-tools .sresult-tool {
+  pointer-events: auto;
+}
+
+/* Touch has no hover: a small "…" stands in for it. */
+.stile-more {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-family: var(--face);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (hover: none) {
+  .stile-more {
+    display: grid;
+  }
+
+  .stile:hover .stile-cover {
+    transform: none;
+  }
+
+  .stile:not(.is-open) .stile-tools {
+    opacity: 0;
+  }
+
+  .stile:not(.is-open) .stile-tools .sresult-tool {
+    pointer-events: none;
+  }
 }
 
 /* ── Artist drill-down ───────────────────────────────────────────────────── */

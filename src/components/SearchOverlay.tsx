@@ -1,9 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 import { api, isTauri } from '../api';
 import { useSonos } from '../store/useSonos';
 import { mmss, serviceLabel } from '../lib/format';
+import {
+  KINDS,
+  LIST_KINDS,
+  passes,
+  servicesPresent,
+  songRows,
+  topResult,
+  type Kind,
+  type ListKind,
+  type SongRow,
+  type SvcFilter,
+} from '../lib/searchModel';
 import { Back, Close, Plus, Play, QueueNext } from './Icons';
-import type { LinkSession, MediaItem, MusicService, SearchResults } from '../api/types';
+import type { LinkSession, MediaItem, MusicService, SearchResults, ServiceId } from '../api/types';
 import '../styles/search.css';
 
 const EMPTY: SearchResults = {
@@ -16,13 +29,26 @@ const EMPTY: SearchResults = {
   errors: [],
 };
 
-const SECTIONS: { key: keyof Omit<SearchResults, 'query' | 'errors'>; label: string }[] = [
-  { key: 'tracks', label: 'Tracks' },
-  { key: 'albums', label: 'Albums' },
-  { key: 'artists', label: 'Artists' },
-  { key: 'playlists', label: 'Playlists' },
-  { key: 'stations', label: 'Stations' },
+const SVC_OPTIONS: { key: SvcFilter; label: string }[] = [
+  { key: 'both', label: 'Both' },
+  { key: 'apple', label: 'Apple Music' },
+  { key: 'spotify', label: 'Spotify' },
 ];
+
+/** How much of each kind the All overview shows before "See all". */
+const OVERVIEW: Record<ListKind, number> = { tracks: 5, albums: 6, artists: 6, playlists: 6, stations: 4 };
+
+const KIND_NOUN: Record<string, string> = {
+  track: 'Song',
+  album: 'Album',
+  artist: 'Artist',
+  playlist: 'Playlist',
+  station: 'Station',
+};
+
+/** Secondary queue actions. The primary one is always the user's tap setting. */
+type QueueFn = (item: MediaItem, action: 'next' | 'later') => void;
+type TapFn = (item: MediaItem) => void;
 
 export default function SearchOverlay() {
   const open = useSonos((s) => s.searchOpen);
@@ -30,6 +56,7 @@ export default function SearchOverlay() {
   const group = useSonos((s) => s.group);
   const topology = useSonos((s) => s.topology);
   const playItem = useSonos((s) => s.playItem);
+  const playItemTap = useSonos((s) => s.playItemTap);
 
   const anyIp = group?.coordinatorIp ?? topology?.groups[0]?.coordinatorIp ?? '';
 
@@ -39,9 +66,18 @@ export default function SearchOverlay() {
   const [services, setServices] = useState<MusicService[]>([]);
   const [drill, setDrill] = useState<{ artist: MediaItem; albums: MediaItem[] } | null>(null);
   const [drilling, setDrilling] = useState(false);
+  const [kind, setKind] = useState<Kind>('all');
+  const [svc, setSvc] = useState<SvcFilter>('both');
+  /** Which service a collapsed song row plays from, by row key. */
+  const [picks, setPicks] = useState<Record<string, ServiceId>>({});
   const inputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const chipRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const runId = useRef(0);
   const artistRun = useRef(0);
+
+  const onTap = useCallback<TapFn>((item) => void playItemTap(item), [playItemTap]);
+  const onQueue = useCallback<QueueFn>((item, action) => void playItem(item, action), [playItem]);
 
   /** Leave the artist page; albums still on their way for it are dropped. */
   const closeDrill = useCallback(() => {
@@ -72,10 +108,11 @@ export default function SearchOverlay() {
     [anyIp],
   );
 
-  // Focus, reset drill-down, and re-read service state each time it opens.
+  // Focus, reset drill-down and kind, and re-read service state each time it opens.
   useEffect(() => {
     if (!open) return;
     closeDrill();
+    setKind('all');
     inputRef.current?.focus();
     inputRef.current?.select();
     if (anyIp) api.getServices(anyIp).then(setServices).catch(() => setServices([]));
@@ -99,6 +136,13 @@ export default function SearchOverlay() {
     return () => window.removeEventListener('keydown', onKey, true);
   }, [open, drill, setOpen, closeDrill]);
 
+  // A new view starts at its top, and its chip is in sight on a narrow row.
+  useEffect(() => {
+    resultsRef.current?.scrollTo({ top: 0 });
+    const i = KINDS.findIndex((k) => k.key === kind);
+    chipRefs.current[i]?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [kind, drill?.artist]);
+
   const openArtist = async (artist: MediaItem) => {
     const id = ++artistRun.current;
     setDrilling(true);
@@ -113,11 +157,170 @@ export default function SearchOverlay() {
     }
   };
 
+  // ── What the chips and views show ────────────────────────────────────────
+
+  const present = useMemo(() => servicesPresent(results), [results]);
+  const showSvc = present.size > 1;
+  // A filter the new results can't honour (only one service answered) stands down.
+  const eff: SvcFilter = showSvc ? svc : 'both';
+
+  const lists = useMemo(() => {
+    const out = {} as Record<ListKind, MediaItem[]>;
+    for (const k of LIST_KINDS) out[k] = results[k].filter((m) => passes(m, eff));
+    return out;
+  }, [results, eff]);
+
+  const songs = useMemo(() => songRows(lists.tracks, eff === 'both'), [lists.tracks, eff]);
+  const top = useMemo(() => topResult(lists, results.query || query), [lists, results.query, query]);
+
+  const counts: Record<Kind, number> = {
+    all: 0,
+    tracks: songs.length,
+    albums: lists.albums.length,
+    artists: lists.artists.length,
+    playlists: lists.playlists.length,
+    stations: lists.stations.length,
+  };
+  counts.all = LIST_KINDS.reduce((n, k) => n + counts[k], 0);
+
   if (!open) return null;
 
   const spotify = services.find((s) => s.id === 'spotify');
-  const hits = SECTIONS.reduce((n, s) => n + results[s.key].length, 0);
+  const hits = LIST_KINDS.reduce((n, k) => n + results[k].length, 0);
   const short = query.trim().length < 2;
+
+  const choose = (next: Kind) => {
+    if (drill) closeDrill();
+    setKind(next);
+  };
+
+  /** Step the chip selection; `focus` moves keyboard focus with it (chip row), or leaves it in the input. */
+  const step = (dir: 1 | -1, focus: boolean): boolean => {
+    const i = KINDS.findIndex((k) => k.key === kind);
+    const j = i + dir;
+    if (j < 0 || j >= KINDS.length) return false;
+    choose(KINDS[j].key);
+    if (focus) chipRefs.current[j]?.focus();
+    return true;
+  };
+
+  const onInputKey = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (!e.altKey || short) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      step(e.key === 'ArrowRight' ? 1 : -1, false);
+    }
+  };
+
+  const onChipsKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    let dir: 1 | -1 | 0 = 0;
+    if (e.key === 'ArrowRight' || (e.key === 'Tab' && !e.shiftKey)) dir = 1;
+    else if (e.key === 'ArrowLeft' || (e.key === 'Tab' && e.shiftKey)) dir = -1;
+    if (!dir) return;
+    // Tab past either end leaves the row the ordinary way.
+    if (step(dir, true)) e.preventDefault();
+  };
+
+  const pick = (row: SongRow) => row.items.find((i) => i.service === picks[row.key]) ?? row.items[0];
+  const setPick = (row: SongRow, s: ServiceId) => setPicks((p) => ({ ...p, [row.key]: s }));
+  const songList = (rows: SongRow[]) => (
+    <ul className="search-list">
+      {rows.map((row) => (
+        <SongRowView key={row.key} row={row} chosen={pick(row)} onPick={(s) => setPick(row, s)} onTap={onTap} onQueue={onQueue} />
+      ))}
+    </ul>
+  );
+  const rowList = (items: MediaItem[]) => (
+    <ul className="search-list">
+      {items.map((item) => (
+        <Row key={`${item.service}-${item.id}`} item={item} onTap={onTap} onQueue={onQueue} />
+      ))}
+    </ul>
+  );
+  const coverGrid = (items: MediaItem[], row = false) => (
+    <ul className={`sgrid${row ? ' is-row' : ''}`}>
+      {items.map((item) => (
+        <Tile key={`${item.service}-${item.id}`} item={item} onTap={onTap} onQueue={onQueue} />
+      ))}
+    </ul>
+  );
+  const artistGrid = (items: MediaItem[], row = false) => (
+    <ul className={`sgrid is-artists${row ? ' is-row' : ''}`}>
+      {items.map((item) => (
+        <ArtistTile key={`${item.service}-${item.id}`} item={item} onOpen={() => void openArtist(item)} />
+      ))}
+    </ul>
+  );
+
+  const render: Record<ListKind, (row: boolean) => ReactNode> = {
+    tracks: (overview) => songList(overview ? songs.slice(0, OVERVIEW.tracks) : songs),
+    albums: (overview) => coverGrid(overview ? lists.albums.slice(0, OVERVIEW.albums) : lists.albums, overview),
+    artists: (overview) => artistGrid(overview ? lists.artists.slice(0, OVERVIEW.artists) : lists.artists, overview),
+    playlists: (overview) =>
+      coverGrid(overview ? lists.playlists.slice(0, OVERVIEW.playlists) : lists.playlists, overview),
+    stations: (overview) => rowList(overview ? lists.stations.slice(0, OVERVIEW.stations) : lists.stations),
+  };
+
+  const labelOf = (k: Kind) => KINDS.find((x) => x.key === k)?.label ?? '';
+  const selectedIdx = KINDS.findIndex((k) => k.key === kind);
+
+  let view: ReactNode = null;
+  if (drill) {
+    const albums = drill.albums.filter((m) => passes(m, eff));
+    view = (
+      <>
+        <button type="button" className="search-crumb" onClick={closeDrill}>
+          <Back size={15} />
+          <span className="label">{kind === 'artists' ? 'Artists' : 'All results'}</span>
+        </button>
+        <h3 className="search-drill-title">{drill.artist.title}</h3>
+        {drilling && <p className="label search-working">loading albums…</p>}
+        {!drilling && albums.length === 0 && <p className="label search-working">no albums for this artist</p>}
+        {coverGrid(albums)}
+      </>
+    );
+  } else if (!short && kind === 'all') {
+    view = (
+      <>
+        {top && (
+          <TopCard
+            item={top}
+            onTap={onTap}
+            onQueue={onQueue}
+            onOpenArtist={() => void openArtist(top)}
+          />
+        )}
+        {LIST_KINDS.map((k) =>
+          counts[k] === 0 ? null : (
+            <section key={k} className={`search-section is-${k}`}>
+              <header className="search-section-top">
+                <h3 className="label search-section-head">{labelOf(k)}</h3>
+                <button type="button" className="search-more" onClick={() => choose(k)}>
+                  See all <span aria-hidden="true">›</span>
+                  <span className="search-more-n">{counts[k]}</span>
+                </button>
+              </header>
+              {render[k](true)}
+            </section>
+          ),
+        )}
+      </>
+    );
+  } else if (!short) {
+    const k = kind as ListKind;
+    view =
+      counts[k] === 0 ? (
+        !searching &&
+        hits > 0 && (
+          <p className="search-empty">
+            No {labelOf(k).toLowerCase()}
+            {eff !== 'both' ? ` on ${serviceLabel(eff)}` : ''} for “{query.trim()}”.
+          </p>
+        )
+      ) : (
+        <section className={`search-section is-${k} is-full`}>{render[k](false)}</section>
+      );
+  }
 
   return (
     <div className="search-scrim" role="dialog" aria-modal="true" aria-label="Search music">
@@ -134,7 +337,11 @@ export default function SearchOverlay() {
             ref={inputRef}
             className="search-input"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setKind('all');
+            }}
+            onKeyDown={onInputKey}
             placeholder="What shall we play?"
             aria-label="Search Apple Music, Spotify and TuneIn"
             spellCheck={false}
@@ -144,6 +351,51 @@ export default function SearchOverlay() {
             <Close size={20} />
           </button>
         </div>
+
+        {!short && (
+          <div className="search-kinds">
+            <div className="search-chips" role="tablist" aria-label="Kind of result" onKeyDown={onChipsKey}>
+              {KINDS.map((k, i) => {
+                const on = k.key === kind;
+                return (
+                  <button
+                    key={k.key}
+                    ref={(el) => {
+                      chipRefs.current[i] = el;
+                    }}
+                    type="button"
+                    role="tab"
+                    id={`search-tab-${k.key}`}
+                    aria-selected={on}
+                    aria-controls="search-view"
+                    tabIndex={on ? 0 : -1}
+                    className={`search-chip${on ? ' is-on' : ''}${counts[k.key] === 0 ? ' is-empty' : ''}`}
+                    onClick={() => choose(k.key)}
+                  >
+                    <span className="search-chip-label">{k.label}</span>
+                    <span className="search-chip-count">{counts[k.key]}</span>
+                  </button>
+                );
+              })}
+            </div>
+            {showSvc && (
+              <div className="search-svc" role="radiogroup" aria-label="Service">
+                {SVC_OPTIONS.map((o) => (
+                  <button
+                    key={o.key}
+                    type="button"
+                    role="radio"
+                    aria-checked={svc === o.key}
+                    className={`search-svc-opt${svc === o.key ? ' is-on' : ''}`}
+                    onClick={() => setSvc(o.key)}
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="search-status">
           {searching && <span className="label search-working">searching…</span>}
@@ -162,45 +414,14 @@ export default function SearchOverlay() {
           void runSearch(query);
         }} />}
 
-        <div className="search-results scroll">
-          {drill ? (
-            <>
-              <button type="button" className="search-crumb" onClick={closeDrill}>
-                <Back size={15} />
-                <span className="label">All results</span>
-              </button>
-              <h3 className="search-drill-title">{drill.artist.title}</h3>
-              {drilling && <p className="label search-working">loading albums…</p>}
-              {!drilling && drill.albums.length === 0 && (
-                <p className="label search-working">no albums for this artist</p>
-              )}
-              <ul className="search-list">
-                {drill.albums.map((item) => (
-                  <Row key={`${item.service}-${item.id}`} item={item} onPlay={playItem} />
-                ))}
-              </ul>
-            </>
-          ) : (
-            SECTIONS.map(({ key, label }) => {
-              const items = results[key];
-              if (items.length === 0) return null;
-              return (
-                <section key={key} className="search-section">
-                  <h3 className="label search-section-head">{label}</h3>
-                  <ul className="search-list">
-                    {items.map((item) => (
-                      <Row
-                        key={`${item.service}-${item.id}`}
-                        item={item}
-                        onPlay={playItem}
-                        onOpenArtist={item.kind === 'artist' ? () => void openArtist(item) : undefined}
-                      />
-                    ))}
-                  </ul>
-                </section>
-              );
-            })
-          )}
+        <div
+          ref={resultsRef}
+          className="search-results scroll"
+          id="search-view"
+          role={short ? undefined : 'tabpanel'}
+          aria-labelledby={short ? undefined : `search-tab-${KINDS[selectedIdx].key}`}
+        >
+          {view}
 
           {short && !drill && (
             <p className="search-prompt">
@@ -213,60 +434,239 @@ export default function SearchOverlay() {
   );
 }
 
-function Row({
-  item,
-  onPlay,
-  onOpenArtist,
-}: {
-  item: MediaItem;
-  onPlay: (item: MediaItem, action: 'now' | 'next' | 'later') => void;
-  onOpenArtist?: () => void;
-}) {
-  const isArtist = item.kind === 'artist';
+// ── Rows ────────────────────────────────────────────────────────────────────
+
+function subLine(item: MediaItem): string {
+  return [
+    item.subtitle,
+    item.year ? String(item.year) : '',
+    item.durationSecs ? mmss(item.durationSecs) : '',
+    item.trackCount ? `${item.trackCount} tracks` : '',
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
+function Tools({ item, onTap, onQueue, className = 'sresult-tools' }: { item: MediaItem; onTap: TapFn; onQueue: QueueFn; className?: string }) {
+  return (
+    <div className={className}>
+      <button type="button" className="sresult-tool" aria-label={`Play ${item.title}`} onClick={() => onTap(item)}>
+        <Play size={13} />
+      </button>
+      <button type="button" className="sresult-tool" aria-label={`Play ${item.title} next`} onClick={() => onQueue(item, 'next')}>
+        <QueueNext size={14} />
+      </button>
+      <button type="button" className="sresult-tool" aria-label={`Add ${item.title} to the queue`} onClick={() => onQueue(item, 'later')}>
+        <Plus size={14} />
+      </button>
+    </div>
+  );
+}
+
+function Row({ item, onTap, onQueue }: { item: MediaItem; onTap: TapFn; onQueue: QueueFn }) {
   return (
     <li className="sresult">
-      <button
-        type="button"
-        className="sresult-main"
-        onClick={() => (isArtist ? onOpenArtist?.() : onPlay(item, 'now'))}
-        aria-label={isArtist ? `Albums by ${item.title}` : `Play ${item.title}`}
-      >
-        <span className={`sresult-art${isArtist ? ' is-round' : ''}`}>
+      <button type="button" className="sresult-main" onClick={() => onTap(item)} aria-label={`Play ${item.title}`}>
+        <span className="sresult-art">
           <RowArt src={item.art} />
         </span>
         <span className="sresult-text">
           <span className="sresult-title">{item.title}</span>
-          <span className="sresult-sub">
-            {item.subtitle}
-            {item.year ? ` · ${item.year}` : ''}
-            {item.durationSecs ? ` · ${mmss(item.durationSecs)}` : ''}
-            {item.trackCount ? ` · ${item.trackCount} tracks` : ''}
-          </span>
+          <span className="sresult-sub">{subLine(item)}</span>
         </span>
-        <span className="label sresult-badge">{serviceLabel(item.service)}</span>
       </button>
-
-      {!isArtist && (
-        <div className="sresult-tools">
-          <button type="button" className="sresult-tool" aria-label={`Play ${item.title} now`} onClick={() => onPlay(item, 'now')}>
-            <Play size={13} />
-          </button>
-          <button type="button" className="sresult-tool" aria-label={`Play ${item.title} next`} onClick={() => onPlay(item, 'next')}>
-            <QueueNext size={14} />
-          </button>
-          <button type="button" className="sresult-tool" aria-label={`Add ${item.title} to the queue`} onClick={() => onPlay(item, 'later')}>
-            <Plus size={14} />
-          </button>
-        </div>
-      )}
+      <span className="label sresult-badge">{serviceLabel(item.service)}</span>
+      <Tools item={item} onTap={onTap} onQueue={onQueue} />
     </li>
   );
 }
 
+const SHORT_SVC: Record<string, string> = { apple: 'Apple', spotify: 'Spotify' };
+/** For a phone row, where every pixel is the title's. */
+const TINY_SVC: Record<string, string> = { apple: 'AM', spotify: 'SP' };
+
+/** One song, possibly from two services; the badge becomes the switch between them. */
+function SongRowView({
+  row,
+  chosen,
+  onPick,
+  onTap,
+  onQueue,
+}: {
+  row: SongRow;
+  chosen: MediaItem;
+  onPick: (s: ServiceId) => void;
+  onTap: TapFn;
+  onQueue: QueueFn;
+}) {
+  if (row.items.length === 1) return <Row item={chosen} onTap={onTap} onQueue={onQueue} />;
+  return (
+    <li className="sresult has-pick">
+      <button type="button" className="sresult-main" onClick={() => onTap(chosen)} aria-label={`Play ${chosen.title}`}>
+        <span className="sresult-art">
+          <RowArt src={chosen.art} />
+        </span>
+        <span className="sresult-text">
+          <span className="sresult-title">{chosen.title}</span>
+          <span className="sresult-sub">{subLine(chosen)}</span>
+        </span>
+      </button>
+      <span className="sresult-pick" role="radiogroup" aria-label={`Play ${chosen.title} from`}>
+        {row.items.map((i) => (
+          <button
+            key={i.service}
+            type="button"
+            role="radio"
+            aria-checked={i === chosen}
+            aria-label={serviceLabel(i.service)}
+            title={serviceLabel(i.service)}
+            className={`sresult-pick-opt${i === chosen ? ' is-on' : ''}`}
+            onClick={() => onPick(i.service)}
+          >
+            <span className="sresult-pick-long">{SHORT_SVC[i.service] ?? serviceLabel(i.service)}</span>
+            <span className="sresult-pick-short" aria-hidden="true">{TINY_SVC[i.service] ?? serviceLabel(i.service).slice(0, 2)}</span>
+          </button>
+        ))}
+      </span>
+      <Tools item={chosen} onTap={onTap} onQueue={onQueue} />
+    </li>
+  );
+}
+
+// ── Tiles ───────────────────────────────────────────────────────────────────
+
+function Tile({ item, onTap, onQueue }: { item: MediaItem; onTap: TapFn; onQueue: QueueFn }) {
+  const [open, setOpen] = useState(false);
+  const meta = [item.year ? String(item.year) : '', item.trackCount ? `${item.trackCount} tracks` : '']
+    .filter(Boolean)
+    .join(' · ');
+  const act: TapFn = (i) => {
+    setOpen(false);
+    onTap(i);
+  };
+  const queue: QueueFn = (i, a) => {
+    setOpen(false);
+    onQueue(i, a);
+  };
+  return (
+    <li className={`stile${open ? ' is-open' : ''}`}>
+      <button type="button" className="stile-face" onClick={() => act(item)} aria-label={`Play ${item.title}`}>
+        <span className="stile-cover">
+          <RowArt src={item.art} />
+        </span>
+        <span className="stile-cap">
+          <span className="stile-title">{item.title}</span>
+          {item.subtitle && <span className="stile-sub">{item.subtitle}</span>}
+          {meta && <span className="stile-meta">{meta}</span>}
+        </span>
+      </button>
+      <Tools item={item} onTap={act} onQueue={queue} className="stile-tools" />
+      <button
+        type="button"
+        className="stile-more"
+        aria-expanded={open}
+        aria-label={open ? 'Hide actions' : `Actions for ${item.title}`}
+        onClick={() => setOpen((o) => !o)}
+      >
+        {open ? <Close size={13} /> : <span aria-hidden="true">…</span>}
+      </button>
+    </li>
+  );
+}
+
+function ArtistTile({ item, onOpen }: { item: MediaItem; onOpen: () => void }) {
+  const initials = item.title
+    .replace(/^the\s+/i, '')
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((w) => w[0] ?? '')
+    .join('');
+  return (
+    <li className="stile is-artist">
+      <button type="button" className="stile-face" onClick={onOpen} aria-label={`Albums by ${item.title}`}>
+        <span className="stile-cover is-round">
+          <RowArt src={item.art} fallback={<span className="stile-mono">{initials}</span>} />
+        </span>
+        <span className="stile-cap">
+          <span className="stile-title">{item.title}</span>
+          {item.subtitle && <span className="stile-sub">{item.subtitle}</span>}
+        </span>
+      </button>
+    </li>
+  );
+}
+
+// ── Top result ──────────────────────────────────────────────────────────────
+
+function TopCard({
+  item,
+  onTap,
+  onQueue,
+  onOpenArtist,
+}: {
+  item: MediaItem;
+  onTap: TapFn;
+  onQueue: QueueFn;
+  onOpenArtist: () => void;
+}) {
+  const isArtist = item.kind === 'artist';
+  const primary = () => (isArtist ? onOpenArtist() : onTap(item));
+  return (
+    <section className="search-top" aria-label="Top result">
+      <h3 className="label search-section-head">Top result</h3>
+      <div className={`stop is-${item.kind}`}>
+        <button
+          type="button"
+          className={`stop-art${isArtist ? ' is-round' : ''}`}
+          onClick={primary}
+          aria-label={isArtist ? `Albums by ${item.title}` : `Play ${item.title}`}
+          tabIndex={-1}
+        >
+          <RowArt src={item.art} fallback={isArtist ? <span className="stile-mono">{item.title.slice(0, 1)}</span> : undefined} />
+        </button>
+        <div className="stop-body">
+          <span className="label stop-kind">
+            {KIND_NOUN[item.kind] ?? item.kind}
+            <span className="stop-svc"> · {serviceLabel(item.service)}</span>
+          </span>
+          <span className="stop-title">{item.title}</span>
+          {!isArtist && <span className="stop-sub">{subLine(item)}</span>}
+          {isArtist && item.subtitle && <span className="stop-sub">{item.subtitle}</span>}
+          <div className="stop-actions">
+            {/* The primary button borrows the link card's button, which every skin already dresses. */}
+            <button
+              type="button"
+              className="linkcard-btn stop-play"
+              onClick={primary}
+              aria-label={isArtist ? `Albums by ${item.title}` : `Play ${item.title}`}
+            >
+              {isArtist ? 'See albums' : (
+                <>
+                  <Play size={11} /> Play
+                </>
+              )}
+            </button>
+            {!isArtist && (
+              <>
+                <button type="button" className="sresult-tool" aria-label={`Play ${item.title} next`} onClick={() => onQueue(item, 'next')}>
+                  <QueueNext size={14} />
+                </button>
+                <button type="button" className="sresult-tool" aria-label={`Add ${item.title} to the queue`} onClick={() => onQueue(item, 'later')}>
+                  <Plus size={14} />
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /** A cover the art cache refuses (403, gone) falls back to the blank stock. */
-function RowArt({ src }: { src?: string }) {
+function RowArt({ src, fallback }: { src?: string; fallback?: ReactNode }) {
   const [broken, setBroken] = useState<string | undefined>();
-  if (!src || broken === src) return <span className="sresult-art-blank" />;
+  if (!src || broken === src) return <span className="sresult-art-blank">{fallback}</span>;
   return <img src={src} alt="" loading="lazy" draggable={false} onError={() => setBroken(src)} />;
 }
 

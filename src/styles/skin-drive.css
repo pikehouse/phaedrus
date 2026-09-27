@@ -192,6 +192,9 @@
 [data-skin='drive'] .room-with,
 [data-skin='drive'] .qrow-artist,
 [data-skin='drive'] .sresult-sub,
+[data-skin='drive'] .stile-sub,
+[data-skin='drive'] .stile-meta,
+[data-skin='drive'] .stop-sub,
 [data-skin='drive'] .crate-caption-sub {
   font-variation-settings: 'wdth' 80, 'wght' 500;
   font-size: 9px;
@@ -904,6 +907,105 @@ html[data-skin='drive'][data-shell='phone'] .faceplate .faders {
 
 [data-skin='drive'] .linkcard-dot {
   background: var(--pink);
+}
+
+/* ── Search kinds: neon on chrome ──────────────────────────────────────── */
+
+[data-skin='drive'] .search-chip {
+  font-variation-settings: 'wdth' 100, 'wght' 650;
+}
+
+[data-skin='drive'] .search-chip.is-on {
+  text-shadow: 0 0 8px var(--pink-glow);
+}
+
+/* The lamp becomes a short neon tube along the bottom. */
+[data-skin='drive'] .search-chip::before {
+  top: auto;
+  bottom: 0;
+  left: 11px;
+  right: 11px;
+  width: auto;
+  height: 2px;
+  border-radius: 1px;
+  background: transparent;
+}
+
+[data-skin='drive'] .search-chip.is-on::before {
+  background: var(--pink);
+  box-shadow: 0 0 6px var(--pink), 0 0 14px var(--pink-glow);
+}
+
+[data-skin='drive'] .search-chip-count,
+[data-skin='drive'] .stop-title,
+[data-skin='drive'] .stile-title,
+[data-skin='drive'] .stile-mono,
+[data-skin='drive'] .search-empty {
+  font-style: normal;
+  font-variation-settings: 'wdth' 100, 'wght' 500;
+}
+
+[data-skin='drive'] .search-chip.is-on .search-chip-count {
+  color: var(--sodium);
+}
+
+[data-skin='drive'] .search-svc,
+[data-skin='drive'] .sresult-pick {
+  box-shadow: inset 0 0 0 1px var(--chrome-line);
+}
+
+[data-skin='drive'] .search-svc-opt.is-on {
+  color: #1c0714;
+  background: var(--pink);
+}
+
+/* On every song row a filled pink switch would shout; a lit outline is enough. */
+[data-skin='drive'] .sresult-pick-opt.is-on {
+  color: var(--pink-hot);
+  background: rgba(255, 45, 149, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(255, 45, 149, 0.45);
+}
+
+[data-skin='drive'] .search-more:hover,
+[data-skin='drive'] .stile:hover .stile-title {
+  color: var(--pink-hot);
+}
+
+[data-skin='drive'] .stop {
+  background: linear-gradient(100deg, rgba(122, 43, 255, 0.16), rgba(255, 45, 149, 0.06));
+  box-shadow: inset 0 0 0 1px var(--chrome-line), 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .stile-title {
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+[data-skin='drive'] .stile-cover,
+[data-skin='drive'] .stop-art {
+  background: #0f0d1a;
+  box-shadow: 0 0 0 1px var(--chrome-line), 0 3px 10px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='drive'] .stile:hover .stile-cover {
+  box-shadow: 0 0 0 1px rgba(255, 45, 149, 0.6), 0 8px 20px rgba(0, 0, 0, 0.7), 0 0 22px rgba(255, 45, 149, 0.22);
+}
+
+[data-skin='drive'] .stile-cover img,
+[data-skin='drive'] .stop-art img {
+  filter: saturate(0.7) contrast(1.1) brightness(0.94);
+}
+
+/* Same night-shoot veil the rows and the crate wear. */
+[data-skin='drive'] .stile-cover:has(> img)::after,
+[data-skin='drive'] .stop-art:has(> img)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(150deg, rgba(122, 43, 255, 0.34), rgba(255, 45, 149, 0.26));
+  mix-blend-mode: multiply;
 }
 
 /* ── Status, curtains, boundary ────────────────────────────────────────── */

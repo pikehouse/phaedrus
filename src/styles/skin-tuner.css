@@ -209,6 +209,9 @@
 [data-skin='tuner'] .room-with,
 [data-skin='tuner'] .qrow-artist,
 [data-skin='tuner'] .sresult-sub,
+[data-skin='tuner'] .stile-sub,
+[data-skin='tuner'] .stile-meta,
+[data-skin='tuner'] .stop-sub,
 [data-skin='tuner'] .crate-caption-sub {
   font-variation-settings: 'wdth' 78, 'wght' 500;
   font-size: 9px;
@@ -997,6 +1000,135 @@
 
 [data-skin='tuner'] .linkcard-dot {
   background: var(--vfd-lit);
+}
+
+/* ── Search kinds: rubber keys with a lamp ─────────────────────────────────
+   A row of function keys under the display. The chosen key sits pressed in
+   with its amber lamp lit; its count reads out in phosphor. */
+
+[data-skin='tuner'] .search-chips {
+  gap: 6px;
+}
+
+[data-skin='tuner'] .search-chip {
+  align-items: center;
+  padding: 8px 11px 7px 21px;
+  border-radius: 3px;
+  font-variation-settings: 'wdth' 80, 'wght' 650;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--silk);
+  background: linear-gradient(180deg, #2b2e33, #1b1d21);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.55);
+  transition: transform 90ms var(--ease), box-shadow 90ms var(--ease), opacity var(--t) var(--ease);
+}
+
+[data-skin='tuner'] .search-chip::before {
+  top: 50%;
+  left: 9px;
+  width: 5px;
+  height: 5px;
+  transform: translateY(-50%);
+  background: #2c1d0c;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .search-chip:hover {
+  color: #ffffff;
+}
+
+[data-skin='tuner'] .search-chip.is-on {
+  color: var(--silk);
+  transform: translateY(1px);
+  background: linear-gradient(180deg, #222428, #17191c);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+[data-skin='tuner'] .search-chip.is-on::before {
+  background: var(--lamp-amber);
+  box-shadow: 0 0 4px var(--lamp-amber), 0 0 10px rgba(255, 179, 71, 0.5);
+}
+
+[data-skin='tuner'] .search-chip-count {
+  font-family: var(--face);
+  font-style: normal;
+  font-variation-settings: 'wdth' 100, 'wght' 500;
+  font-size: 10.5px;
+  color: var(--silk-dim);
+}
+
+[data-skin='tuner'] .search-chip.is-on .search-chip-count {
+  color: var(--vfd-lit);
+  text-shadow: var(--vfd-bloom);
+}
+
+[data-skin='tuner'] .search-svc,
+[data-skin='tuner'] .sresult-pick {
+  border-radius: 3px;
+  background: var(--panel-well);
+  box-shadow: var(--sink);
+}
+
+[data-skin='tuner'] .search-svc-opt,
+[data-skin='tuner'] .sresult-pick-opt {
+  border-radius: 2px;
+  color: var(--silk-dim);
+}
+
+[data-skin='tuner'] .search-svc-opt.is-on,
+[data-skin='tuner'] .sresult-pick-opt.is-on {
+  color: var(--vfd-lit);
+  background: rgba(141, 255, 240, 0.08);
+  text-shadow: 0 0 6px rgba(120, 255, 235, 0.45);
+}
+
+[data-skin='tuner'] .stop {
+  background: var(--panel-raised);
+  box-shadow: inset 0 1px 0 var(--chamfer-hi), 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .stop-title,
+[data-skin='tuner'] .stile-title,
+[data-skin='tuner'] .stile-mono,
+[data-skin='tuner'] .search-empty {
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+[data-skin='tuner'] .stile-title {
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+[data-skin='tuner'] .stile-cover,
+[data-skin='tuner'] .stop-art {
+  border-radius: 1px;
+  background: #16181b;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), 0 3px 9px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='tuner'] .stile-cover.is-round,
+[data-skin='tuner'] .stop-art.is-round {
+  border-radius: 50%;
+}
+
+[data-skin='tuner'] .stile:hover .stile-cover {
+  box-shadow: inset 0 0 0 1px rgba(141, 255, 240, 0.28), 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='tuner'] .stile-cover img,
+[data-skin='tuner'] .stop-art img {
+  filter: grayscale(0.55) contrast(1.18) brightness(0.92);
+  transition: filter var(--t) var(--ease);
+}
+
+[data-skin='tuner'] .stile:hover .stile-cover img {
+  filter: grayscale(0.2) contrast(1.14) brightness(1.02);
 }
 
 /* ── Status, curtains, boundary ────────────────────────────────────────── */
