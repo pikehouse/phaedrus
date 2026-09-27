@@ -716,3 +716,87 @@ html[data-skin='hifi'][data-shell='phone'] .hifi-meters {
     font-size: clamp(16px, 2.2cqw, 22px);
   }
 }
+
+/* ── Settings: the owner's card, kept in a walnut lid ─────────────────── */
+
+html[data-skin='hifi'] .settings-scrim {
+  background:
+    radial-gradient(60% 50% at 40% 0%, rgba(158, 98, 58, 0.2), transparent 70%),
+    rgba(12, 6, 4, 0.9);
+}
+
+/* The lamp falls across the top of the card; its upper edge catches it. */
+html[data-skin='hifi'] .settings-panel {
+  background:
+    radial-gradient(80% 55% at 32% 0%, rgba(158, 98, 58, 0.18), transparent 72%),
+    linear-gradient(176deg, #2a1912 0%, #1c100b 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 214, 158, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 40px 90px -20px rgba(0, 0, 0, 0.85);
+}
+
+html[data-skin='hifi'] .settings-title {
+  font-style: italic;
+}
+
+/* The section list is a strip of the rail's walnut, grain and all. */
+html[data-skin='hifi'] .settings-nav {
+  position: relative;
+  isolation: isolate;
+  background: rgba(12, 7, 5, 0.34);
+  border-right-color: rgba(0, 0, 0, 0.45);
+  box-shadow: inset -1px 0 0 rgba(242, 228, 201, 0.04);
+}
+
+html[data-skin='hifi'] .settings-nav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--hifi-grain);
+  background-size: 240px 720px;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+html[data-skin='hifi'] .settings-navbtn.is-on {
+  background: linear-gradient(90deg, rgba(90, 57, 38, 0.72) 0%, rgba(59, 36, 24, 0.22) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 228, 186, 0.07);
+}
+
+html[data-skin='hifi'] .settings-navlabel {
+  font-family: var(--display);
+  font-variation-settings: var(--wonk-small);
+  font-size: 14.5px;
+}
+
+html[data-skin='hifi'] .set-heading {
+  font-variation-settings: var(--wonk-big);
+  font-size: 23px;
+}
+
+html[data-skin='hifi'] .tapseg-opt,
+html[data-skin='hifi'] .skincard {
+  background: rgba(12, 7, 5, 0.22);
+}
+
+html[data-skin='hifi'] .tapseg-opt.is-on {
+  background:
+    radial-gradient(90% 80% at 30% 0%, rgba(226, 154, 74, 0.14), transparent 75%),
+    rgba(12, 7, 5, 0.22);
+}
+
+/* Keycaps in the amplifier's brushed aluminium. */
+html[data-skin='hifi'] .keys kbd {
+  color: #22150e;
+  background: linear-gradient(180deg, var(--hifi-alu-hi), var(--hifi-alu));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+html[data-skin='hifi'] .home-room-name {
+  color: rgba(242, 228, 201, 0.78);
+}

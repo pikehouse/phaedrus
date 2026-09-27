@@ -257,20 +257,6 @@
   box-shadow: 0 0 8px rgba(120, 255, 235, 0.5);
 }
 
-/* ── Skin picker: three source keys ────────────────────────────────────── */
-
-[data-skin='tuner'] .skinpick-btn {
-  font-variation-settings: 'wdth' 80, 'wght' 700;
-  border-radius: 2px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-[data-skin='tuner'] .skinpick-btn.is-on {
-  color: #06110f;
-  background: var(--vfd-lit);
-  box-shadow: inset 0 0 0 1px var(--vfd-lit), 0 0 12px rgba(120, 255, 235, 0.22);
-}
-
 /* ── Transport: a row of soft-touch keys, all one height ───────────────── */
 
 /* The panel lays the keys, the toggles, the DISPLAY key and the progress
@@ -1387,4 +1373,198 @@
 [data-skin='tuner'] .room.is-selected .room-with {
   color: var(--vfd-lit);
   opacity: 0.7;
+}
+
+/* ── Settings: the set-up menu, on the faceplate ──────────────────────── */
+
+[data-skin='tuner'] .settings-scrim {
+  background: rgba(9, 10, 12, 0.9);
+}
+
+[data-skin='tuner'] .settings-panel {
+  border-radius: 3px;
+  background: var(--brush), linear-gradient(180deg, #1b1d20 0%, #111214 100%);
+  box-shadow:
+    inset 0 1px 0 var(--chamfer-hi),
+    inset 0 -1px 0 var(--chamfer-lo),
+    0 0 0 1px #000,
+    0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+[data-skin='tuner'] .settings-head {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.7);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+[data-skin='tuner'] .settings-title {
+  font-variation-settings: 'wdth' 62, 'wght' 600;
+  font-size: 18px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--silk);
+}
+
+/* The section list sits behind smoked glass, lit in phosphor. */
+[data-skin='tuner'] .settings-nav {
+  margin: 12px 0 12px 12px;
+  border-radius: 2px;
+  border-right: 0;
+  background: var(--vfd-glass);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+[data-skin='tuner'] .settings-navbtn {
+  color: var(--vfd-dim);
+}
+
+[data-skin='tuner'] .settings-navbtn:hover {
+  color: rgba(141, 255, 240, 0.5);
+}
+
+[data-skin='tuner'] .settings-navlabel {
+  font-variation-settings: 'wdth' 70, 'wght' 500;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+[data-skin='tuner'] .settings-navbtn.is-on {
+  color: var(--vfd-lit);
+  background: transparent;
+  text-shadow: var(--vfd-bloom);
+}
+
+/* The marker is an amber indicator lamp. */
+[data-skin='tuner'] .settings-navbtn::before {
+  left: 2px;
+  top: 50%;
+  bottom: auto;
+  width: 5px;
+  height: 5px;
+  margin-top: -2.5px;
+  border-radius: 50%;
+  background: var(--lamp-amber);
+}
+
+[data-skin='tuner'] .settings-navbtn.is-on::before {
+  box-shadow: 0 0 6px rgba(255, 179, 71, 0.8);
+}
+
+[data-skin='tuner'] .settings-navbtn.is-on .settings-navnum {
+  color: var(--vfd-lit);
+}
+
+[data-skin='tuner'] .set-section + .set-section {
+  border-top-color: rgba(0, 0, 0, 0.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+[data-skin='tuner'] .set-kicker {
+  color: var(--vfd-lit);
+  text-shadow: var(--vfd-bloom);
+}
+
+[data-skin='tuner'] .set-heading {
+  font-variation-settings: 'wdth' 68, 'wght' 600;
+  font-size: 17px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--silk);
+}
+
+/* The three choices are soft-touch keys; the chosen one is pressed in. */
+[data-skin='tuner'] .tapseg-opt {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #2a2d32, #1b1d21);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.09),
+    0 2px 5px rgba(0, 0, 0, 0.55);
+}
+
+[data-skin='tuner'] .tapseg-opt:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 2px 5px rgba(0, 0, 0, 0.55);
+}
+
+[data-skin='tuner'] .tapseg-opt.is-on {
+  background: linear-gradient(180deg, #16181b, #1d2024);
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.75),
+    inset 0 0 0 1px rgba(141, 255, 240, 0.3);
+}
+
+[data-skin='tuner'] .tapseg-title,
+[data-skin='tuner'] .set-row-title,
+[data-skin='tuner'] .skincard-label {
+  font-variation-settings: 'wdth' 80, 'wght' 600;
+}
+
+[data-skin='tuner'] .skincard {
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+[data-skin='tuner'] .skincard.is-on {
+  box-shadow:
+    inset 0 0 0 1px var(--vfd-lit),
+    0 0 14px -2px rgba(120, 255, 235, 0.3);
+}
+
+[data-skin='tuner'] .set-btn {
+  border-radius: 2px;
+  color: var(--silk);
+  background: linear-gradient(180deg, #31353b, #1a1d21);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='tuner'] .set-btn:hover:not(:disabled) {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+[data-skin='tuner'] .set-btn.is-armed,
+[data-skin='tuner'] .set-btn.is-armed:hover:not(:disabled) {
+  color: var(--led-red);
+  background: linear-gradient(180deg, #2a1a1a, #1a1112);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 10px rgba(255, 59, 48, 0.25);
+}
+
+/* Addresses read out in phosphor. */
+[data-skin='tuner'] .home-room-ip {
+  color: var(--vfd-lit);
+  opacity: 0.72;
+  text-shadow: 0 0 5px rgba(120, 255, 235, 0.35);
+}
+
+[data-skin='tuner'] .about-name {
+  font-variation-settings: 'wdth' 125, 'wght' 750;
+  font-size: 28px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+[data-skin='tuner'] .about-ver {
+  color: var(--vfd-lit);
+  text-shadow: var(--vfd-bloom);
+}
+
+[data-skin='tuner'] .about-line {
+  font-style: normal;
+}
+
+[data-skin='tuner'] .keys kbd {
+  color: var(--silk);
+  border-radius: 2px;
+  background: linear-gradient(180deg, #2c3035, #1b1d21);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.6);
 }

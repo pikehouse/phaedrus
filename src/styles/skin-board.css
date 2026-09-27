@@ -223,16 +223,6 @@
   box-shadow: none;
 }
 
-/* ── Skin picker ───────────────────────────────────────────────────────── */
-
-/* Base picker layout lives in rooms.css; only the board colours are here. */
-
-[data-skin='board'] .skinpick-btn.is-on {
-  color: var(--paper);
-  background: var(--ink);
-  box-shadow: inset 0 0 0 1px var(--ink);
-}
-
 /* ── Now playing ───────────────────────────────────────────────────────── */
 
 [data-skin='board'] .meta-over {
@@ -1591,4 +1581,179 @@
   .board-calling {
     display: none;
   }
+}
+
+/* ── Settings: a notice pinned to the board ───────────────────────────── */
+
+[data-skin='board'] .settings-scrim {
+  background: rgba(238, 235, 227, 0.9);
+}
+
+[data-skin='board'] .settings-panel {
+  border-radius: 0;
+  background: var(--paper-lit);
+  box-shadow:
+    0 0 0 1px var(--ink),
+    8px 8px 0 var(--hard-shadow);
+}
+
+[data-skin='board'] .settings-head {
+  border-bottom: 2px solid var(--ink);
+}
+
+[data-skin='board'] .settings-title {
+  font-variation-settings: 'wdth' 72, 'wght' 800;
+  font-size: 26px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-skin='board'] .settings-close {
+  border-radius: 0;
+}
+
+[data-skin='board'] .settings-close:hover {
+  color: var(--paper);
+  background: var(--ink);
+}
+
+[data-skin='board'] .settings-nav {
+  background: var(--paper);
+  border-right: 1px solid var(--rule-strong);
+}
+
+/* The section you are reading is the lit line on the board: ink, paper type. */
+[data-skin='board'] .settings-navbtn {
+  border-radius: 0;
+}
+
+[data-skin='board'] .settings-navbtn::before {
+  display: none;
+}
+
+[data-skin='board'] .settings-navlabel {
+  font-variation-settings: 'wdth' 85, 'wght' 650;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-skin='board'] .settings-navbtn.is-on {
+  color: var(--paper-lit);
+  background: var(--ink);
+}
+
+[data-skin='board'] .settings-navbtn.is-on .settings-navnum {
+  color: var(--signal-hot);
+}
+
+[data-skin='board'] .set-section + .set-section {
+  border-top: 2px solid var(--ink);
+}
+
+[data-skin='board'] .set-kicker {
+  padding: 3px 6px 4px;
+  color: var(--paper-lit);
+  background: var(--ink);
+}
+
+[data-skin='board'] .set-heading {
+  font-variation-settings: 'wdth' 80, 'wght' 760;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-skin='board'] .tapseg-opt,
+[data-skin='board'] .skincard {
+  border-radius: 0;
+  background: var(--paper-lit);
+  box-shadow: 0 0 0 1px var(--rule-strong);
+}
+
+[data-skin='board'] .tapseg-opt:hover,
+[data-skin='board'] .skincard:hover {
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+[data-skin='board'] .tapseg-opt.is-on,
+[data-skin='board'] .skincard.is-on {
+  position: relative;
+  z-index: 1;
+  background: var(--paper-lit);
+  box-shadow:
+    0 0 0 2px var(--ink),
+    4px 4px 0 var(--signal);
+}
+
+[data-skin='board'] .skincard-face {
+  border-radius: 0;
+}
+
+[data-skin='board'] .tapseg-title,
+[data-skin='board'] .set-row-title,
+[data-skin='board'] .skincard-label {
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+}
+
+[data-skin='board'] .tapq-cell {
+  border-radius: 0;
+}
+
+[data-skin='board'] .set-btn {
+  border-radius: 0;
+  color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+[data-skin='board'] .set-btn:hover:not(:disabled) {
+  color: var(--paper-lit);
+  background: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+[data-skin='board'] .set-btn.is-armed,
+[data-skin='board'] .set-btn.is-armed:hover:not(:disabled) {
+  color: var(--paper-lit);
+  background: var(--signal);
+  box-shadow: 0 0 0 1px var(--signal);
+}
+
+[data-skin='board'] .svc-lamp,
+[data-skin='board'] .svc-lamp.is-on {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-skin='board'] .svc-lamp {
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+[data-skin='board'] .home-room {
+  border-bottom-style: solid;
+  border-bottom-color: var(--rule);
+}
+
+[data-skin='board'] .home-room-name {
+  font-variation-settings: 'wdth' 85, 'wght' 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+}
+
+[data-skin='board'] .about-name {
+  font-variation-settings: 'wdth' 70, 'wght' 850;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+[data-skin='board'] .about-line {
+  font-style: normal;
+}
+
+/* Keys are single split-flap cards. */
+[data-skin='board'] .keys kbd {
+  color: var(--flap-ink);
+  background: var(--flap-face-top);
+  border-radius: var(--flap-radius);
+  box-shadow: var(--flap-shadow);
 }

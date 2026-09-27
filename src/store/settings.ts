@@ -39,3 +39,11 @@ export const useSettings = create<SettingsStore>((set, get) => ({
     }
   },
 }));
+
+/** Whether the Settings sheet is up. Not persisted: it always starts closed. */
+export const useSettingsPanel = create<{ open: boolean; setOpen: (open: boolean) => void }>((set) => ({
+  open: false,
+  setOpen(open) {
+    set({ open });
+  },
+}));

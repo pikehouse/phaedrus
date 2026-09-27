@@ -5,10 +5,12 @@ import RoomsRail from './components/RoomsRail';
 import NowPlaying from './components/NowPlaying';
 import RightRail from './components/RightRail';
 import SearchOverlay from './components/SearchOverlay';
+import Settings from './components/Settings';
 import StatusStrip from './components/StatusStrip';
 import Vinyl from './components/Vinyl';
 import MobileShell from './components/MobileShell';
 import { useViewport } from './hooks/useViewport';
+import { useSettingsPanel } from './store/settings';
 import './styles/app.css';
 
 export default function App() {
@@ -40,6 +42,7 @@ export default function App() {
           </div>
         ))}
       <SearchOverlay />
+      <Settings />
       <StatusStrip />
     </>
   );
@@ -61,17 +64,26 @@ function useKeyboard() {
         el?.isContentEditable === true;
       const onSlider = el?.getAttribute('role') === 'slider';
 
+      const panel = useSettingsPanel.getState();
+
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'f')) {
         e.preventDefault();
+        panel.setOpen(false);
         s.setSearchOpen(true);
         return;
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === ',') {
+        e.preventDefault();
+        s.setSearchOpen(false);
+        panel.setOpen(true);
+        return;
+      }
       if (e.key === 'Escape') {
-        if (s.searchOpen) return; // the overlay handles its own escape
+        if (s.searchOpen || panel.open) return; // the overlays handle their own escape
         if (s.arranging) s.setArranging(false);
         return;
       }
-      if (typing || s.searchOpen) return;
+      if (typing || s.searchOpen || panel.open) return;
 
       switch (e.key) {
         case ' ':

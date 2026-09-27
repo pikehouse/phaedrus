@@ -254,26 +254,6 @@
   color: var(--cream-dim);
 }
 
-/* The skin picker at thumb size — same markup as the rail's, so each skin's
-   own colours for it apply. */
-.sheet .skinpick {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  padding: 0;
-}
-
-.sheet .skinpick-btn {
-  min-height: 48px;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-}
-
-.sheet-hint {
-  margin: 16px 4px 2px;
-  text-align: center;
-  font-size: 15px;
-}
-
 /* The rooms rail inside a sheet: no rail chrome, just its list. */
 .sheet .rooms {
   flex: 1;
@@ -296,11 +276,6 @@ html[data-shell='phone'] .phone-page > .rooms {
 }
 
 html[data-shell='phone'] .rooms-drag {
-  display: none;
-}
-
-/* Appearance has its own glyph in the header; the rail's picker would say it twice. */
-html[data-shell='phone'] .rooms .skinpick {
   display: none;
 }
 
@@ -337,6 +312,11 @@ html[data-shell='phone'] .rooms-foot {
 html[data-shell='phone'] .rooms-rescan {
   min-height: 44px;
   padding: 0 8px;
+}
+
+/* Settings has its own gear in the header; the rail's would say it twice. */
+html[data-shell='phone'] .rooms-gear {
+  display: none;
 }
 
 html[data-shell='phone'] .arrange {

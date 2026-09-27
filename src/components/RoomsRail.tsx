@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useSonos } from '../store/useSonos';
-import { SKINS, useSkin } from '../store/skin';
+import { useSettingsPanel } from '../store/settings';
 import { plural } from '../lib/format';
-import { Radar } from './Icons';
+import { Gear, Radar } from './Icons';
 import type { Zone } from '../api/types';
 import '../styles/rooms.css';
 
@@ -16,6 +16,7 @@ export default function RoomsRail() {
   const setArranging = useSonos((s) => s.setArranging);
   const everywhere = useSonos((s) => s.everywhere);
   const rediscover = useSonos((s) => s.rediscover);
+  const openSettings = useSettingsPanel((s) => s.setOpen);
 
   // Re-render the "found 4s ago" line without polling anything.
   const [, setNow] = useState(0);
@@ -84,45 +85,33 @@ export default function RoomsRail() {
         </button>
       )}
 
-      <SkinPicker />
-
       <footer className="rooms-foot">
         <span className="rooms-status num">
           {topology ? plural(roomCount, 'room') : 'looking…'}
         </span>
-        <button
-          type="button"
-          className="rooms-rescan"
-          onClick={() => void rediscover()}
-          disabled={busy}
-          aria-label="Rescan the network for speakers"
-        >
-          <Radar size={13} className={busy ? 'is-spinning' : undefined} />
-          <span>rescan</span>
-        </button>
+        <span className="rooms-foot-tools">
+          <button
+            type="button"
+            className="rooms-rescan"
+            onClick={() => void rediscover()}
+            disabled={busy}
+            aria-label="Rescan the network for speakers"
+          >
+            <Radar size={13} className={busy ? 'is-spinning' : undefined} />
+            <span>rescan</span>
+          </button>
+          <button
+            type="button"
+            className="rooms-rescan rooms-gear"
+            onClick={() => openSettings(true)}
+            aria-label="Settings"
+            title="Settings (⌘,)"
+          >
+            <Gear size={14} />
+          </button>
+        </span>
       </footer>
     </aside>
-  );
-}
-
-export function SkinPicker() {
-  const skin = useSkin((s) => s.skin);
-  const setSkin = useSkin((s) => s.setSkin);
-  return (
-    <div className="skinpick" role="group" aria-label="Appearance">
-      {SKINS.map((s) => (
-        <button
-          key={s.id}
-          type="button"
-          className={`skinpick-btn${skin === s.id ? ' is-on' : ''}`}
-          aria-pressed={skin === s.id}
-          title={s.hint}
-          onClick={() => setSkin(s.id)}
-        >
-          {s.label}
-        </button>
-      ))}
-    </div>
   );
 }
 

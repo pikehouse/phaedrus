@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useSonos } from '../store/useSonos';
-import { SKINS, useSkin } from '../store/skin';
+import { useSettingsPanel } from '../store/settings';
 import NowPlaying from './NowPlaying';
 import Queue from './Queue';
 import Crate from './Crate';
-import RoomsRail, { SkinPicker } from './RoomsRail';
-import { Close, Disc, Search, Sleeves, Speaker, Swatch, Tracklist } from './Icons';
+import RoomsRail from './RoomsRail';
+import { Close, Disc, Gear, Search, Sleeves, Speaker, Tracklist } from './Icons';
 import '../styles/mobile.css';
 
 type Tab = 'now' | 'queue' | 'crate' | 'rooms';
-type Sheet = 'rooms' | 'skin' | null;
+type Sheet = 'rooms' | null;
 
 const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
   { id: 'now', label: 'Now Playing', icon: <Disc /> },
@@ -29,6 +29,7 @@ export default function MobileShell() {
   const [sheet, setSheet] = useState<Sheet>(null);
   const group = useSonos((s) => s.group);
   const setSearchOpen = useSonos((s) => s.setSearchOpen);
+  const openSettings = useSettingsPanel((s) => s.setOpen);
 
   // Fixed chrome outside this tree (the status strip, the search overlay)
   // reads this to keep clear of the tab bar and the notch.
@@ -77,8 +78,16 @@ export default function MobileShell() {
         >
           <Search size={20} />
         </button>
-        <button type="button" className="phone-tool" aria-label="Appearance" onClick={() => setSheet('skin')}>
-          <Swatch size={20} />
+        <button
+          type="button"
+          className="phone-tool"
+          aria-label="Settings"
+          onClick={() => {
+            setSheet(null);
+            openSettings(true);
+          }}
+        >
+          <Gear size={20} />
         </button>
       </header>
 
@@ -110,11 +119,6 @@ export default function MobileShell() {
           <RoomsRail />
         </Sheet>
       )}
-      {sheet === 'skin' && (
-        <Sheet label="Appearance" title="Appearance" onClose={closeSheet}>
-          <SkinSheet />
-        </Sheet>
-      )}
     </div>
   );
 }
@@ -134,8 +138,8 @@ function Sheet({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
-      // Search opens above the sheet; that Escape is the overlay's alone.
-      if (useSonos.getState().searchOpen) return;
+      // Search and Settings open above the sheet; that Escape is theirs alone.
+      if (useSonos.getState().searchOpen || useSettingsPanel.getState().open) return;
       e.stopPropagation();
       onClose();
     };
@@ -159,16 +163,5 @@ function Sheet({
         {children}
       </div>
     </div>
-  );
-}
-
-function SkinSheet() {
-  const skin = useSkin((s) => s.skin);
-  const hint = SKINS.find((s) => s.id === skin)?.hint;
-  return (
-    <>
-      <SkinPicker />
-      <p className="panel-empty-line sheet-hint">{hint}</p>
-    </>
   );
 }

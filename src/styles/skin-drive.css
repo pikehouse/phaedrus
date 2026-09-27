@@ -241,20 +241,6 @@
   box-shadow: 0 0 8px rgba(255, 45, 149, 0.55);
 }
 
-/* ── Skin picker ───────────────────────────────────────────────────────── */
-
-[data-skin='drive'] .skinpick-btn {
-  font-variation-settings: 'wdth' 80, 'wght' 700;
-  border-radius: 3px;
-  box-shadow: inset 0 0 0 1px rgba(226, 230, 250, 0.12);
-}
-
-[data-skin='drive'] .skinpick-btn.is-on {
-  color: #1c0714;
-  background: var(--pink);
-  box-shadow: inset 0 0 0 1px var(--pink), 0 0 14px rgba(255, 45, 149, 0.3);
-}
-
 /* ── Transport: backlit rubber dash keys ───────────────────────────────── */
 
 /* Matte black rubber, a millimetre of travel, and the legend is the lamp: the
@@ -1077,4 +1063,134 @@ html[data-skin='drive'][data-shell='phone'] .faceplate .faders {
 [data-skin='drive'] :focus-visible {
   outline: 1px solid var(--pink);
   outline-offset: 2px;
+}
+
+/* ── Settings: the glovebox manual, under neon ────────────────────────── */
+
+[data-skin='drive'] .settings-scrim {
+  background:
+    radial-gradient(72% 46% at 50% 104%, rgba(122, 43, 255, 0.2), transparent 70%),
+    radial-gradient(60% 34% at 50% -4%, rgba(255, 45, 149, 0.12), transparent 70%),
+    rgba(7, 6, 15, 0.92);
+}
+
+[data-skin='drive'] .settings-panel {
+  border-radius: 4px;
+  background:
+    radial-gradient(90% 40% at 50% 100%, rgba(122, 43, 255, 0.14), transparent 70%),
+    linear-gradient(180deg, var(--night-3) 0%, var(--night-2) 100%);
+  box-shadow:
+    inset 0 0 0 1px var(--chrome-line),
+    0 0 50px -12px rgba(255, 45, 149, 0.3),
+    0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+/* The title is the neon sign. */
+[data-skin='drive'] .settings-title {
+  font-variation-settings: 'wdth' 100, 'wght' 700;
+  font-style: italic;
+  font-size: 26px;
+  color: var(--pink-hot);
+  text-shadow:
+    0 0 4px var(--pink),
+    0 0 14px var(--pink-glow),
+    0 0 28px rgba(255, 45, 149, 0.25);
+}
+
+[data-skin='drive'] .settings-nav {
+  background: rgba(7, 6, 15, 0.4);
+  border-right-color: var(--chrome-line);
+}
+
+[data-skin='drive'] .settings-navbtn.is-on {
+  background: rgba(255, 45, 149, 0.08);
+}
+
+[data-skin='drive'] .settings-navbtn.is-on::before {
+  background: var(--pink);
+  box-shadow:
+    0 0 6px var(--pink),
+    0 0 12px var(--pink-glow);
+}
+
+[data-skin='drive'] .set-kicker {
+  color: var(--sodium);
+}
+
+/* Section names are chrome badges. */
+[data-skin='drive'] .set-heading {
+  font-variation-settings: 'wdth' 112, 'wght' 750;
+  font-size: 19px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+[data-skin='drive'] .set-section + .set-section {
+  border-top-color: rgba(238, 240, 255, 0.08);
+}
+
+[data-skin='drive'] .tapseg-opt,
+[data-skin='drive'] .skincard {
+  border-radius: 3px;
+  background: rgba(7, 6, 15, 0.35);
+}
+
+[data-skin='drive'] .tapseg-opt.is-on,
+[data-skin='drive'] .skincard.is-on {
+  background: linear-gradient(160deg, rgba(122, 43, 255, 0.16), rgba(255, 45, 149, 0.08));
+  box-shadow:
+    inset 0 0 0 1px var(--pink),
+    0 0 20px -4px var(--pink-glow);
+}
+
+[data-skin='drive'] .tapseg-title,
+[data-skin='drive'] .set-row-title,
+[data-skin='drive'] .skincard-label {
+  font-variation-settings: 'wdth' 100, 'wght' 600;
+}
+
+[data-skin='drive'] .set-btn {
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--chrome-line);
+}
+
+[data-skin='drive'] .set-btn:hover:not(:disabled) {
+  color: var(--pink-hot);
+  box-shadow:
+    inset 0 0 0 1px var(--pink),
+    0 0 12px -2px var(--pink-glow);
+}
+
+/* The addresses read like the dash: sodium digits. */
+[data-skin='drive'] .home-room-ip {
+  color: var(--sodium);
+  opacity: 0.8;
+  text-shadow: 0 0 6px var(--sodium-glow);
+}
+
+[data-skin='drive'] .about-name {
+  font-variation-settings: 'wdth' 100, 'wght' 700;
+  font-style: italic;
+  color: var(--pink-hot);
+  text-shadow:
+    0 0 4px var(--pink),
+    0 0 16px var(--pink-glow);
+}
+
+[data-skin='drive'] .about-ver {
+  color: var(--cyan);
+}
+
+[data-skin='drive'] .about-line {
+  font-style: normal;
+}
+
+[data-skin='drive'] .keys kbd {
+  color: var(--night-2);
+  background: var(--chrome);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }

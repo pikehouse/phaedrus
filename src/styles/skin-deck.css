@@ -273,18 +273,6 @@
   box-shadow: 0 0 8px rgba(255, 159, 28, 0.6);
 }
 
-/* ── Skin picker: colours only — the layout is the rail's own ──────────── */
-
-[data-skin='deck'] .skinpick-btn {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.09);
-}
-
-[data-skin='deck'] .skinpick-btn.is-on {
-  color: #0b0c0e;
-  background: var(--led);
-  box-shadow: inset 0 0 0 1px var(--led), 0 0 12px rgba(255, 159, 28, 0.3);
-}
-
 /* ── Transport: rubber keys with LEDs, silkscreen under each ───────────── */
 
 /* The deck lays the keys and the toggles out as one row; letting Transport's
@@ -1262,4 +1250,179 @@
 [data-skin='deck'] :focus-visible {
   outline: 1px solid var(--led);
   outline-offset: 2px;
+}
+
+/* ── Settings: the utility page on the controller ─────────────────────── */
+
+[data-skin='deck'] .settings-scrim {
+  background: rgba(7, 8, 10, 0.9);
+}
+
+[data-skin='deck'] .settings-panel {
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #17191d 0%, #0e0f12 100%);
+  box-shadow:
+    inset 0 1px 0 var(--chamfer-hi),
+    0 0 0 1px #000,
+    0 30px 80px rgba(0, 0, 0, 0.75);
+}
+
+[data-skin='deck'] .settings-head {
+  border-bottom-color: rgba(0, 0, 0, 0.8);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* The title is the corner wordmark: extended, in chrome. */
+[data-skin='deck'] .settings-title {
+  font-variation-settings: 'wdth' 125, 'wght' 800;
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+[data-skin='deck'] .settings-nav {
+  background: rgba(0, 0, 0, 0.25);
+  border-right-color: rgba(0, 0, 0, 0.8);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+[data-skin='deck'] .settings-navlabel {
+  font-variation-settings: 'wdth' 90, 'wght' 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-skin='deck'] .settings-navbtn.is-on {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* An LED strip beside the section you are on. */
+[data-skin='deck'] .settings-navbtn::before {
+  width: 3px;
+  background: var(--led);
+}
+
+[data-skin='deck'] .settings-navbtn.is-on::before {
+  box-shadow: var(--led-bloom);
+}
+
+[data-skin='deck'] .set-section + .set-section {
+  border-top-color: rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+[data-skin='deck'] .set-heading {
+  font-variation-settings: 'wdth' 112, 'wght' 700;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The three choices are rubber pads; the chosen one lights along its lip. */
+[data-skin='deck'] .tapseg-opt {
+  border-radius: 6px;
+  background: linear-gradient(180deg, #1d1f24, #16181c);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .tapseg-opt:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .tapseg-opt.is-on {
+  background: linear-gradient(180deg, #1d1f24, #16181c);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -3px 0 var(--led),
+    0 6px 18px -8px rgba(255, 159, 28, 0.6),
+    0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .tapseg-title,
+[data-skin='deck'] .set-row-title,
+[data-skin='deck'] .skincard-label {
+  font-variation-settings: 'wdth' 100, 'wght' 600;
+}
+
+[data-skin='deck'] .skincard {
+  border-radius: 6px;
+  background: #15171b;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .skincard-face {
+  border-radius: 5px 5px 0 0;
+}
+
+[data-skin='deck'] .skincard.is-on {
+  box-shadow:
+    inset 0 0 0 1px var(--led),
+    0 0 14px -2px rgba(255, 159, 28, 0.4);
+}
+
+[data-skin='deck'] .set-btn {
+  border-radius: 4px;
+  color: var(--silk);
+  background: linear-gradient(180deg, #25282e, #1a1c21);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .set-btn:hover:not(:disabled) {
+  color: var(--led-hot);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+[data-skin='deck'] .set-btn.is-armed,
+[data-skin='deck'] .set-btn.is-armed:hover:not(:disabled) {
+  color: var(--coral);
+  background: linear-gradient(180deg, #25282e, #1a1c21);
+  box-shadow:
+    inset 0 0 0 1px var(--coral-dim),
+    var(--coral-bloom);
+}
+
+[data-skin='deck'] .home-room-ip {
+  color: var(--led);
+  opacity: 0.7;
+}
+
+[data-skin='deck'] .about-name {
+  font-variation-settings: 'wdth' 125, 'wght' 800;
+  font-size: 30px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: transparent;
+  background: var(--chrome);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+[data-skin='deck'] .about-line {
+  font-style: normal;
+}
+
+[data-skin='deck'] .keys kbd {
+  color: var(--led);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #25282e, #1a1c21);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.6);
 }
