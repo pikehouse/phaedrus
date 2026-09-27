@@ -24,10 +24,13 @@ from Safari 16.4.
 
 ## Run it
 
+Not a programmer? Open this folder in Claude Code and ask it to set up and build
+Phaedrus. `CLAUDE.md` tells it how, including the prerequisites.
+
 ```bash
 pnpm install
 pnpm tauri dev          # dev window with hot reload
-pnpm tauri build        # .app and .dmg in src-tauri/target/release/bundle/
+pnpm tauri build --target universal-apple-darwin --bundles app   # installable Phaedrus.app
 ```
 
 Rust is required (`curl https://sh.rustup.rs -sSf | sh`). The first Rust build
@@ -39,7 +42,7 @@ Frontend-only work (mock data, no speakers needed):
 pnpm dev                # http://localhost:1420 with a fake Sonos system
 ```
 
-Tests for the protocol parsers, using XML captured from a real household:
+Tests for the protocol parsers, using anonymised XML captured from a real household:
 
 ```bash
 cd src-tauri && cargo test
