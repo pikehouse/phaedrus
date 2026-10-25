@@ -1876,6 +1876,68 @@ html[data-skin='pocket'] .pk-sheet-volume .pk-room {
   gap: 8px;
 }
 
+/* Stacked: speaker and full name on one line, the slider and number under. */
+html[data-skin='pocket'] .pk-room.is-stacked {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'mute name  name'
+    '.    slider value';
+  column-gap: 8px;
+  row-gap: 2px;
+  padding-block: 4px;
+}
+
+html[data-skin='pocket'] .pk-room.is-stacked .pk-mute {
+  grid-area: mute;
+}
+
+html[data-skin='pocket'] .pk-room.is-stacked .pk-room-name {
+  grid-area: name;
+  width: auto !important;
+}
+
+html[data-skin='pocket'] .pk-room.is-stacked .pk-slider-room {
+  grid-area: slider;
+  min-width: 0;
+}
+
+html[data-skin='pocket'] .pk-room.is-stacked .pk-room-value {
+  grid-area: value;
+}
+
+/* The close box, when it closes something: a real button, the same box. */
+html[data-skin='pocket'] .pk-win-close-btn {
+  position: absolute;
+  left: 12px;
+  top: -2px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  outline: none;
+}
+
+html[data-skin='pocket'] .pk-win-close-btn .pk-win-close {
+  position: static;
+}
+
+html[data-skin='pocket'] .pk-win-close-btn:active .pk-win-close {
+  filter: invert(1);
+}
+
+html[data-skin='pocket'] .pk-win-close-btn:focus-visible {
+  outline: 2px dotted var(--ink);
+  outline-offset: -2px;
+}
+
+html[data-skin='pocket'] .pk-sheet:has(.pk-sheet-volume) .pk-sheet-volume {
+  padding-top: 10px;
+}
+
 html[data-skin='pocket'][data-shell='phone'] .search-panel {
   padding: 18px 16px 4px;
   border-radius: 22px;

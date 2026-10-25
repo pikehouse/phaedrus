@@ -61,13 +61,13 @@ export default function PocketPhone() {
     <div className="phone pk-phone">
       <PocketDevice phone onSheet={open} />
       {sheet && (
-        <PocketSheet title={SHEET_TITLE[sheet]} onClose={close}>
+        <PocketSheet title={SHEET_TITLE[sheet]} onClose={close} bare={sheet === 'volume'}>
           {sheet === 'rooms' && <RoomsRail />}
           {sheet === 'queue' && <Queue />}
           {sheet === 'crate' && <Crate />}
           {sheet === 'volume' && (
             <div className="pk-sheet-volume">
-              <PocketPanel />
+              <PocketPanel stacked onClose={close} />
             </div>
           )}
         </PocketSheet>
@@ -76,7 +76,8 @@ export default function PocketPhone() {
   );
 }
 
-function PocketSheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+/** `bare`: the content brings its own title and close (the Sound window). */
+function PocketSheet({ title, onClose, bare = false, children }: { title: string; onClose: () => void; bare?: boolean; children: ReactNode }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return;
@@ -93,12 +94,14 @@ function PocketSheet({ title, onClose, children }: { title: string; onClose: () 
       <button type="button" className="sheet-dismiss" aria-label="Close" onClick={onClose} />
       <div className="sheet pk-sheet">
         <i className="sheet-grip" aria-hidden="true" />
-        <header className="sheet-head">
-          <h2 className="label sheet-title">{title}</h2>
-          <button type="button" className="phone-tool" aria-label="Close" onClick={onClose}>
-            <Close size={18} />
-          </button>
-        </header>
+        {!bare && (
+          <header className="sheet-head">
+            <h2 className="label sheet-title">{title}</h2>
+            <button type="button" className="phone-tool" aria-label="Close" onClick={onClose}>
+              <Close size={18} />
+            </button>
+          </header>
+        )}
         <div className="pk-sheet-body">{children}</div>
       </div>
     </div>

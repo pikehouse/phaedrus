@@ -196,7 +196,7 @@ function GroupVolume() {
 
 // ── A room ───────────────────────────────────────────────────────────────────
 
-function Room({ member, nameMax }: { member: MemberVolume; nameMax: number }) {
+function Room({ member, nameMax, stacked }: { member: MemberVolume; nameMax: number; stacked?: boolean }) {
   const setMemberVolume = useSonos((s) => s.setMemberVolume);
   const setMemberMute = useSonos((s) => s.setMemberMute);
   const [wrap, w] = usePanelWidth<HTMLDivElement>();
@@ -208,7 +208,7 @@ function Room({ member, nameMax }: { member: MemberVolume; nameMax: number }) {
   const drag = useDrag(onValue, g.x0, g.x1);
 
   return (
-    <li className={`pk-room${member.muted ? ' is-muted' : ''}`}>
+    <li className={`pk-room${member.muted ? ' is-muted' : ''}${stacked ? ' is-stacked' : ''}`}>
       <button
         type="button"
         className="pk-mute"
@@ -252,23 +252,38 @@ function Room({ member, nameMax }: { member: MemberVolume; nameMax: number }) {
 
 // ── The window ───────────────────────────────────────────────────────────────
 
-export default function PocketPanel({ title = 'Sound' }: { title?: string }) {
+/**
+ * `stacked` (the phone's sheet) puts each room's name on its own line over
+ * its slider, so names aren't cut to fit beside it. `onClose` makes the
+ * close box a real button.
+ */
+export default function PocketPanel({ title = 'Sound', stacked = false, onClose }: { title?: string; stacked?: boolean; onClose?: () => void }) {
   const members = useSonos((s) => s.state?.members);
   const hasState = useSonos((s) => !!s.state);
   const [list, listW] = usePanelWidth<HTMLUListElement>();
   if (!hasState || !members) return null;
-  // The name column takes what the row can spare (a third, within reason),
-  // always leaving the slider about sixty pixels.
-  const nameMax = Math.max(30, Math.min(120, Math.floor(listW * 0.42), listW - 112));
+  // Side by side, the name column takes what the row can spare (a third,
+  // within reason), always leaving the slider about sixty pixels. Stacked,
+  // it has the whole line after the speaker.
+  const nameMax = stacked
+    ? Math.max(30, listW - 26)
+    : Math.max(30, Math.min(120, Math.floor(listW * 0.42), listW - 112));
   const tw = measure(Bold, title);
+  const closeBox = (
+    <Bits className="pk-win-close" w={13} h={13} draw={(p) => {
+      p.fill(0, 0, 13, 13, WHITE);
+      p.frame(1, 1, 11, 11);
+    }} />
+  );
 
   return (
     <div className="pk-win" role="group" aria-label="Volume">
-      <div className="pk-win-title" aria-hidden="true">
-        <Bits className="pk-win-close" w={13} h={13} draw={(p) => {
-          p.fill(0, 0, 13, 13, WHITE);
-          p.frame(1, 1, 11, 11);
-        }} />
+      <div className="pk-win-title">
+        {onClose ? (
+          <button type="button" className="pk-win-close-btn" aria-label="Close" onClick={onClose}>
+            {closeBox}
+          </button>
+        ) : closeBox}
         <Bits className="pk-win-name" w={tw + 10} h={13} draw={(p) => {
           p.fill(0, 0, p.w, p.h, WHITE);
           p.text(Bold, title, 5, 2);
@@ -281,7 +296,7 @@ export default function PocketPanel({ title = 'Sound' }: { title?: string }) {
           <Label text={members.length === 1 ? 'Room' : 'Rooms'} className="pk-rooms-caption" />
           <ul className="pk-rooms" ref={list}>
             {members.map((m) => (
-              <Room key={m.uuid} member={m} nameMax={nameMax} />
+              <Room key={m.uuid} member={m} nameMax={nameMax} stacked={stacked} />
             ))}
           </ul>
         </div>
