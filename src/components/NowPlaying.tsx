@@ -17,6 +17,7 @@ import PuttyStage, { PuttyGrille, useTrackPop } from './PuttyStage';
 import KissaStage from './KissaStage';
 import KissaDeck from './KissaDeck';
 import PocketStage from './PocketStage';
+import PocketPanel from './PocketPanel';
 import '../styles/nowplaying.css';
 
 /** How long each line of the board's cycling sub-head holds before it turns. */
@@ -146,8 +147,14 @@ export default function NowPlaying() {
 
   const faceplate = (
     <div className="faceplate" role="group" aria-label="Volume">
-      <VolumeKnob />
-      <Faders />
+      {skin === 'pocket' ? (
+        <PocketPanel />
+      ) : (
+        <>
+          <VolumeKnob />
+          <Faders />
+        </>
+      )}
       {skin === 'hifi' && <HifiMeters playing={!!playing} />}
       {skin === 'putty' && <PuttyGrille className="pt-grille-deck" cols={14} rows={8} />}
       {skin === 'kissa' && <KissaDeck playing={!!playing} />}

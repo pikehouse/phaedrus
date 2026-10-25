@@ -11,8 +11,8 @@
      rooms rail   a white polycarbonate module; the room you're in is the
                   LCD's own inverse highlight
      stage        the desk and the player (PocketStage, pocket.css)
-     faceplate    a strip of polished steel: a small white wheel for the
-                  volume, slots with white caps for the rooms
+     faceplate    a one-bit Sound window from an old desktop (PocketPanel):
+                  pinstriped title bar, notched sliders, pointer thumbs
      queue        an LCD panel set in white: the playlist screen, large
      crate        the same panel; covers in grey on the crystal
      search       a white sheet with an LCD search field
@@ -294,18 +294,14 @@ html[data-skin='pocket'] .rooms-head {
 
 /* Headings in the LCD's own face, printed grey on the white. */
 html[data-skin='pocket'] .rooms-head .label,
-html[data-skin='pocket'] .right-tab,
-html[data-skin='pocket'] .faders-caption,
-html[data-skin='pocket'] .knob-caption {
+html[data-skin='pocket'] .right-tab {
   font-size: 0;
   letter-spacing: 0;
   color: var(--pk-print);
 }
 
 html[data-skin='pocket'] .rooms-head .label::before,
-html[data-skin='pocket'] .right-tab::before,
-html[data-skin='pocket'] .faders-caption::before,
-html[data-skin='pocket'] .knob-caption::before {
+html[data-skin='pocket'] .right-tab::before {
   content: '';
   display: block;
   height: calc(var(--pk-t-rooms-h, 12) * 2px);
@@ -980,226 +976,247 @@ html[data-skin='pocket'] .tactile:disabled {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   FACEPLATE — a strip of polished steel
+   FACEPLATE — a control panel from an old desktop (PocketPanel)
+   A one-bit window lying on the desk: black on white, a one-pixel frame and
+   a hard one-pixel shadow, a pinstriped title bar. One panel pixel is two CSS
+   pixels throughout. The only soft thing is the photograph: the card's faint
+   shadow on the desk, and a breath of screen softness over it.
    ══════════════════════════════════════════════════════════════════════════ */
 
 html[data-skin='pocket'] .faceplate {
   margin: 0 12px;
-  padding: 10px 26px 12px;
-  gap: 26px;
-  border-radius: 18px;
+  padding: 4px 4px 16px;
+  gap: 0;
   border-top: none;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent 7%, transparent 88%, rgba(0, 0, 0, 0.4)),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.1), transparent 30%, rgba(255, 220, 180, 0.08) 70%, transparent),
-    linear-gradient(180deg, #b4bac0 0%, #979ea5 46%, #8a9198 54%, #a2a9b0 100%);
-  background-blend-mode: normal, screen, normal;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(0, 0, 0, 0.6),
-    0 12px 26px rgba(0, 0, 0, 0.55);
+  background: transparent;
+  box-shadow: none;
 }
 
-html[data-skin='pocket'] .faceplate::before {
-  border-radius: inherit;
-  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px);
-}
-
-html[data-skin='pocket'] .faceplate .label,
-html[data-skin='pocket'] .faders-caption,
-html[data-skin='pocket'] .knob-caption {
-  color: rgba(20, 23, 26, 0.75);
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.28));
-}
-
-html[data-skin='pocket'] .knob-caption::before {
-  height: calc(var(--pk-t-volume-h, 12) * 2px);
-  width: calc(var(--pk-t-volume-w, 30) * 2px);
-  -webkit-mask-image: var(--pk-t-volume);
-  mask-image: var(--pk-t-volume);
-}
-
-html[data-skin='pocket'] .faders-caption::before {
-  height: calc(var(--pk-t-rooms-h, 12) * 2px);
-  width: calc(var(--pk-t-rooms-w, 30) * 2px);
-}
-
-html[data-skin='pocket'] .faders-count {
+html[data-skin='pocket'] .faceplate::before,
+html[data-skin='pocket'] .faceplate-brand {
   display: none;
 }
 
-/* The volume: a small white wheel, with the number on a chip of crystal. */
-html[data-skin='pocket'] .knob {
-  width: 92px;
-  height: 92px;
-}
-
-html[data-skin='pocket'] .knob-tick {
-  stroke: rgba(20, 23, 26, 0.45);
-}
-
-html[data-skin='pocket'] .knob-tick.is-major {
-  stroke: rgba(20, 23, 26, 0.65);
-}
-
-html[data-skin='pocket'] .knob-tick.is-lit,
-html[data-skin='pocket'] .knob-tick.is-major.is-lit {
-  stroke: #eef3f7;
-}
-
-html[data-skin='pocket'] .knob-body {
-  inset: 12px;
-  background: radial-gradient(closest-side, transparent 52%, rgba(255, 255, 255, 0.7) 56%, transparent 62%),
-    linear-gradient(180deg, #fbfbf9, #ededE8 50%, #dcdcd6);
+html[data-skin='pocket'] .pk-win {
+  --ink: #101214;
+  --paper: #fbfbf8;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
   box-shadow:
-    0 0 0 1px rgba(60, 66, 72, 0.7),
-    inset 0 1px 0 #fff,
-    inset 0 -4px 8px rgba(90, 96, 102, 0.2),
-    0 4px 10px rgba(0, 0, 0, 0.5);
+    2px 2px 0 var(--ink),
+    0 16px 30px rgba(0, 0, 0, 0.42),
+    0 3px 8px rgba(0, 0, 0, 0.35);
 }
 
-html[data-skin='pocket'] .knob-body::before {
-  inset: 26%;
-  border-radius: 4px;
-  background: var(--pk-crystal);
-  box-shadow: 0 0 0 2px #1b1e21, inset 0 2px 3px rgba(0, 0, 0, 0.4);
-  -webkit-mask-image: none;
-  mask-image: none;
+/* A breath of screen softness: the faintest scanlines and a vignette, so the
+   window belongs to the photograph. The pixels under it stay hard. */
+html[data-skin='pocket'] .pk-win::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(180deg, rgba(16, 18, 20, 0.028) 0 1px, transparent 1px 2px),
+    radial-gradient(120% 140% at 50% 40%, transparent 55%, rgba(16, 18, 20, 0.07));
 }
 
-html[data-skin='pocket'] .knob:hover .knob-body,
-html[data-skin='pocket'] .knob.is-dragging .knob-body {
-  box-shadow:
-    0 0 0 1px rgba(60, 66, 72, 0.7),
-    inset 0 1px 0 #fff,
-    inset 0 -4px 8px rgba(90, 96, 102, 0.2),
-    0 4px 12px rgba(0, 0, 0, 0.55);
-}
-
-html[data-skin='pocket'] .knob-pointer {
-  top: 3px;
-  width: 3px;
-  height: 7px;
-  margin-left: -1.5px;
-  border-radius: 2px;
-  background: #8e959b;
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.4);
-}
-
-html[data-skin='pocket'] .knob-value {
-  font-family: var(--pk-sans);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--pk-lcd-ink);
-  text-shadow: none;
-}
-
-html[data-skin='pocket'] .fader {
-  min-height: 28px;
-}
-
-html[data-skin='pocket'] .fader-name {
-  font-family: var(--pk-sans);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  color: rgba(16, 19, 22, 0.78);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-html[data-skin='pocket'] .fader-value {
-  font-size: 12px;
-  font-weight: 700;
-  color: rgba(16, 19, 22, 0.7);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
-}
-
-html[data-skin='pocket'] .fader-mute {
-  color: rgba(16, 19, 22, 0.6);
-}
-
-html[data-skin='pocket'] .fader-mute:hover {
-  color: #0f1113;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-html[data-skin='pocket'] .fader.is-muted .fader-mute {
-  color: #8f2a1a;
-}
-
-html[data-skin='pocket'] .fader.is-muted .fader-name,
-html[data-skin='pocket'] .fader.is-muted .fader-value {
-  color: rgba(16, 19, 22, 0.4);
-}
-
-/* A slot cut through the steel. */
-html[data-skin='pocket'] .fader-slot {
-  inset: 8px 0;
-  border-radius: 2px;
-  background: linear-gradient(180deg, #070809, #1d2023);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.9);
-}
-
-html[data-skin='pocket'] .fader-fill {
-  top: 9px;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(200, 220, 240, 0.25), #cfe3f6);
-}
-
-html[data-skin='pocket'] .fader.is-muted .fader-fill {
-  background: #8f2a1a;
-}
-
-/* A white polycarbonate cap. */
-html[data-skin='pocket'] .fader-cap {
-  width: 14px;
-  height: 18px;
-  margin-left: -7px;
-  border-radius: 4px;
-  background: linear-gradient(180deg, #ffffff, #ededE8 55%, #d3d4ce);
-  box-shadow: 0 0 0 0.5px rgba(30, 34, 38, 0.8), 0 2px 3px rgba(0, 0, 0, 0.55), inset 0 1px 0 #fff;
-}
-
-html[data-skin='pocket'] .fader-cap::after {
-  left: 3px;
-  right: 3px;
-  background: rgba(60, 66, 72, 0.4);
-}
-
-html[data-skin='pocket'] .fader-rail:hover .fader-cap,
-html[data-skin='pocket'] .fader-rail.is-dragging .fader-cap {
-  box-shadow: 0 0 0 0.5px rgba(30, 34, 38, 0.8), 0 3px 5px rgba(0, 0, 0, 0.6), inset 0 1px 0 #fff;
-}
-
-/* The maker's mark, engraved in the steel like the back of the player. */
-html[data-skin='pocket'] .faceplate-brand {
-  font-size: 0;
-  right: 22px;
-  bottom: 12px;
-  color: rgba(16, 19, 22, 0.55);
-  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.3));
-}
-
-html[data-skin='pocket'] .faceplate-brand span {
+html[data-skin='pocket'] .pk-bits,
+html[data-skin='pocket'] .pk-win canvas {
   display: block;
-  height: calc(var(--pk-t-brand-h, 14) * 1px);
-  width: calc(var(--pk-t-brand-w, 40) * 1px);
-  background: currentColor;
-  -webkit-mask: var(--pk-t-brand) 0 0 / 100% 100% no-repeat;
-  mask: var(--pk-t-brand) 0 0 / 100% 100% no-repeat;
+  image-rendering: pixelated;
 }
 
-html[data-skin='pocket'] .faceplate-led {
-  width: 4px;
-  height: 4px;
-  background: rgba(16, 19, 22, 0.4);
-  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.6);
+/* The title bar: five pinstripes, a close box, the name knocked out. */
+html[data-skin='pocket'] .pk-win-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  border-bottom: 2px solid var(--ink);
 }
 
-html[data-skin='pocket'] .faceplate-led.is-lit {
-  background: #d9ebfb;
-  box-shadow: 0 0 5px rgba(178, 214, 255, 0.7);
+html[data-skin='pocket'] .pk-win-title::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  top: 4px;
+  height: 18px;
+  background: repeating-linear-gradient(180deg, var(--ink) 0 2px, transparent 2px 4px);
+}
+
+html[data-skin='pocket'] .pk-win-close {
+  position: absolute;
+  left: 14px;
+  top: 0;
+}
+
+html[data-skin='pocket'] .pk-win-name {
+  position: relative;
+}
+
+html[data-skin='pocket'] .pk-win-body {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.8fr) 2px minmax(0, 1.7fr);
+  gap: 16px;
+  padding: 10px 36px 14px 16px;
+}
+
+/* A dotted rule: the desktop's grey, one pixel wide. */
+html[data-skin='pocket'] .pk-win-rule {
+  width: 2px;
+  background: repeating-linear-gradient(180deg, var(--ink) 0 2px, transparent 2px 4px);
+}
+
+html[data-skin='pocket'] .pk-sound {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+html[data-skin='pocket'] .pk-sound-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+}
+
+html[data-skin='pocket'] .pk-sound-value {
+  margin-top: 2px;
+}
+
+html[data-skin='pocket'] .pk-slider-group {
+  align-self: stretch;
+}
+
+html[data-skin='pocket'] .pk-slider {
+  position: relative;
+  min-width: 0;
+  cursor: pointer;
+  touch-action: none;
+  outline: none;
+}
+
+html[data-skin='pocket'] .pk-slider:focus-visible,
+html[data-skin='pocket'] .pk-mute:focus-visible {
+  outline: 2px dotted var(--ink);
+  outline-offset: 2px;
+}
+
+html[data-skin='pocket'] .pk-rooms-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-width: 0;
+}
+
+html[data-skin='pocket'] .pk-rooms {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  max-height: 118px;
+  /* room for the dotted focus ring inside the scroll box */
+  padding: 5px 5px;
+  margin: -5px -5px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink) transparent;
+}
+
+html[data-skin='pocket'] .pk-room {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 34px;
+  min-width: 0;
+}
+
+html[data-skin='pocket'] .pk-room-name {
+  flex: none;
+  overflow: hidden;
+}
+
+html[data-skin='pocket'] .pk-slider-room {
+  flex: 1;
+}
+
+html[data-skin='pocket'] .pk-room-value {
+  flex: none;
+}
+
+html[data-skin='pocket'] .pk-slider-room {
+  min-width: 120px;
+}
+
+/* A narrow stage: the speaker volume becomes one row over the rooms. */
+@container (max-width: 640px) {
+  html[data-skin='pocket'] .faceplate .pk-win-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    padding-top: 8px;
+  }
+
+  html[data-skin='pocket'] .faceplate .pk-win-rule {
+    width: auto;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px);
+  }
+
+  html[data-skin='pocket'] .faceplate .pk-sound {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+  }
+
+  html[data-skin='pocket'] .faceplate .pk-sound > .pk-bits:first-child {
+    display: none;
+  }
+
+  html[data-skin='pocket'] .faceplate .pk-slider-group {
+    flex: 1;
+    align-self: auto;
+  }
+
+  html[data-skin='pocket'] .faceplate .pk-rooms-caption {
+    display: none;
+  }
+
+  html[data-skin='pocket'] .faceplate .pk-room {
+    min-height: 30px;
+  }
+}
+
+/* The speaker is the mute button; pressed, it inverts, at once. */
+html[data-skin='pocket'] .pk-mute {
+  flex: none;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 0;
+  background: var(--paper);
+  outline: none;
+}
+
+html[data-skin='pocket'] .pk-mute:active {
+  filter: invert(1);
+}
+
+html[data-skin='pocket'] .pk-win-grow {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
 
 html[data-skin='pocket'] .stage-pocket {
@@ -1833,20 +1850,30 @@ html[data-skin='pocket'] .pk-sheet .arrange {
   margin: 0 4px;
 }
 
-html[data-skin='pocket'] .pk-sheet-volume.faceplate {
-  margin: 4px 0 6px;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 14px;
-  padding: 16px 18px 18px;
+/* Room Volumes on a phone: the same window, its columns stacked. */
+html[data-skin='pocket'] .pk-sheet-volume {
+  padding: 4px 4px 12px;
+  overflow-y: auto;
 }
 
-html[data-skin='pocket'] .pk-sheet-volume .knob-block {
-  align-self: center;
+html[data-skin='pocket'] .pk-sheet-volume .pk-win-body {
+  grid-template-columns: minmax(0, 1fr);
+  padding: 10px 32px 18px 14px;
 }
 
-html[data-skin='pocket'] .pk-sheet-volume .faders-list {
-  max-height: 46vh;
+html[data-skin='pocket'] .pk-sheet-volume .pk-win-rule {
+  width: auto;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 4px);
+}
+
+html[data-skin='pocket'] .pk-sheet-volume .pk-rooms {
+  max-height: none;
+}
+
+html[data-skin='pocket'] .pk-sheet-volume .pk-room {
+  min-height: 44px;
+  gap: 8px;
 }
 
 html[data-skin='pocket'][data-shell='phone'] .search-panel {

@@ -10,7 +10,8 @@ Files: `src/styles/skin-pocket.css` (tokens, the desk and the film, rails,
 faceplate, overlays, phone), `src/styles/pocket.css` (the player),
 `src/components/PocketStage.tsx` (the player and its little UI),
 `src/components/PocketWheel.tsx`, `src/components/PocketLcd.tsx`,
-`src/components/PocketPhone.tsx`, `src/lib/pocketFont.ts`,
+`src/components/PocketPhone.tsx`, `src/components/PocketPanel.tsx`,
+`src/lib/pocketFont.ts`, `src/lib/pocketPix.ts`,
 `src/lib/pocketLcd.ts`, `src/lib/pocketScreens.ts`, `src/lib/pocketArt.ts`,
 `src/lib/pocketLabels.ts`, and the textures in `src/assets/pocket/`.
 Everything is scoped to `html[data-skin='pocket']`.
@@ -28,7 +29,7 @@ this app.
 | Dock | Under the player | The app's seek bar between shuffle and repeat/crossfade. The transport's big buttons stand down: the wheel is the transport. |
 | Rooms rail | A white polycarbonate module | Headings in the LCD's bitmap face, printed grey. The list sits in an inset crystal window: the room you're in is the LCD's inverse bar, the others carry a `›`. Everywhere is a white push button. |
 | Right rail | A white module with the playlist screen | Queue and Favourites as a segmented white switch. The list is a big LCD: inverse bar on the playing track with `▶`, covers in grey pressed into the crystal. |
-| Faceplate | A strip of satin steel | A small white wheel for the group volume with the number on a chip of crystal; slots cut in the steel with white caps for each room; the name engraved in the bitmap face. |
+| Faceplate | A control panel from an old desktop, lying on the desk | See "The Sound window" below. |
 | Search | A white sheet | The field is a strip of lit crystal with SEARCH printed on it; chips and the selected service use the inverse bar; covers stay in colour. |
 | Settings | A white sheet | SETTINGS in the bitmap face, the section list in a crystal window with the inverse bar. |
 | Status line | A strip of lit crystal | |
@@ -126,6 +127,44 @@ headers); a tainted canvas or a failed load draws a ♪ pattern instead.
   hold box.
 - No sounds.
 
+## The Sound window
+
+The volume deck under the player is a little one-bit window in the manner
+of a 1990 desktop control panel (`PocketPanel`, drawn with `pocketPix.ts`):
+
+- **Window:** black on white (`#101214` on `#fbfbf8`), a one-pixel frame and a
+  hard one-pixel shadow down and right. The title bar has five pinstripes, a
+  close box on the left and "Sound" in the bold bitmap face, knocked out of
+  the stripes. A grow box sits in the bottom-right corner. One panel pixel is
+  two CSS pixels throughout, and every part is drawn into a canvas at a whole
+  number of device pixels, so nothing is smoothed.
+- **In the photograph:** the grain and vignette still lie over it, the card
+  casts a faint soft shadow on the desk, and the faintest scanlines and a
+  vignette give it a breath of screen softness. The UI itself has no
+  gradients and no soft edges.
+- **Speaker volume (left):** a speaker whose sound waves grow with the group
+  volume (none at 0; one, two or three), the number in the bold face, and a
+  slider in the old Sound panel's manner: an outlined track filled with the
+  desktop's 50% grey up to a square knob with grip lines, and eight notches
+  numbered 0–7 underneath. The notches are decoration; the slider runs
+  0–100 like the knob it replaces.
+- **Rooms (right):** one row per room. The speaker is the mute button
+  (crossed out when muted; inverted, instantly, while pressed), then the name
+  in the bold face, cut with an ellipsis to the room the row can spare, then a
+  slider with tick marks and the pentagon pointer thumb of the old mouse
+  panels, then the number in the small face. A muted room's track loses its
+  grey fill.
+- **Separators:** one-pixel dotted rules.
+- **Narrow stages** (under 640px wide, e.g. a 1024px window): the speaker volume
+  becomes one row over the rooms.
+- **Behaviour:** the same as the knob and faders it replaces:
+  `setGroupVolume` / `setMemberVolume` while dragging and again with `final`
+  on release, `setMemberMute`, arrows ±2 (Page Up/Down ±10 on the group), the
+  mouse wheel on the group slider, the same aria labels. Focus is a
+  one-pixel dotted outline. Nothing animates.
+- **Type:** every label, name and number is the LCD's own bitmap face; names
+  are drawn on the fly.
+
 ## Phone
 
 Below 760 px `MobileShell` hands over to `PocketPhone`: the white front fills
@@ -133,7 +172,8 @@ the screen with a hairline of steel at the glass's edge, the LCD at the top,
 the wheel under the thumb, sized by whichever runs out first, width or
 height. The app's pages are reached through the player's menus: Queue › Edit
 Queue…, Favourites › Covers…, Rooms › Arrange… and Room Volumes… slide the
-full page up as a sheet of white plastic; Search… and Settings open the
+full page up as a sheet of white plastic (Room Volumes is the Sound window,
+its columns stacked); Search… and Settings open the
 app's overlays. Tapping the screen on Now Playing opens the menu.
 
 ## Palette
@@ -148,6 +188,7 @@ app's overlays. Tapping the screen on Now Playing opens the menu.
 | `--pk-lcd-ink` | `#1a2228` | LCD ink |
 | `--pk-hi` / `--pk-hi-ink` | `#1f272d` / `#c3cec9` | the inverse highlight |
 | `--pk-steel` | `#a9b0b7` | steel |
+| `--ink` / `--paper` (Sound window) | `#101214` / `#fbfbf8` | the one-bit control panel |
 
 ## The film
 
@@ -169,6 +210,7 @@ blurred shapes, no photographs).
 | Marquee | 18 px a second, once per line, then holds | timers stop when hidden; none under reduced motion (lines are cut with …) |
 | LCD clock | redraws once a second | only while playing and visible |
 | Wheel press shading, hold switch | 0.08–0.45 s | transitions only |
+| Sound window | none: a pressed speaker inverts at once | n/a |
 
 The LCD never redraws on a timer while nothing changes: each screen says when
 it next needs drawing (a second ticking over, a marquee step, an overlay

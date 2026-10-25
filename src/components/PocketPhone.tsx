@@ -5,8 +5,7 @@ import { PocketDevice } from './PocketStage';
 import RoomsRail from './RoomsRail';
 import Queue from './Queue';
 import Crate from './Crate';
-import VolumeKnob from './VolumeKnob';
-import Faders from './Faders';
+import PocketPanel from './PocketPanel';
 import { Close } from './Icons';
 import '../styles/mobile.css';
 
@@ -67,9 +66,8 @@ export default function PocketPhone() {
           {sheet === 'queue' && <Queue />}
           {sheet === 'crate' && <Crate />}
           {sheet === 'volume' && (
-            <div className="faceplate pk-sheet-volume">
-              <VolumeKnob />
-              <Faders />
+            <div className="pk-sheet-volume">
+              <PocketPanel />
             </div>
           )}
         </PocketSheet>
