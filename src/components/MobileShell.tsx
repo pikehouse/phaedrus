@@ -7,6 +7,7 @@ import Crate from './Crate';
 import RoomsRail from './RoomsRail';
 import { PuttyMini, PuttyVolume } from './PuttyStage';
 import { useSkin } from '../store/skin';
+import PocketPhone from './PocketPhone';
 import { useRoomDots } from '../hooks/useRoomDots';
 import { Close, Disc, Gear, Search, Sleeves, Speaker, Tracklist } from './Icons';
 import '../styles/mobile.css';
@@ -28,6 +29,12 @@ const TABS: { id: Tab; label: string; icon: ReactNode }[] = [
  * around them speaks only in tokens, so each skin colours it.
  */
 export default function MobileShell() {
+  // Pocket turns the whole phone into the player; every other skin gets the tabs.
+  const pocket = useSkin((s) => s.skin === 'pocket');
+  return pocket ? <PocketPhone /> : <TabbedShell />;
+}
+
+function TabbedShell() {
   const [tab, setTab] = useState<Tab>('now');
   const [sheet, setSheet] = useState<Sheet>(null);
   const group = useSonos((s) => s.group);
