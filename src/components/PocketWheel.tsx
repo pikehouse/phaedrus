@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { localPoint } from '../lib/localPoint';
 
 /* ══════════════════════════════════════════════════════════════════════════
    POCKET WHEEL
@@ -107,12 +108,12 @@ export default function PocketWheel({
   };
 
   const geometry = (x: number, y: number) => {
-    const r = root.current!.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
-    const dx = x - cx;
-    const dy = y - cy;
-    return { angle: Math.atan2(dy, dx), radius: Math.hypot(dx, dy) / (r.width / 2) };
+    // In the wheel's own frame, so the player can lie tilted on the desk and
+    // the quadrants and the centre button still line up with what's drawn.
+    const p = localPoint(root.current!, x, y);
+    const dx = p.x - p.width / 2;
+    const dy = p.y - p.height / 2;
+    return { angle: Math.atan2(dy, dx), radius: Math.hypot(dx, dy) / (p.width / 2) };
   };
 
   const onPointerDown = (e: React.PointerEvent) => {

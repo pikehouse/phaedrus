@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Bitmap, LCD_W, LCD_H } from '../lib/pocketLcd';
 import { STATUS_H } from '../lib/pocketScreens';
+import { localPoint } from '../lib/localPoint';
 
 /* ══════════════════════════════════════════════════════════════════════════
    POCKET LCD — the liquid crystal
@@ -346,8 +347,8 @@ export default function PocketLcd({
         const d = down.current;
         down.current = null;
         if (!d || !onTap || Math.hypot(ev.clientX - d.x, ev.clientY - d.y) > 8) return;
-        const r = ev.currentTarget.getBoundingClientRect();
-        onTap(((ev.clientX - r.left) / r.width) * LCD_W, ((ev.clientY - r.top) / r.height) * LCD_H);
+        const p = localPoint(ev.currentTarget, ev.clientX, ev.clientY); // tilt-proof
+        onTap((p.x / p.width) * LCD_W, (p.y / p.height) * LCD_H);
       }}
     />
   );

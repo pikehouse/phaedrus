@@ -101,6 +101,13 @@ html[data-skin='pocket'] .pk-device {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* On the desk it lies where it was dropped, a few degrees off square. The
+   wheel and the screen read pointers in their own frame (lib/localPoint),
+   so the controls follow the tilt. The phone *is* the player: no tilt. */
+html[data-skin='pocket'] .pk-scene .pk-device {
+  transform: rotate(var(--pk-tilt, -3.5deg));
+}
+
 /* Its shadow on the desk: a dark contact line under the base, and a long
    soft fall-off behind, as from a lamp above and in front. */
 html[data-skin='pocket'] .pk-device::before {
