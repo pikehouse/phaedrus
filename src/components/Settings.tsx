@@ -359,6 +359,12 @@ const LOOK: Record<Skin, { ground: string; ink: string; font: CSSProperties; str
     font: { fontFamily: "'Cormorant Garamond', 'Hiragino Mincho ProN', Georgia, serif", fontWeight: 500, fontStyle: 'italic' },
     strip: ['#0a0706', '#e8a06a', '#efb59c', '#4f6ef0', '#a9e8ff'],
   },
+  pocket: {
+    ground: 'linear-gradient(180deg, #cdc8bd, #b3ada1)',
+    ink: '#24361f',
+    font: { fontFamily: "'Jersey 10', monospace", fontWeight: 400, fontSize: '43px' },
+    strip: ['#c9c4b9', '#3d3e44', '#bccb8c', '#4f6a45', '#b0413e'],
+  },
 };
 
 function Appearance() {

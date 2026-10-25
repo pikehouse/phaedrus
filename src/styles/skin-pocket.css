@@ -1,0 +1,672 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   POCKET SKIN — a late-80s handheld that never existed.
+
+   The handheld itself (the LCD, the buttons) lives in pocket.css. The
+   rest of the app is moulded from the same warm gray plastic, printed in
+   the same navy-gray, and every list is another little LCD: rooms and the queue are menus with
+   a cursor, favourites are cartridges. Everything is keyed off
+   [data-skin='pocket'] on <html>.
+
+   Fonts (licences in src/assets/fonts/LICENSES.md):
+     Jersey 10       the LCD's pixel face   OFL
+     Archivo         italic, printed on the plastic (already bundled)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+@import '@fontsource/jersey-10/latin-400.css';
+@import '@fontsource-variable/archivo/wdth-italic.css';
+
+[data-skin='pocket'] {
+  /* ── The handheld's vocabulary ─────────────────────────────────────────── */
+  --lcd-0: #c3cd8f;
+  --lcd-1: #8ea062;
+  --lcd-2: #516b40;
+  --lcd-3: #24361f;
+  --plastic: #cbc5b9;
+  --charcoal: #2b2b30;
+  --charcoal-2: #36363c;
+  --charcoal-3: #44444b;
+  --button: #a8383a;
+  --led: #ff3b2b;
+
+  --pixel: 'Jersey 10', 'Menlo', monospace;
+  --printed: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+
+  /* ── Hi-fi tokens, re-pointed: the whole case is the handheld's warm gray
+     plastic, and the ink is the navy-gray its legends are printed in ──── */
+  --bg-deep: #c2bcb0;
+  --bg: var(--plastic);
+  --bg-raised: #d6d1c6;
+  --walnut: #b3ada0;
+  --walnut-light: #beb8ac;
+
+  --ink: #2d3040;
+  --cream: var(--ink);
+  --cream-dim: #4a4e60;
+  --cream-faint: rgba(45, 48, 64, 0.62);
+  --cream-ghost: rgba(45, 48, 64, 0.14);
+
+  /* "Active" is the green the name is printed in. */
+  --amber: #2f6b4a;
+  --amber-hot: #24573b;
+  --amber-glow: rgba(47, 107, 74, 0.22);
+
+  --rust: #e0574a;
+  --burgundy: var(--button);
+  --wine: #5a2226;
+  --olive: var(--lcd-2);
+  --mustard: #c9b45a;
+
+  --display: var(--pixel);
+  --face: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+
+  --radius: 4px;
+
+  --sink: inset 0 1px 2px rgba(60, 50, 40, 0.3), inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+  --lift: 0 2px 8px rgba(60, 50, 40, 0.25), 0 0 0 0.5px rgba(60, 50, 40, 0.12);
+}
+
+[data-skin='pocket'] body {
+  background: var(--bg-deep);
+  font-synthesis: none;
+}
+
+/* Jersey has one weight and none of Fraunces's axes: restate them, and never
+   let the browser smear a fake bold over the pixels. */
+[data-skin='pocket'] .meta-title,
+[data-skin='pocket'] .meta-artist,
+[data-skin='pocket'] .room-name,
+[data-skin='pocket'] .arrange-name,
+[data-skin='pocket'] .qrow-title,
+[data-skin='pocket'] .crate-caption,
+[data-skin='pocket'] .crate-bill-title,
+[data-skin='pocket'] .sresult-title,
+[data-skin='pocket'] .search-input,
+[data-skin='pocket'] .search-drill-title,
+[data-skin='pocket'] .curtain-title,
+[data-skin='pocket'] .boundary-title,
+[data-skin='pocket'] .panel-empty-line,
+[data-skin='pocket'] .search-prompt,
+[data-skin='pocket'] .linkcard-title {
+  font-variation-settings: normal;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+/* ── Shell and rails: the charcoal of the case ─────────────────────────── */
+
+[data-skin='pocket'] .shell,
+[data-skin='pocket'] .stage {
+  background: var(--bg-deep);
+}
+
+/* The rails are moulded plastic too, a parting line where they meet the stage. */
+[data-skin='pocket'] .rooms,
+[data-skin='pocket'] .right-rail {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.2 0 0 0 0 0.18 0 0 0 0 0.15 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #d2cdc2, #c4beb2);
+}
+
+[data-skin='pocket'] .rooms {
+  box-shadow: inset -1px 0 0 rgba(60, 50, 40, 0.22), inset -2px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+[data-skin='pocket'] .right-rail {
+  box-shadow: inset 1px 0 0 rgba(60, 50, 40, 0.22), inset 2px 0 0 rgba(255, 255, 255, 0.35);
+}
+
+/* No lamp light, no film: a screen, not a photograph. */
+[data-skin='pocket'] .atmo-leak,
+[data-skin='pocket'] .atmo-vignette,
+[data-skin='pocket'] .atmo-grain {
+  display: none;
+}
+
+/* ── Labels: printed italic, like the legends on the case ──────────────── */
+
+[data-skin='pocket'] .label {
+  font-family: var(--printed);
+  font-style: italic;
+  font-variation-settings: 'wdth' 100, 'wght' 700;
+  letter-spacing: 0.12em;
+  color: var(--cream-dim);
+}
+
+[data-skin='pocket'] .rooms-head .label,
+[data-skin='pocket'] .right-tab {
+  font-family: var(--pixel);
+  font-style: normal;
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── LCD menus: rooms and the queue ────────────────────────────────────── */
+
+[data-skin='pocket'] .rooms-list,
+[data-skin='pocket'] .queue {
+  padding: 6px 4px;
+  border-radius: 3px;
+  background:
+    repeating-linear-gradient(90deg, rgba(36, 54, 31, 0.045) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(180deg, rgba(36, 54, 31, 0.045) 0 1px, transparent 1px 3px),
+    var(--lcd-0);
+  box-shadow:
+    inset 3px 3px 6px rgba(20, 30, 10, 0.3),
+    0 0 0 2px #1d1d21,
+    0 0 0 9px #3c3d43,
+    0 0 0 10px rgba(255, 255, 255, 0.06);
+  margin: 12px 20px 20px;
+}
+
+[data-skin='pocket'] .room,
+[data-skin='pocket'] .qrow {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-skin='pocket'] .rooms-list .room-name,
+[data-skin='pocket'] .qrow-title {
+  font-family: var(--pixel);
+  font-weight: 400;
+  color: var(--lcd-3);
+}
+
+[data-skin='pocket'] .rooms-list .room-name {
+  font-size: 24px;
+  line-height: 1;
+}
+
+[data-skin='pocket'] .qrow-title {
+  font-size: 19px;
+  line-height: 1.05;
+}
+
+[data-skin='pocket'] .rooms-list .room-with,
+[data-skin='pocket'] .qrow-artist,
+[data-skin='pocket'] .qrow-time {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: 15px;
+  color: var(--lcd-3);
+  opacity: 0.85;
+}
+
+/* The cursor: a ▶ where the marker was. */
+[data-skin='pocket'] .rooms-list .room-marker,
+[data-skin='pocket'] .qrow-marker {
+  left: 5px;
+  top: 50%;
+  bottom: auto;
+  margin-top: -5px;
+  width: 0;
+  height: 0;
+  border: 5px solid transparent;
+  border-left: 7px solid var(--lcd-3);
+  border-right: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  opacity: 0;
+}
+
+[data-skin='pocket'] .room:hover,
+[data-skin='pocket'] .qrow:hover {
+  background: rgba(36, 54, 31, 0.1);
+}
+
+[data-skin='pocket'] .room:hover .room-marker,
+[data-skin='pocket'] .qrow:hover .qrow-marker {
+  opacity: 0.5;
+}
+
+/* Selected / playing: the row inverted, the cursor lit. */
+[data-skin='pocket'] .room.is-selected,
+[data-skin='pocket'] .qrow.is-current {
+  background: var(--lcd-3);
+}
+
+[data-skin='pocket'] .room.is-selected .room-name,
+[data-skin='pocket'] .room.is-selected .room-with,
+[data-skin='pocket'] .qrow.is-current .qrow-title,
+[data-skin='pocket'] .qrow.is-current .qrow-artist,
+[data-skin='pocket'] .qrow.is-current .qrow-time {
+  color: var(--lcd-0);
+}
+
+[data-skin='pocket'] .rooms-list .room.is-selected .room-marker,
+[data-skin='pocket'] .queue .qrow.is-current .qrow-marker {
+  opacity: 1;
+  border-left-color: var(--lcd-0);
+  background: none;
+  box-shadow: none;
+}
+
+[data-skin='pocket'] .bars i {
+  background: var(--lcd-0);
+}
+
+[data-skin='pocket'] .room:not(.is-selected) .bars i {
+  background: var(--lcd-3);
+}
+
+/* Queue covers become tiny four-shade tiles. */
+[data-skin='pocket'] .qrow-art {
+  border-radius: 0;
+  box-shadow: 0 0 0 1.5px var(--lcd-3);
+}
+
+[data-skin='pocket'] .qrow-art img {
+  filter: grayscale(1) contrast(1.2) brightness(1.05);
+  mix-blend-mode: multiply;
+}
+
+[data-skin='pocket'] .qrow-art-blank {
+  background: var(--lcd-1);
+}
+
+[data-skin='pocket'] .qrow-art::after,
+[data-skin='pocket'] .qrow-art-glow {
+  display: none;
+}
+
+[data-skin='pocket'] .qrow.is-current .qrow-art {
+  box-shadow: 0 0 0 1.5px var(--lcd-0);
+}
+
+/* On the inverted row there is nothing light to multiply into. */
+[data-skin='pocket'] .qrow.is-current .qrow-art img {
+  mix-blend-mode: normal;
+  filter: grayscale(1) sepia(0.4) hue-rotate(40deg) contrast(1.1);
+}
+
+[data-skin='pocket'] .qrow-remove {
+  color: var(--lcd-2);
+}
+
+[data-skin='pocket'] .qrow.is-current .qrow-remove {
+  color: var(--lcd-1);
+}
+
+[data-skin='pocket'] .qrow-remove:hover {
+  color: var(--rust);
+}
+
+[data-skin='pocket'] .panel-head {
+  font-family: var(--pixel);
+}
+
+[data-skin='pocket'] .panel-count {
+  font-family: var(--pixel);
+  font-size: 16px;
+  letter-spacing: 0.04em;
+}
+
+[data-skin='pocket'] .panel-empty-line,
+[data-skin='pocket'] .panel-empty-sub {
+  color: var(--lcd-3);
+  font-family: var(--pixel);
+}
+
+[data-skin='pocket'] .right-tab {
+  color: var(--cream-faint);
+}
+
+[data-skin='pocket'] .right-tab.is-active {
+  color: var(--cream);
+}
+
+[data-skin='pocket'] .right-tab.is-active::after {
+  background: var(--amber);
+  box-shadow: none;
+}
+
+/* ── Crate: cartridges ─────────────────────────────────────────────────── */
+
+[data-skin='pocket'] .crate-face {
+  border-radius: 4px 4px 2px 2px;
+  padding: 14px 9px 9px;
+  background:
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.12) 0 1px, rgba(255, 255, 255, 0.4) 1px 2px, transparent 2px 4px) 50% 4px / 46% 7px no-repeat,
+    linear-gradient(180deg, #cdc7bb, #b8b1a4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.15),
+    0 4px 10px rgba(0, 0, 0, 0.45);
+}
+
+[data-skin='pocket'] .crate-face img,
+[data-skin='pocket'] .crate-face .crate-bill {
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.3);
+  filter: none;
+}
+
+[data-skin='pocket'] .crate-wear {
+  display: none;
+}
+
+[data-skin='pocket'] .crate-caption {
+  font-family: var(--pixel);
+  font-size: 17px;
+  color: var(--cream);
+}
+
+[data-skin='pocket'] .crate-caption-sub {
+  color: var(--cream-faint);
+}
+
+[data-skin='pocket'] .crate-bill-title {
+  font-family: var(--pixel);
+}
+
+/* ── The faceplate: the handheld's lower half ──────────────────────────── */
+
+[data-skin='pocket'] .faceplate {
+  background: linear-gradient(180deg, #c6c0b4 0%, #b7b0a3 100%);
+  border-top: 0;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 3px 0 rgba(0, 0, 0, 0.08),
+    0 -10px 24px rgba(60, 48, 36, 0.2);
+}
+
+[data-skin='pocket'] .faceplate::before {
+  display: none;
+}
+
+[data-skin='pocket'] .knob-caption,
+[data-skin='pocket'] .faders-caption {
+  font-family: var(--printed);
+  font-style: italic;
+  font-variation-settings: 'wdth' 100, 'wght' 700;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #3e4256;
+}
+
+/* Volume: a ridged thumbwheel seen face on. */
+[data-skin='pocket'] .knob-tick {
+  stroke: rgba(62, 66, 86, 0.3);
+}
+
+[data-skin='pocket'] .knob-tick.is-major {
+  stroke: rgba(62, 66, 86, 0.55);
+}
+
+[data-skin='pocket'] .knob-tick.is-lit,
+[data-skin='pocket'] .knob-tick.is-major.is-lit {
+  stroke: #2f6b4a;
+}
+
+[data-skin='pocket'] .knob-body {
+  background:
+    radial-gradient(circle, #3a3b41 0 40%, transparent 41%),
+    repeating-conic-gradient(from 0deg, #2a2b30 0deg 6deg, #4a4b52 6deg 12deg);
+  box-shadow:
+    inset 0 2px 2px rgba(255, 255, 255, 0.15),
+    0 4px 8px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(0, 0, 0, 0.25);
+}
+
+[data-skin='pocket'] .knob-body::before {
+  display: none;
+}
+
+[data-skin='pocket'] .knob:hover .knob-body,
+[data-skin='pocket'] .knob.is-dragging .knob-body {
+  box-shadow:
+    inset 0 2px 2px rgba(255, 255, 255, 0.2),
+    0 4px 10px rgba(0, 0, 0, 0.45),
+    0 0 0 2px rgba(47, 107, 74, 0.6);
+}
+
+[data-skin='pocket'] .knob-pointer {
+  top: 4px;
+  height: 10px;
+  width: 4px;
+  margin-left: -2px;
+  border-radius: 0;
+  background: #d9d4c8;
+  box-shadow: none;
+}
+
+/* The value in a tiny LCD window in the hub. */
+[data-skin='pocket'] .knob-value {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: 20px;
+  min-width: 34px;
+  padding: 2px 4px 1px;
+  text-align: center;
+  color: var(--lcd-3);
+  background: var(--lcd-0);
+  box-shadow: inset 1px 1px 2px rgba(20, 30, 10, 0.35), 0 0 0 1.5px #1d1d21;
+  text-shadow: none;
+}
+
+/* Faders: each room a little LCD bar of blocks. */
+[data-skin='pocket'] .fader-name,
+[data-skin='pocket'] .fader-value {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: 0.03em;
+  color: #2d3040;
+}
+
+[data-skin='pocket'] .fader-mute {
+  color: #3e4256;
+}
+
+[data-skin='pocket'] .fader-slot {
+  border-radius: 0;
+  background: var(--lcd-0);
+  box-shadow: inset 1px 1px 2px rgba(20, 30, 10, 0.3), 0 0 0 2px #2b2c31;
+}
+
+[data-skin='pocket'] .fader-fill {
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--lcd-3) 0 5px, transparent 5px 7px);
+  box-shadow: none;
+}
+
+[data-skin='pocket'] .fader.is-muted .fader-fill {
+  background: repeating-linear-gradient(90deg, var(--lcd-1) 0 5px, transparent 5px 7px);
+}
+
+[data-skin='pocket'] .fader-cap {
+  border-radius: 2px;
+  background: linear-gradient(180deg, #3a3b41, #2a2b30);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 2px 3px rgba(0, 0, 0, 0.35);
+}
+
+[data-skin='pocket'] .fader-cap::after {
+  background: #8e8f97;
+}
+
+[data-skin='pocket'] .faceplate-brand {
+  font-family: var(--printed);
+  font-style: italic;
+  font-variation-settings: 'wdth' 100, 'wght' 700;
+  color: rgba(62, 66, 86, 0.6);
+}
+
+[data-skin='pocket'] .faceplate-led.is-lit {
+  background: var(--led);
+  box-shadow: 0 0 6px rgba(255, 59, 43, 0.7);
+}
+
+/* ── Curtains, search and settings: the same gray plastic ──────────────── */
+
+[data-skin='pocket'] .curtain,
+[data-skin='pocket'] .boundary {
+  background:
+    radial-gradient(80% 60% at 50% 42%, rgba(255, 255, 255, 0.25), transparent 70%),
+    linear-gradient(180deg, #d2cdc2, #c2bcb0);
+}
+
+[data-skin='pocket'] .curtain-title,
+[data-skin='pocket'] .boundary-title {
+  font-size: clamp(30px, 3.6vw, 42px);
+}
+
+[data-skin='pocket'] .search-scrim {
+  background:
+    radial-gradient(78% 58% at 50% 6%, rgba(255, 255, 255, 0.3), transparent 72%),
+    rgba(200, 194, 182, 0.97);
+}
+
+[data-skin='pocket'] .linkcard {
+  background: var(--bg-raised);
+  box-shadow: inset 0 0 0 1px rgba(60, 50, 40, 0.16), 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Buttons the base styles paint dark-on-amber or on dark walnut. */
+[data-skin='pocket'] .linkcard-btn {
+  color: #eef2e4;
+}
+
+[data-skin='pocket'] .sresult-tool,
+[data-skin='pocket'] .crate-tool {
+  color: var(--ink);
+  background: rgba(214, 209, 198, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(60, 50, 40, 0.2), 0 1px 3px rgba(60, 50, 40, 0.25);
+}
+
+[data-skin='pocket'] .sresult-tool:hover,
+[data-skin='pocket'] .crate-tool:hover {
+  color: var(--amber);
+}
+
+[data-skin='pocket'] .settings-title,
+[data-skin='pocket'] .set-heading {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-variation-settings: normal;
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+
+/* ── Scrollbars, selection, focus ──────────────────────────────────────── */
+
+[data-skin='pocket'] .scroll::-webkit-scrollbar-thumb {
+  background: rgba(45, 48, 64, 0.22);
+}
+
+[data-skin='pocket'] ::selection {
+  background: var(--lcd-2);
+  color: var(--lcd-0);
+}
+
+[data-skin='pocket'] :focus-visible {
+  outline: 2px solid var(--amber-hot);
+  outline-offset: 2px;
+}
+
+/* The phone's header strip is plastic, not glass. */
+[data-skin='pocket'] .phone-head .room-name {
+  font-family: var(--pixel);
+  font-size: 22px;
+}
+
+[data-skin='pocket'] .phone-head .room-with {
+  color: var(--cream-dim);
+}
+
+/* ── Pocket on a phone ─────────────────────────────────────────────────────
+   The handheld the way it was held: upright. The cover sits over the type
+   on the LCD; the D-pad and the A/B pair share a row, the pills below. */
+
+html[data-shell='phone'] .stage-pocket .stage-body {
+  flex: none;
+}
+
+html[data-shell='phone'] .pocket {
+  container-type: inline-size;
+  padding: 8px 8px 12px;
+  --art: clamp(140px, 48cqw, 220px);
+}
+
+html[data-shell='phone'] .pk-body {
+  padding: 18px 12px 16px;
+  border-radius: 18px;
+}
+
+html[data-shell='phone'] .pk-bezel {
+  flex: none;
+  padding: 12px;
+}
+
+html[data-shell='phone'] .pk-lcd {
+  gap: 10px;
+  padding: 8px 10px 6px;
+}
+
+html[data-shell='phone'] .pk-status {
+  font-size: 16px;
+  gap: 8px;
+}
+
+html[data-shell='phone'] .pk-main {
+  flex-direction: column;
+  gap: 10px;
+}
+
+html[data-shell='phone'] .pk-text {
+  width: 100%;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+}
+
+html[data-shell='phone'] .pk-title {
+  font-size: clamp(26px, 9cqw, 36px);
+}
+
+html[data-shell='phone'] .pk-artist {
+  font-size: 22px;
+}
+
+html[data-shell='phone'] .pk-album {
+  max-width: 100%;
+  font-size: 17px;
+}
+
+html[data-shell='phone'] .pk-track {
+  display: none;
+}
+
+html[data-shell='phone'] .pk-mark {
+  padding: 10px 4px 0;
+}
+
+html[data-shell='phone'] .pk-controls {
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'dpad ab'
+    'pills pills';
+  justify-content: space-between;
+  row-gap: 10px;
+  padding: 10px 2px 0;
+}
+
+html[data-shell='phone'] .pk-dpad-wrap {
+  grid-area: dpad;
+}
+
+html[data-shell='phone'] .pk-dpad {
+  --arm: 33px;
+}
+
+html[data-shell='phone'] .pk-ab {
+  grid-area: ab;
+  gap: 12px;
+}
+
+html[data-shell='phone'] .pk-pills {
+  grid-area: pills;
+}

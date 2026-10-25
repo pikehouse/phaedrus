@@ -16,6 +16,7 @@ import PrismStage from './PrismStage';
 import PuttyStage, { PuttyGrille, useTrackPop } from './PuttyStage';
 import KissaStage from './KissaStage';
 import KissaDeck from './KissaDeck';
+import PocketStage from './PocketStage';
 import '../styles/nowplaying.css';
 
 /** How long each line of the board's cycling sub-head holds before it turns. */
@@ -219,6 +220,20 @@ export default function NowPlaying() {
         <div className="stage-scroll">
           <div className="stage-body">
             <PrismStage />
+          </div>
+        </div>
+
+        {faceplate}
+      </section>
+    );
+  }
+
+  if (skin === 'pocket') {
+    return (
+      <section className="stage stage-pocket" aria-label="Now playing">
+        <div className="stage-scroll">
+          <div className="stage-body">
+            <PocketStage />
           </div>
         </div>
 

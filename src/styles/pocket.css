@@ -1,0 +1,727 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   POCKET — the handheld.
+
+   Shared components are re-pointed in skin-pocket.css; this file owns the
+   console: the warm gray body, the charcoal bezel and its four-shade LCD,
+   the D-pad, the two round buttons, the pills, the power lamp and the
+   speaker grille. Every class here only ever renders in this skin.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── The stage becomes a desk with the handheld on it ──────────────────── */
+
+.stage-pocket .stage-scroll {
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+}
+
+.stage-pocket .stage-body {
+  width: 100%;
+  max-width: none;
+  align-items: stretch;
+  gap: 0;
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+.pocket {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  container: pocket / size;
+  padding: clamp(14px, 3cqh, 28px) clamp(16px, 4cqw, 44px);
+  /* The same plastic, a shade deeper, so the handheld still stands off it. */
+  background:
+    radial-gradient(70% 60% at 50% 30%, rgba(255, 255, 255, 0.22), transparent 70%),
+    linear-gradient(180deg, #c6c0b4, #bab3a6);
+  /* The picture on the screen: as big as the body leaves room for. */
+  --art: clamp(104px, min(30cqw, calc(100cqh - 330px)), 300px);
+}
+
+/* ── The body ──────────────────────────────────────────────────────────── */
+
+.pk-body {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px clamp(18px, 4cqw, 40px) 18px;
+  border-radius: 22px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.2 0 0 0 0 0.18 0 0 0 0 0.15 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #d6d1c6 0%, #cbc5b9 40%, #bfb8ab 100%);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.14),
+    inset 2px 0 0 rgba(255, 255, 255, 0.25),
+    inset -2px 0 0 rgba(0, 0, 0, 0.08),
+    0 16px 32px rgba(60, 48, 36, 0.32),
+    0 3px 6px rgba(60, 48, 36, 0.25);
+}
+
+/* Moulded grip lines along the top edge. */
+.pk-ridges {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 34%;
+  height: 7px;
+  transform: translateX(-50%);
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.12) 0 1px,
+    rgba(255, 255, 255, 0.45) 1px 2px,
+    transparent 2px 3.5px
+  );
+  border-radius: 2px;
+}
+
+/* ── The bezel and the LCD ─────────────────────────────────────────────── */
+
+.pk-bezel {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: 820px;
+  display: flex;
+  padding: clamp(12px, 2.6cqh, 22px) clamp(16px, 4cqw, 34px);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #4a4b52, #3c3d43);
+  box-shadow:
+    inset 0 2px 3px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.pk-lcd {
+  --lcd-0: #c3cd8f;
+  --lcd-1: #8ea062;
+  --lcd-2: #516b40;
+  --lcd-3: #24361f;
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.8cqh, 14px);
+  padding: 10px 14px 8px;
+  border-radius: 3px;
+  overflow: hidden;
+  font-family: var(--pixel);
+  color: var(--lcd-3);
+  background:
+    radial-gradient(120% 90% at 30% 20%, rgba(255, 255, 230, 0.12), transparent 60%),
+    var(--lcd-0);
+  box-shadow:
+    inset 3px 3px 6px rgba(20, 30, 10, 0.35),
+    inset -1px -1px 0 rgba(255, 255, 230, 0.2),
+    0 0 0 2px #2b2c31;
+  /* The ink sits a hair above the glass and throws a faint shadow onto it. */
+  text-shadow: 1px 1px 0 rgba(36, 54, 31, 0.16);
+}
+
+/* The dot grid, faint enough to read through. */
+.pk-lcd::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(36, 54, 31, 0.05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(180deg, rgba(36, 54, 31, 0.05) 0 1px, transparent 1px 3px);
+}
+
+/* ── Status line ───────────────────────────────────────────────────────── */
+
+.pk-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.pk-status-room {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pk-status-src {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pk-flags {
+  display: flex;
+  gap: 4px;
+}
+
+/* An unlit LCD segment is still faintly there; a lit one is inverted. */
+.pk-flags i {
+  font-style: normal;
+  font-size: 15px;
+  padding: 1px 3px 0;
+  color: var(--lcd-1);
+  text-shadow: none;
+}
+
+.pk-flags i.is-on {
+  color: var(--lcd-0);
+  background: var(--lcd-3);
+}
+
+.pk-state {
+  width: 20px;
+  text-align: right;
+  font-size: 15px;
+}
+
+/* ── Cover and type ────────────────────────────────────────────────────── */
+
+.pk-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 3cqw, 28px);
+}
+
+.pk-art {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.pk-art-screen {
+  position: relative;
+  width: var(--art);
+  height: var(--art);
+  display: grid;
+  place-items: center;
+  background: var(--lcd-1);
+  box-shadow: 0 0 0 2px var(--lcd-3);
+}
+
+.pk-art-dots,
+.pk-art-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+/* No CORS to read the cover back: the plain picture under a green wash. */
+.pk-art-img.is-wash {
+  filter: grayscale(1) contrast(1.15) brightness(1.05);
+  mix-blend-mode: multiply;
+}
+
+.pk-art-screen:has(.is-wash) {
+  background: var(--lcd-0);
+}
+
+.pk-art-note {
+  width: 46%;
+  height: 46%;
+  fill: var(--lcd-3);
+  opacity: 0.85;
+}
+
+.pk-art-toggle {
+  font-family: var(--pixel);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  padding: 1px 6px 0;
+  color: var(--lcd-3);
+  box-shadow: inset 0 0 0 1.5px var(--lcd-3);
+}
+
+.pk-art-toggle:hover,
+.pk-art-toggle[aria-pressed='true'] {
+  color: var(--lcd-0);
+  background: var(--lcd-3);
+}
+
+.pk-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.pk-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pk-title {
+  font-family: var(--pixel);
+  font-weight: 400;
+  font-size: clamp(30px, 6.4cqw, 66px);
+  line-height: 0.98;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+}
+
+.pk-title.is-idle {
+  color: var(--lcd-2);
+}
+
+.pk-artist {
+  font-size: clamp(21px, 3.6cqw, 38px);
+  line-height: 1.05;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.pk-album {
+  font-size: clamp(17px, 2.6cqw, 26px);
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pk-track {
+  margin-top: 4px;
+  font-size: 17px;
+  letter-spacing: 0.06em;
+}
+
+/* ── Progress: a block bar on the glass ────────────────────────────────── */
+
+.pk-lcd .progress {
+  max-width: none;
+  gap: 10px;
+}
+
+.pk-lcd .progress-time {
+  font-family: var(--pixel);
+  font-size: 19px;
+  min-width: 40px;
+  letter-spacing: 0.02em;
+  color: var(--lcd-3);
+}
+
+.pk-lcd .progress-track {
+  height: 22px;
+}
+
+.pk-lcd .progress-groove {
+  inset: 5px 0;
+  border-radius: 0;
+  background: var(--lcd-0);
+  box-shadow: inset 0 0 0 2px var(--lcd-3);
+}
+
+.pk-lcd .progress-played {
+  top: 8px;
+  height: 6px;
+  margin-left: 3px;
+  max-width: calc(100% - 6px);
+  border-radius: 0;
+  background: repeating-linear-gradient(90deg, var(--lcd-3) 0 6px, transparent 6px 8px);
+  box-shadow: none;
+}
+
+.pk-lcd .progress-cap {
+  width: 4px;
+  height: 16px;
+  margin-left: -2px;
+  border-radius: 0;
+  background: var(--lcd-3);
+  box-shadow: none;
+}
+
+.pk-lcd .progress-track:hover .progress-cap,
+.pk-lcd .progress-track.is-scrubbing .progress-cap {
+  width: 6px;
+  height: 18px;
+  margin-left: -3px;
+}
+
+.pk-lcd .progress-live .label {
+  font-family: var(--pixel);
+  color: var(--lcd-3);
+}
+
+.pk-lcd .live-pip {
+  border-radius: 0;
+  background: var(--lcd-3);
+  box-shadow: none;
+  animation: none;
+}
+
+.pk-lcd .progress-live-rule {
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--lcd-3) 0 4px, transparent 4px 8px);
+}
+
+/* ── Under the screen: the lamp and the name ───────────────────────────── */
+
+.pk-mark {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  max-width: 820px;
+  padding: 10px 6px 0;
+}
+
+.pk-power {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #8a5550, #4a2622);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: background 600ms var(--ease), box-shadow 600ms var(--ease);
+}
+
+.pk-power.is-lit {
+  background: radial-gradient(circle at 35% 30%, #ffb3a6, #ff3b2b 55%, #b0150c);
+  box-shadow: 0 0 6px rgba(255, 59, 43, 0.75), 0 0 14px rgba(255, 59, 43, 0.35);
+}
+
+.pk-power-label,
+.pk-print {
+  font-family: var(--printed);
+  font-style: italic;
+  font-variation-settings: 'wdth' 100, 'wght' 700;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: #3e4256;
+  white-space: nowrap;
+}
+
+.pk-name {
+  margin-left: auto;
+  font-family: var(--printed);
+  font-style: italic;
+  font-variation-settings: 'wdth' 110, 'wght' 800;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: #3e4256;
+}
+
+.pk-name b {
+  font-family: var(--pixel);
+  font-style: normal;
+  font-size: 21px;
+  letter-spacing: 0.02em;
+  color: #2f6b4a;
+}
+
+/* ── Controls ──────────────────────────────────────────────────────────── */
+
+.pk-controls {
+  position: relative;
+  flex: none;
+  width: 100%;
+  max-width: 820px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: clamp(10px, 2.4cqh, 22px) clamp(4px, 2cqw, 20px) 0;
+  padding-right: calc(clamp(4px, 2cqw, 20px) + 96px); /* the grille */
+}
+
+/* The D-pad: a charcoal cross, its printed functions round it. */
+.pk-dpad-wrap {
+  position: relative;
+  display: grid;
+  grid-template-areas:
+    '. up .'
+    'left pad right'
+    '. down .';
+  align-items: center;
+  justify-items: center;
+  gap: 4px 6px;
+}
+
+.pk-print-up {
+  grid-area: up;
+}
+
+.pk-print-down {
+  grid-area: down;
+}
+
+.pk-print-left {
+  grid-area: left;
+}
+
+.pk-print-right {
+  grid-area: right;
+}
+
+.pk-dpad {
+  grid-area: pad;
+  --arm: 34px;
+  position: relative;
+  width: calc(var(--arm) * 3);
+  height: calc(var(--arm) * 3);
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.4));
+}
+
+/* A shallow round well the cross sits in. */
+.pk-dpad::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.02) 70%, transparent 72%);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.pk-dir {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: var(--arm);
+  height: var(--arm);
+  color: #8e8f97;
+  background: linear-gradient(180deg, #3a3b41, #2a2b30);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  transition: transform 80ms var(--ease), background 80ms var(--ease);
+}
+
+.pk-up {
+  left: var(--arm);
+  top: 0;
+  border-radius: 5px 5px 0 0;
+}
+
+.pk-down {
+  left: var(--arm);
+  bottom: 0;
+  border-radius: 0 0 5px 5px;
+  box-shadow: none;
+}
+
+.pk-left {
+  left: 0;
+  top: var(--arm);
+  border-radius: 5px 0 0 5px;
+}
+
+.pk-right {
+  right: 0;
+  top: var(--arm);
+  border-radius: 0 5px 5px 0;
+}
+
+/* Embossed arrows. */
+.pk-dir i {
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+}
+
+.pk-up i {
+  border-bottom-color: currentColor;
+  margin-top: -6px;
+}
+
+.pk-down i {
+  border-top-color: currentColor;
+  margin-bottom: -6px;
+}
+
+.pk-left i {
+  border-right-color: currentColor;
+  margin-left: -6px;
+}
+
+.pk-right i {
+  border-left-color: currentColor;
+  margin-right: -6px;
+}
+
+.pk-dpad-hub {
+  position: absolute;
+  left: var(--arm);
+  top: var(--arm);
+  width: var(--arm);
+  height: var(--arm);
+  background:
+    radial-gradient(circle, rgba(0, 0, 0, 0.35) 0 7px, transparent 9px),
+    #2f3035;
+  pointer-events: none;
+}
+
+.pk-dir:hover:not(:disabled) {
+  color: #c8c9cf;
+}
+
+.pk-dir:active:not(:disabled) {
+  background: linear-gradient(180deg, #232428, #2c2d32);
+  transform: scale(0.97);
+}
+
+.pk-dir:disabled {
+  color: #55565c;
+}
+
+/* The pills: grey rubber, flat across, their jobs printed under them. */
+.pk-pills {
+  display: flex;
+  justify-content: center;
+  gap: clamp(14px, 3cqw, 30px);
+}
+
+.pk-pill-wrap,
+.pk-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.pk-pill {
+  width: 50px;
+  height: 14px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #8e8d92, #6f6e74);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 2px 0 rgba(0, 0, 0, 0.25),
+    0 0 0 3px rgba(0, 0, 0, 0.07);
+  transition: transform 80ms var(--ease), background 200ms var(--ease);
+}
+
+.pk-pill.is-on {
+  background: linear-gradient(180deg, #5c5b61, #48474d);
+}
+
+.pk-pill:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 0 3px rgba(0, 0, 0, 0.07);
+}
+
+.pk-pill:disabled {
+  opacity: 0.5;
+}
+
+/* A and B: two round buttons, set on a slant. */
+.pk-ab {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.pk-b {
+  margin-top: 26px;
+}
+
+.pk-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  font-family: var(--printed);
+  font-style: italic;
+  font-variation-settings: 'wdth' 100, 'wght' 800;
+  font-size: 15px;
+  color: rgba(255, 220, 210, 0.55);
+  background: radial-gradient(circle at 40% 32%, #cf5a54, #a8383a 55%, #84262b);
+  box-shadow:
+    inset 0 2px 1px rgba(255, 200, 190, 0.35),
+    inset 0 -3px 4px rgba(0, 0, 0, 0.3),
+    0 3px 0 #6a1d21,
+    0 5px 8px rgba(0, 0, 0, 0.35),
+    0 0 0 4px rgba(0, 0, 0, 0.07);
+  transition: transform 80ms var(--ease), box-shadow 80ms var(--ease);
+}
+
+.pk-btn:hover:not(:disabled) {
+  color: rgba(255, 230, 220, 0.85);
+}
+
+.pk-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 2px 1px rgba(255, 200, 190, 0.25),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.3),
+    0 1px 0 #6a1d21,
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    0 0 0 4px rgba(0, 0, 0, 0.07);
+}
+
+.pk-btn:disabled {
+  filter: saturate(0.4) brightness(0.9);
+}
+
+.pk-dir:focus-visible,
+.pk-pill:focus-visible,
+.pk-btn:focus-visible,
+.pk-art-toggle:focus-visible {
+  outline: 2px solid #2f6b4a;
+  outline-offset: 3px;
+}
+
+/* The speaker: a round field of holes in the corner. */
+.pk-grille {
+  position: absolute;
+  right: clamp(16px, 3cqw, 32px);
+  bottom: 18px;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #2c2a27 0 2px, rgba(0, 0, 0, 0.1) 2.6px, transparent 3.2px) 0 0 / 10px 10px;
+  -webkit-mask-image: radial-gradient(circle, #000 0 66%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 0 66%, transparent 68%);
+}
+
+/* ── Short or narrow rooms ─────────────────────────────────────────────── */
+
+@container pocket (max-height: 520px) {
+  .pk-ridges,
+  .pk-track {
+    display: none;
+  }
+
+  .pk-body {
+    padding-top: 14px;
+  }
+}
+
+@container pocket (max-width: 640px) {
+  .pk-grille {
+    display: none;
+  }
+
+  .pk-controls {
+    padding-right: clamp(4px, 2cqw, 20px);
+  }
+}

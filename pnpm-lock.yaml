@@ -29,6 +29,9 @@ importers:
       '@fontsource/ibm-plex-serif':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/jersey-10':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/karla':
         specifier: ^5.3.0
         version: 5.3.0
@@ -89,6 +92,9 @@ packages:
 
   '@fontsource/ibm-plex-serif@5.3.0':
     resolution: {integrity: sha512-zwPfHB7EJbS5B8qnitPigJYzNdnt6PUeaoOA1gAAt//1pjpTVZN5sOU14NIAZ+C1xypL6GWsUG2VMYJW9bhJqQ==}
+
+  '@fontsource/jersey-10@5.3.0':
+    resolution: {integrity: sha512-1dOTUg3JXm/Ls6j4BEPLRF5DHGadCGQy/sIHS7L0SWauB2rEd2W6614Xufxoc+TVXtrt8kVR6IWh3RFkXmy/Cw==}
 
   '@fontsource/karla@5.3.0':
     resolution: {integrity: sha512-zHBkxMumwFE+K4RgHQAv2xH0O2lAX9y4zPun5JEFZyNQQclZ5Oz/XvByE3CB5+rnxKEV5BXlZShIEfz0VILDmQ==}
@@ -503,6 +509,8 @@ snapshots:
   '@fontsource/ibm-plex-mono@5.3.0': {}
 
   '@fontsource/ibm-plex-serif@5.3.0': {}
+
+  '@fontsource/jersey-10@5.3.0': {}
 
   '@fontsource/karla@5.3.0': {}
 
