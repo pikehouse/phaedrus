@@ -1,6 +1,6 @@
 [package]
 name = "phaedrus"
-version = "0.2.0"
+version = "0.3.0"
 description = "Phaedrus — a warm, analog Sonos controller for the Mac"
 authors = ["JR Tipton"]
 edition = "2021"
