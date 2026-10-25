@@ -6,6 +6,7 @@ import Queue from './Queue';
 import Crate from './Crate';
 import RoomsRail from './RoomsRail';
 import { PuttyMini, PuttyVolume } from './PuttyStage';
+import { NightdriveMini, NightdriveVolume } from './NightdriveStage';
 import { useSkin } from '../store/skin';
 import { useRoomDots } from '../hooks/useRoomDots';
 import { Close, Disc, Gear, Search, Sleeves, Speaker, Tracklist } from './Icons';
@@ -34,6 +35,7 @@ export default function MobileShell() {
   const setSearchOpen = useSonos((s) => s.setSearchOpen);
   const openSettings = useSettingsPanel((s) => s.setOpen);
   const putty = useSkin((s) => s.skin === 'putty');
+  const nightdrive = useSkin((s) => s.skin === 'nightdrive');
   const dotOf = useRoomDots();
 
   // Fixed chrome outside this tree (the status strip, the search overlay)
@@ -103,10 +105,12 @@ export default function MobileShell() {
       <main className="phone-page" data-tab={tab}>
         {tab === 'now' && <NowPlaying />}
         {tab === 'queue' && putty && <PuttyMini onOpen={() => setTab('now')} />}
+        {tab === 'queue' && nightdrive && <NightdriveMini onOpen={() => setTab('now')} />}
         {tab === 'queue' && <Queue />}
         {tab === 'crate' && <Crate />}
         {tab === 'rooms' && <RoomsRail />}
         {tab === 'rooms' && putty && <PuttyVolume />}
+        {tab === 'rooms' && nightdrive && <NightdriveVolume />}
       </main>
 
       <nav className="phone-tabs" role="tablist" aria-label="Sections">

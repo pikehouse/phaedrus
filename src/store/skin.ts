@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type Skin = 'hifi' | 'board' | 'tuner' | 'drive' | 'daylight' | 'deck' | 'prism' | 'putty' | 'kissa';
+export type Skin = 'hifi' | 'board' | 'tuner' | 'drive' | 'daylight' | 'deck' | 'prism' | 'putty' | 'kissa' | 'nightdrive';
 
 export const SKINS: { id: Skin; label: string; hint: string }[] = [
   { id: 'hifi', label: 'Hi-Fi', hint: 'Late night, warm lamp, a record spinning' },
@@ -12,6 +12,7 @@ export const SKINS: { id: Skin; label: string; hint: string }[] = [
   { id: 'prism', label: 'Prism', hint: 'Light through glass, a spectrum on the wall' },
   { id: 'putty', label: 'Putty', hint: 'Soft hardware, warm greys, a little grain' },
   { id: 'kissa', label: 'Kissa', hint: 'A Tokyo listening bar at 1 a.m., records and glass' },
+  { id: 'nightdrive', label: 'Nightdrive', hint: "'80s car stereo, orange keylight, brushed aluminium" },
 ];
 
 const KEY = 'phaedrus.skin';
@@ -19,7 +20,7 @@ const KEY = 'phaedrus.skin';
 function recall(): Skin {
   try {
     const v = localStorage.getItem(KEY);
-    if (v === 'hifi' || v === 'board' || v === 'tuner' || v === 'drive' || v === 'daylight' || v === 'deck' || v === 'prism' || v === 'putty' || v === 'kissa') return v;
+    if (v === 'hifi' || v === 'board' || v === 'tuner' || v === 'drive' || v === 'daylight' || v === 'deck' || v === 'prism' || v === 'putty' || v === 'kissa' || v === 'nightdrive') return v;
   } catch {
     /* private mode — fall through to the default */
   }

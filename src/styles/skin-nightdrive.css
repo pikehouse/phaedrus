@@ -1,0 +1,2115 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   NIGHTDRIVE SKIN — an '80s car stereo head unit in a brushed aluminium
+   dash. Design: Marshall (docs/skins/nightdrive.md and the Claude Design
+   canvas "Phaedrus · Nightdrive skin").
+
+   Every panel is a matte black faceplate with a thin chrome-grey bezel.
+   Keys are black rubber with orange backlit legends: lit when the function
+   is on, dark amber when off. The track title, clock, times and volume read
+   out on an orange 14-segment display behind smoked glass, the unlit
+   segments faintly visible (NightdriveSegments). Rooms are numbered preset
+   keys, levels are orange LED ladders, and the knob wears an orange light
+   ring that shows the level. One mode only: it is already a night look.
+   One accent (keylight orange) plus a green stereo/playing lamp.
+
+   The tokens are re-pointed first, so anything that only speaks in tokens
+   restyles for free; the rest is the work tokens can't do. The stage and
+   the volume deck are NightdriveStage's own markup (.nd-*). Phone rules live
+   here too, at the bottom, scoped to [data-shell='phone'].
+   Everything is keyed off [data-skin='nightdrive'] on <html>.
+
+   Fonts (OFL, bundled from @fontsource in fonts.css):
+     NightdriveSegments            the track playing now, clock, times, VOL
+     Barlow 500                    things you pick: rooms, tracks, sleeves
+     Barlow Condensed 600/700      everything else, upper case, tracked
+     Michroma 400                  silkscreen headings
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* The level behind the knob's light ring, registered so the ring eases. */
+@property --nd-level {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+[data-skin='nightdrive'] {
+  color-scheme: dark;
+
+  /* ── Nightdrive's own palette ─────────────────────────────────────────── */
+  --nd-alu: #2c2e31;
+  --nd-face: #111111;
+  --nd-bezel: #2a2a29;
+  --nd-key: #232323;
+  --nd-tray: #070707;
+  --nd-glass: #0a0705;
+  --nd-text: #e6e1d9;
+  --nd-silk: #bdb7ae;
+  --nd-silk-2: #8c877f;
+  --nd-dim: #a9a39a;
+  --nd-key-on: #ff8a2e;
+  --nd-keylight: #ff7a1a;
+  --nd-seg: #ff9a3c;
+  --nd-seg-ghost: rgba(255, 120, 30, 0.08);
+  --nd-hot: #ffb160;
+  --nd-key-off: #7a3a10;
+  --nd-ann-off: #5a2a0c;
+  --nd-st: #7bd36a;
+
+  --nd-sans: 'Barlow', 'Helvetica Neue', Arial, sans-serif;
+  --nd-cond: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --nd-silkscreen: 'Michroma', 'Barlow Condensed', sans-serif;
+
+  /* The physical vocabulary, named once. */
+  --nd-alu-ground:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%, rgba(0, 0, 0, 0.25)),
+    url('./nightdrive/alu.svg'),
+    linear-gradient(165deg, #3b3d40, #2c2e31 60%, #24262a);
+  --nd-plate: linear-gradient(180deg, #171717, #0e0e0e);
+  --nd-plate-lift: 0 0 0 1px #000, 0 0 0 3px #2a2a29, 0 0 0 4px #050505, 0 22px 36px -18px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --nd-glass-ground: radial-gradient(120% 140% at 20% 0%, #1a120c, #0a0705 60%);
+  --nd-glass-sink: inset 0 3px 8px rgba(0, 0, 0, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 1px 0 rgba(255, 255, 255, 0.06);
+  --nd-tray-sink: inset 0 2px 5px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.05);
+  --nd-key-face: linear-gradient(180deg, #2b2b2b, #1b1b1b);
+  --nd-key-up: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 3px 0 #050505, 0 5px 8px -3px rgba(0, 0, 0, 0.9);
+  --nd-key-down: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 1px 0 #050505, 0 2px 4px -2px rgba(0, 0, 0, 0.9);
+  --nd-key-small: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 0 #050505;
+  --nd-raised: linear-gradient(180deg, #262626, #1a1a1a);
+  --nd-raised-lift: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 0 #050505, 0 6px 12px -6px rgba(0, 0, 0, 0.9);
+  --nd-glow-text: 0 0 5px rgba(255, 122, 26, 0.7);
+  --nd-glow-icon: drop-shadow(0 0 3px rgba(255, 122, 26, 0.75));
+  --nd-glow-seg: drop-shadow(0 0 2.5px rgba(255, 122, 26, 0.85));
+  --nd-glow-green: 0 0 5px rgba(123, 211, 106, 0.6);
+  --nd-sheen: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.45));
+
+  /* ── Hi-Fi tokens, re-pointed ─────────────────────────────────────────── */
+  --bg-deep: #24262a;
+  --bg: #2c2e31;
+  --bg-raised: #171717;
+  --walnut: #111111;
+  --walnut-light: #1b1b1b;
+
+  --cream: #e6e1d9;
+  --cream-dim: #bdb7ae;
+  --cream-faint: #8c877f;
+  --cream-ghost: rgba(230, 225, 217, 0.1);
+
+  /* The lamp becomes keylight orange. */
+  --amber: #ff8a2e;
+  --amber-hot: #ffb160;
+  --amber-glow: rgba(255, 122, 26, 0.35);
+
+  --rust: #ff7a1a;
+  --burgundy: #1c1a18;
+  --wine: #0c0b0a;
+  --olive: #1c1a18;
+  --mustard: #1c1a18;
+
+  --display: 'Barlow Condensed', sans-serif;
+  --face: 'Barlow', sans-serif;
+
+  --radius: 6px;
+  --lift: 0 0 0 1px #000, 0 0 0 3px #2a2a29, 0 0 0 4px #050505, 0 22px 36px -18px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --sink: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='nightdrive'] body {
+  background: var(--nd-alu);
+  color: var(--nd-text);
+  font-family: var(--nd-sans);
+  font-synthesis: none;
+}
+
+/* Barlow has none of Fraunces's axes. */
+[data-skin='nightdrive'] .room-name,
+[data-skin='nightdrive'] .arrange-name,
+[data-skin='nightdrive'] .qrow-title,
+[data-skin='nightdrive'] .crate-caption,
+[data-skin='nightdrive'] .crate-bill-title,
+[data-skin='nightdrive'] .sresult-title,
+[data-skin='nightdrive'] .search-input,
+[data-skin='nightdrive'] .search-drill-title,
+[data-skin='nightdrive'] .curtain-title,
+[data-skin='nightdrive'] .boundary-title,
+[data-skin='nightdrive'] .panel-empty-line,
+[data-skin='nightdrive'] .search-prompt,
+[data-skin='nightdrive'] .linkcard-title,
+[data-skin='nightdrive'] .settings-title,
+[data-skin='nightdrive'] .set-heading {
+  font-variation-settings: normal;
+  text-shadow: none;
+}
+
+/* No lamp, no light leak, no film grain: the light here is the keylight. */
+[data-skin='nightdrive'] .atmo-leak,
+[data-skin='nightdrive'] .atmo-vignette,
+[data-skin='nightdrive'] .atmo-grain {
+  display: none;
+}
+
+/* ── The dash and its faceplates ───────────────────────────────────────── */
+
+[data-skin='nightdrive'] .shell,
+[data-skin='nightdrive'] .phone,
+[data-skin='nightdrive'] .curtain,
+[data-skin='nightdrive'] .boundary {
+  background: var(--nd-alu-ground);
+}
+
+[data-skin='nightdrive'] .shell {
+  gap: 16px;
+  padding: 16px;
+}
+
+[data-skin='nightdrive'] .rooms,
+[data-skin='nightdrive'] .right-rail,
+[data-skin='nightdrive'] .stage-scroll,
+[data-skin='nightdrive'] .nd-module {
+  border: 0;
+  border-radius: 6px;
+  background: var(--nd-plate);
+  box-shadow: var(--nd-plate-lift);
+}
+
+[data-skin='nightdrive'] .rooms,
+[data-skin='nightdrive'] .right-rail {
+  z-index: auto;
+}
+
+/* The traffic lights sit over the rooms module's top edge. */
+[data-skin='nightdrive'] .rooms-drag,
+[data-skin='nightdrive'] .right-drag {
+  height: 22px;
+}
+
+/* ── Type: Barlow Condensed caps for labels, Michroma for silkscreen ───── */
+
+[data-skin='nightdrive'] .label {
+  font-family: var(--nd-cond);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .num {
+  font-family: var(--nd-cond);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+}
+
+[data-skin='nightdrive'] .nd-silk,
+[data-skin='nightdrive'] .rooms-head .label {
+  font-family: var(--nd-silkscreen);
+  font-size: 9.5px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .nd-cap {
+  font-family: var(--nd-cond);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+  white-space: nowrap;
+}
+
+/* ── Keys, trays and windows (the shared vocabulary) ───────────────────── */
+
+[data-skin='nightdrive'] .nd-key,
+[data-skin='nightdrive'] .rooms-arrange,
+[data-skin='nightdrive'] .panel-action,
+[data-skin='nightdrive'] .rooms-everywhere,
+[data-skin='nightdrive'] .right-tab,
+[data-skin='nightdrive'] .right-search,
+[data-skin='nightdrive'] .crate-filter,
+[data-skin='nightdrive'] .crate-tool,
+[data-skin='nightdrive'] .sresult-tool,
+[data-skin='nightdrive'] .curtain-btn,
+[data-skin='nightdrive'] .boundary-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 5px;
+  background: var(--nd-key-face);
+  box-shadow: var(--nd-key-up);
+  color: var(--nd-key-off);
+  font-family: var(--nd-cond);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition:
+    color 240ms ease,
+    text-shadow 240ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+[data-skin='nightdrive'] .nd-key svg,
+[data-skin='nightdrive'] .right-search svg {
+  fill: currentColor;
+  transition: filter 240ms ease;
+}
+
+[data-skin='nightdrive'] .nd-key.is-lit,
+[data-skin='nightdrive'] .rooms-everywhere,
+[data-skin='nightdrive'] .right-tab.is-active,
+[data-skin='nightdrive'] .right-search,
+[data-skin='nightdrive'] .crate-filter.is-on,
+[data-skin='nightdrive'] .crate-tool,
+[data-skin='nightdrive'] .sresult-tool,
+[data-skin='nightdrive'] .curtain-btn,
+[data-skin='nightdrive'] .boundary-btn {
+  color: var(--nd-key-on);
+  text-shadow: var(--nd-glow-text);
+}
+
+[data-skin='nightdrive'] .nd-key.is-lit svg,
+[data-skin='nightdrive'] .right-search svg,
+[data-skin='nightdrive'] .crate-tool svg,
+[data-skin='nightdrive'] .sresult-tool svg {
+  filter: var(--nd-glow-icon);
+}
+
+/* A key drops 2px while held, and stays down while its function runs. */
+[data-skin='nightdrive'] .nd-key:active:not(:disabled),
+[data-skin='nightdrive'] .nd-key.is-down,
+[data-skin='nightdrive'] .rooms-arrange:active,
+[data-skin='nightdrive'] .panel-action:active,
+[data-skin='nightdrive'] .rooms-everywhere:active:not(:disabled),
+[data-skin='nightdrive'] .right-tab:active,
+[data-skin='nightdrive'] .right-search:active,
+[data-skin='nightdrive'] .crate-filter:active,
+[data-skin='nightdrive'] .crate-tool:active,
+[data-skin='nightdrive'] .curtain-btn:active:not(:disabled),
+[data-skin='nightdrive'] .boundary-btn:active {
+  transform: translateY(2px);
+  box-shadow: var(--nd-key-down);
+}
+
+[data-skin='nightdrive'] .nd-key:disabled {
+  cursor: default;
+}
+
+[data-skin='nightdrive'] .nd-legend {
+  font-size: 10px;
+  line-height: 1;
+}
+
+[data-skin='nightdrive'] .nd-tray {
+  border-radius: 6px;
+  background: var(--nd-tray);
+  box-shadow: var(--nd-tray-sink);
+}
+
+[data-skin='nightdrive'] .nd-window {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--nd-glass-ground);
+  box-shadow: var(--nd-glass-sink);
+  transition: opacity 400ms ease;
+}
+
+/* Smoked glass catches a little of the room. */
+[data-skin='nightdrive'] .nd-window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 38%);
+  pointer-events: none;
+}
+
+[data-skin='nightdrive'] .nd-seg {
+  display: block;
+  flex: none;
+  filter: var(--nd-glow-seg);
+}
+
+/* Annunciators: lit orange, or a dark amber you can just make out. */
+[data-skin='nightdrive'] .nd-anns {
+  display: flex;
+  gap: 16px;
+}
+
+[data-skin='nightdrive'] .nd-ann {
+  font-family: var(--nd-cond);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--nd-ann-off);
+  transition: color 240ms ease, text-shadow 240ms ease;
+}
+
+[data-skin='nightdrive'] .nd-ann.is-lit {
+  color: var(--nd-key-on);
+  text-shadow: var(--nd-glow-text);
+}
+
+/* LED ladders: progress, room levels. */
+[data-skin='nightdrive'] .nd-ladder {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 3px;
+}
+
+[data-skin='nightdrive'] .nd-ladder.is-live {
+  padding: 8px 0;
+  margin: -8px 0;
+  cursor: pointer;
+  touch-action: none;
+}
+
+[data-skin='nightdrive'] .nd-ladder i {
+  flex: 1;
+  height: 9px;
+  border-radius: 1px;
+  background-color: var(--nd-seg-ghost);
+  box-shadow: inset 0 0 0 1px rgba(255, 120, 30, 0.06);
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+[data-skin='nightdrive'] .nd-ladder i.is-on {
+  background-color: var(--nd-key-on);
+  box-shadow: 0 0 5px rgba(255, 122, 26, 0.7);
+}
+
+[data-skin='nightdrive'] .nd-ladder i.is-hot {
+  background-color: var(--nd-hot);
+}
+
+[data-skin='nightdrive'] .nd-spacer {
+  flex: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STAGE (NightdriveStage)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+[data-skin='nightdrive'] .stage {
+  gap: 16px;
+  background: transparent;
+}
+
+[data-skin='nightdrive'] .stage > .stage-scroll {
+  flex: 1 0 auto;
+  align-items: stretch;
+  padding: 22px 28px 24px;
+  overflow: visible;
+}
+
+[data-skin='nightdrive'] .stage-nightdrive .stage-body {
+  display: block;
+  width: 100%;
+  max-width: none;
+  margin: auto 0;
+}
+
+[data-skin='nightdrive'] .nightdrive {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Paused, the display windows dim to 60%. The clock never blinks. */
+[data-skin='nightdrive'] .nightdrive:not(.is-playing) .nd-window,
+[data-skin='nightdrive'] .nd-mini:not(.is-playing) .nd-window {
+  opacity: 0.6;
+}
+
+/* The status line: room, queue position, the green lamps. */
+[data-skin='nightdrive'] .nd-top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+[data-skin='nightdrive'] .nd-top .nd-cap {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-skin='nightdrive'] .nd-room {
+  flex: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nd-key-on);
+  text-shadow: var(--nd-glow-text);
+}
+
+[data-skin='nightdrive'] .nd-lamps {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-family: var(--nd-cond);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-st);
+  text-shadow: var(--nd-glow-green);
+}
+
+[data-skin='nightdrive'] .nd-state {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  opacity: 0.25;
+  transition: opacity 400ms ease;
+}
+
+[data-skin='nightdrive'] .nd-lamps.is-playing .nd-state {
+  opacity: 1;
+}
+
+[data-skin='nightdrive'] .nd-state i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--nd-st);
+  box-shadow: 0 0 6px rgba(123, 211, 106, 0.8);
+}
+
+/* The display window: annunciators over the segment title. */
+[data-skin='nightdrive'] .nd-title-window {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px 14px;
+}
+
+[data-skin='nightdrive'] .nd-title-clip {
+  overflow: hidden;
+  min-width: 0;
+}
+
+[data-skin='nightdrive'] .nd-title-strip {
+  width: max-content;
+}
+
+/* The art in its bezel, the track beside it over the vents. */
+[data-skin='nightdrive'] .nd-head {
+  display: flex;
+  gap: 28px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+[data-skin='nightdrive'] .nd-art {
+  --nd-art: 236px;
+  position: relative;
+  flex: none;
+  align-self: flex-start;
+  padding: 8px;
+  border-radius: 4px;
+  background: var(--nd-tray);
+  box-shadow: 0 0 0 1px var(--nd-bezel), inset 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='nightdrive'] .nd-art img,
+[data-skin='nightdrive'] .nd-art-blank {
+  display: block;
+  width: var(--nd-art);
+  height: var(--nd-art);
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+[data-skin='nightdrive'] .nd-art-blank {
+  background: radial-gradient(circle at 30% 20%, #1c1a18, #0c0b0a 70%);
+}
+
+[data-skin='nightdrive'] .nd-art::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 3px;
+  background: var(--nd-sheen);
+  pointer-events: none;
+}
+
+/* Shorter windows give up art before anything else. */
+[data-skin='nightdrive'] .nd-art-desk {
+  --nd-art: clamp(140px, calc(100vh - 664px), 236px);
+}
+
+[data-skin='nightdrive'] .nd-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 6px;
+}
+
+[data-skin='nightdrive'] .nd-artist {
+  font-family: var(--nd-cond);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--nd-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+[data-skin='nightdrive'] .nd-title {
+  font-family: var(--nd-sans);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--nd-silk);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-skin='nightdrive'] .nd-album {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-skin='nightdrive'] .nd-vents {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 6px 8px;
+}
+
+[data-skin='nightdrive'] .nd-vents i {
+  height: 5px;
+  border-radius: 3px;
+  background: #050505;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9), 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Progress: elapsed · ladder · total. */
+[data-skin='nightdrive'] .nd-progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* The key tray and the clock window. */
+[data-skin='nightdrive'] .nd-deck-row {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+[data-skin='nightdrive'] .nd-keys {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 2fr 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 9px;
+}
+
+[data-skin='nightdrive'] .nd-keys .nd-key {
+  min-width: 0;
+  height: 62px;
+}
+
+[data-skin='nightdrive'] .nd-keys.is-compact {
+  grid-template-columns: 1fr 2fr 1fr;
+  padding: 8px;
+}
+
+[data-skin='nightdrive'] .nd-keys.is-compact .nd-key {
+  height: 54px;
+  border-radius: 6px;
+}
+
+[data-skin='nightdrive'] .nd-clock {
+  flex: none;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 14px;
+}
+
+[data-skin='nightdrive'] .nd-clock .nd-anns {
+  gap: 10px;
+}
+
+[data-skin='nightdrive'] .nd-clock .nd-ann {
+  font-size: 10px;
+}
+
+[data-skin='nightdrive'] .nd-clock.is-compact {
+  width: auto;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+}
+
+[data-skin='nightdrive'] .nd-clock.is-compact .nd-ann {
+  font-size: 9px;
+}
+
+/* ── The volume deck ───────────────────────────────────────────────────── */
+
+[data-skin='nightdrive'] .nd-deck {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 18px 28px;
+}
+
+[data-skin='nightdrive'] .nd-deck-vol {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+[data-skin='nightdrive'] .nd-vol {
+  padding: 8px 10px;
+}
+
+[data-skin='nightdrive'] .nd-vol.is-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+}
+
+[data-skin='nightdrive'] .nd-vol.is-inline .nd-silk {
+  font-size: 8px;
+}
+
+/* The knob: black rubber in an orange light ring that shows the level. */
+[data-skin='nightdrive'] .nd-knob {
+  --size: 150px;
+  --ring: 8px;
+  --cap: 30px;
+  --mask: radial-gradient(circle, transparent 58%, #000 59.5%, #000 66%, transparent 67.5%);
+  position: relative;
+  flex: none;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+  transition: --nd-level 180ms ease;
+}
+
+[data-skin='nightdrive'] .nd-knob.is-dragging {
+  cursor: grabbing;
+}
+
+[data-skin='nightdrive'] .nd-knob.is-rooms {
+  --size: 132px;
+  --ring: 4px;
+  --cap: 24px;
+}
+
+[data-skin='nightdrive'] .nd-knob.is-pocket {
+  --size: 60px;
+  --ring: 0px;
+  --cap: 11px;
+  --mask: radial-gradient(circle, transparent 60%, #000 62%, #000 70%, transparent 72%);
+}
+
+[data-skin='nightdrive'] .nd-knob-ring {
+  position: absolute;
+  inset: var(--ring);
+  border-radius: 50%;
+  background: conic-gradient(
+    from 225deg,
+    var(--nd-keylight) 0 calc(var(--nd-level) * 270deg),
+    rgba(255, 122, 26, 0.1) calc(var(--nd-level) * 270deg) 270deg,
+    transparent 270deg
+  );
+  -webkit-mask: var(--mask);
+  mask: var(--mask);
+  filter: drop-shadow(0 0 6px rgba(255, 122, 26, 0.8));
+}
+
+[data-skin='nightdrive'] .nd-knob-cap {
+  position: absolute;
+  inset: var(--cap);
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 28%, #3a3a3a, #161616 55%, #0b0b0b);
+  box-shadow:
+    0 10px 18px -6px rgba(0, 0, 0, 0.9),
+    inset 0 2px 1px rgba(255, 255, 255, 0.12),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6),
+    0 0 0 2px #050505;
+}
+
+/* The pointer turns with the level; the cap's highlight stays put. */
+[data-skin='nightdrive'] .nd-knob-pointer {
+  position: absolute;
+  inset: var(--cap);
+  transform: rotate(calc(-135deg + var(--nd-level) * 270deg));
+  pointer-events: none;
+}
+
+[data-skin='nightdrive'] .nd-knob-pointer::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  width: 4px;
+  height: 14px;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--nd-key-on);
+  box-shadow: 0 0 6px var(--nd-keylight);
+}
+
+[data-skin='nightdrive'] .nd-knob.is-rooms .nd-knob-pointer::before {
+  top: 7px;
+  height: 12px;
+}
+
+[data-skin='nightdrive'] .nd-knob.is-pocket .nd-knob-cap {
+  box-shadow:
+    0 6px 10px -4px rgba(0, 0, 0, 0.9),
+    inset 0 1px 1px rgba(255, 255, 255, 0.12),
+    0 0 0 2px #050505;
+}
+
+[data-skin='nightdrive'] .nd-knob.is-pocket .nd-knob-ring {
+  filter: drop-shadow(0 0 4px rgba(255, 122, 26, 0.8));
+}
+
+[data-skin='nightdrive'] .nd-knob.is-pocket .nd-knob-pointer::before {
+  top: 4px;
+  width: 3px;
+  height: 8px;
+  margin-left: -1.5px;
+  box-shadow: 0 0 4px var(--nd-keylight);
+}
+
+/* A ladder per room in the group. */
+[data-skin='nightdrive'] .nd-rooms-ladders {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+[data-skin='nightdrive'] .nd-rooms-ladders ul {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 122px;
+  margin: -4px;
+  padding: 4px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+[data-skin='nightdrive'] .nd-rooms-ladders li {
+  display: grid;
+  grid-template-columns: 30px minmax(60px, 110px) minmax(0, 1fr) 34px;
+  gap: 12px;
+  align-items: center;
+}
+
+[data-skin='nightdrive'] .nd-preset {
+  height: 26px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+[data-skin='nightdrive'] .nd-ladder-name {
+  font-family: var(--nd-sans);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--nd-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-skin='nightdrive'] .nd-ladder-value {
+  font-family: var(--nd-cond);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: right;
+  color: var(--nd-silk);
+}
+
+[data-skin='nightdrive'] .nd-rooms-ladders li.is-muted .nd-ladder-name,
+[data-skin='nightdrive'] .nd-rooms-ladders li.is-muted .nd-ladder-value {
+  color: var(--nd-silk-2);
+}
+
+/* A narrow stage: the clock drops under the keys, the art and deck shrink. */
+@container (max-width: 640px) {
+  [data-skin='nightdrive'] .stage > .stage-scroll {
+    padding: 18px 20px 20px;
+  }
+
+  [data-skin='nightdrive'] .nd-deck-row {
+    flex-direction: column;
+  }
+
+  [data-skin='nightdrive'] .nd-clock {
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  [data-skin='nightdrive'] .nd-head {
+    gap: 20px;
+  }
+
+  [data-skin='nightdrive'] .nd-art-desk {
+    --nd-art: clamp(120px, calc(100vh - 740px), 170px);
+  }
+
+  [data-skin='nightdrive'] .nd-artist {
+    font-size: 22px;
+  }
+
+  [data-skin='nightdrive'] .nd-keys .nd-legend {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  [data-skin='nightdrive'] .nd-deck {
+    gap: 20px;
+    padding: 14px 20px;
+  }
+
+  [data-skin='nightdrive'] .nd-deck .nd-knob {
+    --size: 112px;
+    --ring: 6px;
+    --cap: 22px;
+  }
+
+  [data-skin='nightdrive'] .nd-deck .nd-knob-pointer::before {
+    top: 6px;
+    height: 11px;
+  }
+
+  [data-skin='nightdrive'] .nd-deck-vol {
+    display: none;
+  }
+
+  [data-skin='nightdrive'] .nd-rooms-ladders li {
+    grid-template-columns: 26px minmax(50px, 80px) minmax(0, 1fr) 30px;
+    gap: 8px;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SHARED PANELS: rooms rail, queue, crate
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Rooms rail: preset keys ───────────────────────────────────────────── */
+
+[data-skin='nightdrive'] .rooms-head {
+  align-items: center;
+  padding: 0 20px 12px;
+}
+
+[data-skin='nightdrive'] .rooms-arrange,
+[data-skin='nightdrive'] .panel-action {
+  height: 26px;
+  padding: 0 10px;
+  font-size: 11px;
+  color: var(--nd-silk);
+}
+
+[data-skin='nightdrive'] .rooms-arrange:hover,
+[data-skin='nightdrive'] .panel-action:hover {
+  color: var(--nd-text);
+  background: var(--nd-key-face);
+}
+
+[data-skin='nightdrive'] .rooms-arrange.is-on,
+[data-skin='nightdrive'] .panel-action.is-armed {
+  color: var(--nd-key-on);
+  text-shadow: var(--nd-glow-text);
+  background: var(--nd-key-face);
+}
+
+[data-skin='nightdrive'] .rooms-list {
+  counter-reset: nd-preset;
+  padding: 0 14px 6px;
+}
+
+[data-skin='nightdrive'] .rooms-list > li {
+  counter-increment: nd-preset;
+}
+
+[data-skin='nightdrive'] .rooms-list li + li {
+  margin-top: 6px;
+}
+
+[data-skin='nightdrive'] .room {
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 5px;
+  transition: background var(--t) var(--ease), box-shadow var(--t) var(--ease);
+}
+
+[data-skin='nightdrive'] .room:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+[data-skin='nightdrive'] .room.is-selected {
+  background: var(--nd-raised);
+  box-shadow: var(--nd-raised-lift);
+}
+
+/* The room's preset key: lit for the group that's on. */
+[data-skin='nightdrive'] .room::before {
+  content: counter(nd-preset);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 28px;
+  border-radius: 4px;
+  background: var(--nd-key-face);
+  box-shadow: var(--nd-key-small);
+  font-family: var(--nd-cond);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--nd-key-off);
+  transition: color 240ms ease, text-shadow 240ms ease;
+}
+
+[data-skin='nightdrive'] .room.is-selected::before {
+  color: var(--nd-key-on);
+  text-shadow: var(--nd-glow-text);
+}
+
+[data-skin='nightdrive'] .room-marker {
+  display: none;
+}
+
+[data-skin='nightdrive'] .room-text {
+  gap: 2px;
+}
+
+[data-skin='nightdrive'] .room-name,
+[data-skin='nightdrive'] .room:hover .room-name {
+  font-family: var(--nd-sans);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.2;
+  color: var(--nd-dim);
+}
+
+[data-skin='nightdrive'] .room.is-selected .room-name,
+[data-skin='nightdrive'] .room:hover .room-name {
+  color: var(--nd-text);
+}
+
+[data-skin='nightdrive'] .room-with {
+  font-family: var(--nd-cond);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+/* The active room's lamp, on the right. */
+[data-skin='nightdrive'] .room.is-selected::after {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--nd-keylight);
+  box-shadow: 0 0 8px 1px rgba(255, 122, 26, 0.8);
+}
+
+[data-skin='nightdrive'] .room .bars {
+  display: none;
+}
+
+/* "Everywhere": a full-width key. */
+[data-skin='nightdrive'] .rooms-everywhere {
+  flex-direction: row;
+  height: 44px;
+  margin: 8px 18px 0;
+  padding: 0;
+}
+
+[data-skin='nightdrive'] .rooms-everywhere .label,
+[data-skin='nightdrive'] .rooms-everywhere:hover:not(:disabled) .label {
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: inherit;
+}
+
+[data-skin='nightdrive'] .rooms-everywhere-rule {
+  display: none;
+}
+
+[data-skin='nightdrive'] .rooms-foot {
+  border-top: 0;
+  padding: 14px 22px 16px;
+}
+
+[data-skin='nightdrive'] .rooms-status,
+[data-skin='nightdrive'] .rooms-rescan {
+  font-family: var(--nd-cond);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .rooms-rescan:hover:not(:disabled) {
+  color: var(--nd-key-on);
+}
+
+/* Arrange mode: each room's switch is a small key that lights when in. */
+[data-skin='nightdrive'] .arrange-hint {
+  font-family: var(--nd-sans);
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .arrange-hint em {
+  font-style: normal;
+  color: var(--nd-key-on);
+}
+
+[data-skin='nightdrive'] .arrange-name {
+  font-family: var(--nd-sans);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--nd-text);
+}
+
+[data-skin='nightdrive'] .switch {
+  background: var(--nd-tray);
+  box-shadow: var(--nd-tray-sink);
+}
+
+[data-skin='nightdrive'] .switch.is-on {
+  background: #3a1a06;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8), 0 0 8px rgba(255, 122, 26, 0.35);
+}
+
+[data-skin='nightdrive'] .switch-thumb {
+  background: var(--nd-key-face);
+  box-shadow: var(--nd-key-small);
+}
+
+[data-skin='nightdrive'] .switch.is-on .switch-thumb {
+  background: linear-gradient(180deg, #ff9a3c, #ff7a1a);
+  box-shadow: 0 0 8px rgba(255, 122, 26, 0.8);
+}
+
+/* ── Right rail: Queue and Crate as two keys in a tray, a search key ───── */
+
+[data-skin='nightdrive'] .right-tabs {
+  gap: 8px;
+  align-items: stretch;
+  padding: 0 14px 10px;
+}
+
+[data-skin='nightdrive'] .right-tabs-set {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+  border-radius: 6px;
+  background: var(--nd-tray);
+  box-shadow: var(--nd-tray-sink);
+}
+
+[data-skin='nightdrive'] .right-tab {
+  height: 36px;
+  padding: 0;
+  font-size: 13px;
+}
+
+[data-skin='nightdrive'] .right-tab:hover {
+  color: var(--nd-key-off);
+}
+
+[data-skin='nightdrive'] .right-tab.is-active,
+[data-skin='nightdrive'] .right-tab.is-active:hover {
+  color: var(--nd-key-on);
+}
+
+[data-skin='nightdrive'] .right-tab.is-active::after {
+  display: none;
+}
+
+[data-skin='nightdrive'] .right-search {
+  width: 48px;
+  height: auto;
+}
+
+[data-skin='nightdrive'] .right-search svg {
+  fill: none;
+  stroke-width: 2.2;
+}
+
+[data-skin='nightdrive'] .right-search:hover {
+  color: var(--nd-key-on);
+  background: var(--nd-key-face);
+}
+
+/* ── Queue ─────────────────────────────────────────────────────────────── */
+
+[data-skin='nightdrive'] .panel-head {
+  align-items: center;
+  padding: 6px 22px 6px;
+}
+
+/* A silkscreen heading on the left, the count on the right. */
+[data-skin='nightdrive'] .panel-head::before {
+  font-family: var(--nd-silkscreen);
+  font-size: 9.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .panel:has(> .queue) .panel-head::before {
+  content: 'Up next';
+}
+
+[data-skin='nightdrive'] .panel:has(> .crate) .panel-head::before {
+  content: 'Crate';
+}
+
+[data-skin='nightdrive'] .panel-head:has(.panel-action)::before {
+  margin-right: auto;
+}
+
+[data-skin='nightdrive'] .panel-count {
+  font-family: var(--nd-cond);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .panel-empty-line {
+  font-family: var(--nd-sans);
+  font-weight: 500;
+  font-style: normal;
+  font-size: 15px;
+  color: var(--nd-silk);
+}
+
+[data-skin='nightdrive'] .panel-empty-sub {
+  font-family: var(--nd-cond);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .queue {
+  counter-reset: nd-q;
+  padding: 0 14px 14px;
+}
+
+[data-skin='nightdrive'] .queue > li {
+  counter-increment: nd-q;
+}
+
+[data-skin='nightdrive'] .queue > li + li {
+  margin-top: 2px;
+}
+
+/* Tracks already played sit back a little. */
+[data-skin='nightdrive'] .queue > li:has(~ li .qrow.is-current) .qrow {
+  opacity: 0.55;
+}
+
+[data-skin='nightdrive'] .qrow {
+  border-radius: 5px;
+  transition: background var(--t) var(--ease), box-shadow var(--t) var(--ease), opacity var(--t) var(--ease);
+}
+
+[data-skin='nightdrive'] .qrow:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+[data-skin='nightdrive'] .qrow.is-current {
+  background: var(--nd-raised);
+  box-shadow: var(--nd-raised-lift);
+}
+
+[data-skin='nightdrive'] .qrow-main {
+  gap: 12px;
+  padding: 7px 10px;
+}
+
+/* The lit bar becomes the track's number, orange on the one playing. */
+[data-skin='nightdrive'] .qrow-marker,
+[data-skin='nightdrive'] .qrow.is-current .qrow-marker {
+  position: static;
+  flex: none;
+  width: 22px;
+  height: auto;
+  background: none;
+  box-shadow: none;
+  font-family: var(--nd-cond);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #6e6a63;
+}
+
+[data-skin='nightdrive'] .qrow-marker::before {
+  content: counter(nd-q, decimal-leading-zero);
+}
+
+[data-skin='nightdrive'] .qrow.is-current .qrow-marker {
+  color: var(--nd-key-on);
+  text-shadow: var(--nd-glow-text);
+}
+
+[data-skin='nightdrive'] .qrow-art {
+  width: 38px;
+  height: 38px;
+  border-radius: 3px;
+  background: var(--nd-face);
+  box-shadow: 0 0 0 2px var(--nd-tray);
+}
+
+[data-skin='nightdrive'] .qrow-art img,
+[data-skin='nightdrive'] .crate-face img {
+  filter: none;
+}
+
+[data-skin='nightdrive'] .qrow-art-blank {
+  background: radial-gradient(circle at 30% 20%, #2b2b2b, #111 70%);
+}
+
+[data-skin='nightdrive'] .qrow-art-glow {
+  display: none;
+}
+
+[data-skin='nightdrive'] .qrow-text {
+  gap: 2px;
+}
+
+[data-skin='nightdrive'] .qrow-title,
+[data-skin='nightdrive'] .qrow:hover .qrow-title,
+[data-skin='nightdrive'] .qrow.is-current .qrow-title {
+  font-family: var(--nd-sans);
+  font-size: 15px;
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: 0;
+  color: var(--nd-text);
+}
+
+[data-skin='nightdrive'] .qrow-artist {
+  font-family: var(--nd-cond);
+  font-size: 11px;
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .qrow-time,
+[data-skin='nightdrive'] .qrow.is-current .qrow-time {
+  font-family: var(--nd-cond);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .qrow-remove {
+  color: var(--nd-key-on);
+}
+
+[data-skin='nightdrive'] .qrow-remove:hover {
+  background: rgba(255, 122, 26, 0.14);
+}
+
+/* ── Crate: filter keys, a two-column grid of sleeves ──────────────────── */
+
+[data-skin='nightdrive'] .crate-filters {
+  flex: none;
+  display: flex;
+  gap: 6px;
+  padding: 4px 16px 10px;
+}
+
+[data-skin='nightdrive'] .crate-filter {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+}
+
+[data-skin='nightdrive'] .crate {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 12px;
+  padding: 6px 18px 18px;
+}
+
+[data-skin='nightdrive'] .crate-item {
+  gap: 7px;
+}
+
+[data-skin='nightdrive'] .crate-face {
+  border-radius: 3px;
+  background: var(--nd-face);
+  box-shadow: 0 0 0 3px var(--nd-tray), 0 0 0 4px var(--nd-bezel), 0 12px 18px -10px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='nightdrive'] .crate-item:hover .crate-face:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px var(--nd-tray), 0 0 0 4px #3a3a38, 0 16px 22px -10px rgba(0, 0, 0, 0.9);
+}
+
+[data-skin='nightdrive'] .crate-item:hover .crate-face img {
+  filter: none;
+}
+
+/* The sleeve's sheen, in place of paper wear. */
+[data-skin='nightdrive'] .crate-wear {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.16), rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.4));
+  mix-blend-mode: normal;
+  opacity: 1;
+  box-shadow: none;
+}
+
+/* A sleeve with no art (radio, mostly): smoked black, call letters lit. */
+[data-skin='nightdrive'] .crate-bill,
+[data-skin='nightdrive'] .crate-bill[class*='ground-'] {
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+  background: radial-gradient(circle at 30% 20%, #1c1a18, #0c0b0a 70%);
+}
+
+[data-skin='nightdrive'] .crate-bill-title,
+[data-skin='nightdrive'] .crate-bill[class*='ground-'] .crate-bill-title {
+  font-family: var(--nd-cond);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--nd-key-on);
+  text-shadow: 0 0 8px rgba(255, 122, 26, 0.75);
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+[data-skin='nightdrive'] .crate-bill-mark,
+[data-skin='nightdrive'] .crate-bill[class*='ground-'] .crate-bill-mark {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--nd-key-off);
+}
+
+[data-skin='nightdrive'] .crate-caption {
+  font-family: var(--nd-sans);
+  font-size: 14px;
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: 0;
+  line-height: 1.2;
+  color: var(--nd-text);
+}
+
+[data-skin='nightdrive'] .crate-caption-sub {
+  margin-top: -4px;
+  font-family: var(--nd-cond);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-silk-2);
+}
+
+[data-skin='nightdrive'] .crate-tool,
+[data-skin='nightdrive'] .sresult-tool {
+  gap: 0;
+  border-radius: 4px;
+  box-shadow: var(--nd-key-small);
+}
+
+[data-skin='nightdrive'] .crate-tool:hover,
+[data-skin='nightdrive'] .sresult-tool:hover {
+  color: var(--nd-hot);
+  background: var(--nd-key-face);
+}
+
+[data-skin='nightdrive'] .crate-tool svg,
+[data-skin='nightdrive'] .sresult-tool svg {
+  fill: none;
+}
+
+/* ── Curtains, search, settings, status ────────────────────────────────── */
+
+[data-skin='nightdrive'] .curtain-title,
+[data-skin='nightdrive'] .boundary-title {
+  font-family: var(--nd-sans);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: 0;
+  color: var(--nd-text);
+}
+
+[data-skin='nightdrive'] .curtain-btn,
+[data-skin='nightdrive'] .boundary-btn {
+  flex-direction: row;
+  height: 44px;
+  padding: 0 22px;
+  font-size: 13px;
+}
+
+[data-skin='nightdrive'] .curtain-btn:hover:not(:disabled),
+[data-skin='nightdrive'] .boundary-btn:hover {
+  color: var(--nd-hot);
+  box-shadow: var(--nd-key-up);
+}
+
+[data-skin='nightdrive'] .search-scrim {
+  background: rgba(14, 14, 14, 0.985);
+}
+
+[data-skin='nightdrive'] .linkcard {
+  background: var(--nd-plate);
+  box-shadow: var(--nd-plate-lift);
+  border-radius: 6px;
+}
+
+/* Search and Settings: titles in Barlow 500, upright. */
+[data-skin='nightdrive'] .search-input,
+[data-skin='nightdrive'] .search-prompt,
+[data-skin='nightdrive'] .search-empty,
+[data-skin='nightdrive'] .sresult-title,
+[data-skin='nightdrive'] .stop-title,
+[data-skin='nightdrive'] .stile-title,
+[data-skin='nightdrive'] .search-drill-title,
+[data-skin='nightdrive'] .linkcard-title,
+[data-skin='nightdrive'] .settings-title,
+[data-skin='nightdrive'] .set-heading,
+[data-skin='nightdrive'] .tapseg-title,
+[data-skin='nightdrive'] .set-row-title,
+[data-skin='nightdrive'] .skincard-label,
+[data-skin='nightdrive'] .home-room-name,
+[data-skin='nightdrive'] .about-name,
+[data-skin='nightdrive'] .about-line {
+  font-family: var(--nd-sans);
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+[data-skin='nightdrive'] .search-chip-count,
+[data-skin='nightdrive'] .stile-mono {
+  font-family: var(--nd-cond);
+  font-style: normal;
+  letter-spacing: 0.12em;
+}
+
+/* The status line reads out on a little display window. */
+[data-skin='nightdrive'] .status-pill {
+  font-family: var(--nd-cond);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nd-key-on);
+  text-shadow: var(--nd-glow-text);
+  background: var(--nd-glass-ground);
+  border-radius: 4px;
+  box-shadow: var(--nd-glass-sink), 0 0 0 1px #000, 0 0 0 3px var(--nd-bezel), 0 10px 24px -10px rgba(0, 0, 0, 0.8);
+}
+
+[data-skin='nightdrive'] .status-pill.is-bad {
+  color: var(--nd-hot);
+}
+
+[data-skin='nightdrive'] .scroll::-webkit-scrollbar-thumb {
+  background: rgba(230, 225, 217, 0.16);
+}
+
+[data-skin='nightdrive'] ::selection {
+  background: rgba(255, 122, 26, 0.35);
+  color: var(--nd-text);
+}
+
+[data-skin='nightdrive'] :focus-visible {
+  outline: 2px solid var(--nd-key-on);
+  outline-offset: 2px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PHONE (below 760px, MobileShell)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* Header: a room key, a search key, a settings key. */
+html[data-skin='nightdrive'][data-shell='phone'] .phone-head {
+  gap: 8px;
+  height: auto;
+  padding: calc(var(--safe-top) + 14px) 12px 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-room,
+html[data-skin='nightdrive'][data-shell='phone'] .phone-tool {
+  border-radius: 6px;
+  background: var(--nd-key-face);
+  box-shadow: var(--nd-key-up);
+  transition: transform 120ms ease, box-shadow 120ms ease, color 240ms ease;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-room {
+  gap: 10px;
+  height: 44px;
+  padding: 0 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-room:active,
+html[data-skin='nightdrive'][data-shell='phone'] .phone-tool:active {
+  background: var(--nd-key-face);
+  transform: translateY(2px);
+  box-shadow: var(--nd-key-down);
+}
+
+/* The room's lamp, lit. */
+html[data-skin='nightdrive'][data-shell='phone'] .phone-room-marker {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--nd-keylight);
+  box-shadow: 0 0 8px 1px rgba(255, 122, 26, 0.8);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-room-text {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 10px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-room .room-name {
+  font-size: 15px;
+  color: var(--nd-text);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-room .room-with {
+  font-size: 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-tool {
+  width: 44px;
+  height: 44px;
+  color: var(--nd-key-on);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-tool svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.1;
+  filter: var(--nd-glow-icon);
+}
+
+/* Settings is a key whose function is off until pressed. */
+html[data-skin='nightdrive'][data-shell='phone'] .phone-head .phone-tool:last-child {
+  color: #a8622e;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-head .phone-tool:last-child svg {
+  filter: none;
+}
+
+/* Tab bar: a tray holding four keys; the page that's up is lit. */
+html[data-skin='nightdrive'][data-shell='phone'] .phone-tabs {
+  gap: 7px;
+  margin: 12px 12px calc(12px + var(--safe-bottom));
+  padding: 7px;
+  border-radius: 7px;
+  background: var(--nd-tray);
+  box-shadow: var(--nd-tray-sink);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .mtab {
+  gap: 4px;
+  height: 56px;
+  border-radius: 6px;
+  color: #a8622e;
+  background: var(--nd-key-face);
+  box-shadow: var(--nd-key-up);
+  transition: color 240ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .mtab:active {
+  transform: translateY(2px);
+  box-shadow: var(--nd-key-down);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .mtab svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  transition: filter 240ms ease;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .mtab-label {
+  font-family: var(--nd-cond);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .mtab.is-active,
+html[data-skin='nightdrive'][data-shell='phone'] .mtab.is-active .mtab-label,
+html[data-skin='nightdrive'][data-shell='phone'] .mtab.is-active svg {
+  color: var(--nd-key-on);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .mtab.is-active .mtab-label {
+  text-shadow: var(--nd-glow-text);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .mtab.is-active svg {
+  filter: var(--nd-glow-icon);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .mtab.is-active::before {
+  display: none;
+}
+
+/* Every page is a faceplate on the dash. */
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page {
+  gap: 12px;
+  padding: 12px 12px 0;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page > .panel,
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page > .rooms {
+  border-radius: 8px;
+  background: var(--nd-plate);
+  box-shadow: var(--nd-plate-lift);
+  overflow: hidden;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-module {
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #000, 0 0 0 3px #2a2a29, 0 0 0 4px #050505, 0 18px 30px -16px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page > .panel {
+  padding-top: 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .panel:has(> .queue) .panel-head::before {
+  content: 'Queue';
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .panel-head {
+  padding: 2px 18px 8px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .queue {
+  padding: 0 10px 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .qrow-main {
+  padding: 7px 44px 7px 8px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .crate-filters {
+  padding: 2px 14px 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .crate-filter {
+  height: 32px;
+  padding: 0 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .crate {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px 14px;
+  padding: 4px 18px 18px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .crate-caption {
+  font-size: 15px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .crate-bill-title {
+  font-size: 26px;
+}
+
+/* Rooms as a page: preset rooms. */
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page > .rooms .rooms-head .label {
+  font-size: 0;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page > .rooms .rooms-head .label::after {
+  content: 'Preset rooms';
+  font-size: 9px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .rooms-head {
+  padding: 14px 18px 8px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .rooms-arrange {
+  display: flex;
+  min-height: 32px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .rooms-list {
+  padding: 0 10px 4px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .rooms-list li + li {
+  margin-top: 4px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .room {
+  min-height: 46px;
+  padding: 7px 10px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .room::before {
+  width: 32px;
+  height: 30px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .room-name {
+  font-size: 16px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .rooms-everywhere {
+  min-height: 44px;
+  margin: 6px 14px 0;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .rooms-foot {
+  padding: 10px 18px 12px;
+}
+
+/* The rooms sheet. */
+html[data-skin='nightdrive'][data-shell='phone'] .sheet {
+  background: var(--nd-plate);
+  border-radius: 10px 10px 0 0;
+  box-shadow: var(--nd-plate-lift), 0 -24px 60px rgba(0, 0, 0, 0.5);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .sheet-grip {
+  background: var(--nd-bezel);
+}
+
+/* Now: one module; the volume deck folds into it. */
+html[data-skin='nightdrive'][data-shell='phone'] .stage {
+  gap: 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .stage > .stage-scroll {
+  flex: 1 1 auto;
+  padding: 16px 16px 14px;
+  border-radius: 8px;
+  overflow-y: auto;
+  box-shadow: 0 0 0 1px #000, 0 0 0 3px #2a2a29, 0 0 0 4px #050505, 0 18px 30px -16px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .stage-nightdrive .nd-deck {
+  display: none;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nightdrive {
+  gap: 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-top {
+  gap: 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-top .nd-cap {
+  flex: 1;
+  font-size: 11px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-lamps {
+  gap: 12px;
+  font-size: 11px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-state {
+  gap: 6px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-state i {
+  width: 6px;
+  height: 6px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-art-phone {
+  --nd-art: clamp(120px, calc(100vh - 624px), 220px);
+  align-self: center;
+  padding: 7px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-art-phone::after {
+  inset: 7px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nightdrive .nd-title-window {
+  padding: 10px 12px 8px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nightdrive .nd-info {
+  gap: 3px;
+  padding: 0 2px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nightdrive .nd-artist {
+  font-size: 18px;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nightdrive .nd-album {
+  font-size: 11px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-progress {
+  gap: 10px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-ladder {
+  gap: 2px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-progress .nd-ladder i {
+  height: 8px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-pocket {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-pocket .nd-vol {
+  padding: 6px 8px;
+}
+
+/* Queue: the mini player over the list. */
+html[data-skin='nightdrive'][data-shell='phone'] .nd-mini {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-mini-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-mini-open {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-art-mini {
+  --nd-art: 56px;
+  padding: 4px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--nd-bezel);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-art-mini img,
+html[data-skin='nightdrive'][data-shell='phone'] .nd-art-mini .nd-art-blank,
+html[data-skin='nightdrive'][data-shell='phone'] .nd-art-mini::after {
+  border-radius: 2px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-art-mini::after {
+  inset: 4px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-mini-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-mini .nd-title-window {
+  padding: 5px 8px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-mini-artist {
+  font-size: 12px;
+  color: var(--nd-silk);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-mini-key {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-ladder-thin i,
+html[data-skin='nightdrive'][data-shell='phone'] .nd-ladder-thin i.is-on {
+  height: 5px;
+  box-shadow: none;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-ladder-thin i.is-on {
+  box-shadow: 0 0 4px rgba(255, 122, 26, 0.7);
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-ladder-thin i.is-hot {
+  background-color: var(--nd-key-on);
+}
+
+/* Rooms: the preset list, then the group volume module. The page scrolls
+   as one, so the last ladder is never under the tab bar. */
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page[data-tab='rooms'] {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding-bottom: 6px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page[data-tab='rooms']::-webkit-scrollbar {
+  display: none;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page[data-tab='rooms'] > .rooms {
+  flex: none;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .phone-page[data-tab='rooms'] .rooms-list {
+  flex: none;
+  overflow: visible;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-volume {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-volume-dial {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-rooms-ladders.is-stacked {
+  gap: 16px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-rooms-ladders.is-stacked ul {
+  gap: 16px;
+  max-height: none;
+  overflow: visible;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-rooms-ladders.is-stacked li {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'name value' 'ladder ladder';
+  gap: 7px 8px;
+  align-items: baseline;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-rooms-ladders.is-stacked .nd-ladder-name {
+  grid-area: name;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-rooms-ladders.is-stacked .nd-ladder-value {
+  grid-area: value;
+  font-size: 13px;
+}
+
+html[data-skin='nightdrive'][data-shell='phone'] .nd-rooms-ladders.is-stacked .nd-ladder {
+  grid-area: ladder;
+}
+
+/* ── Reduced motion: no scroll (the title stage handles that), no fades ── */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-skin='nightdrive'] .nd-key,
+  [data-skin='nightdrive'] .nd-key svg,
+  [data-skin='nightdrive'] .nd-ann,
+  [data-skin='nightdrive'] .nd-window,
+  [data-skin='nightdrive'] .nd-state,
+  [data-skin='nightdrive'] .nd-ladder i,
+  [data-skin='nightdrive'] .nd-knob,
+  [data-skin='nightdrive'] .room::before,
+  [data-skin='nightdrive'] .rooms-arrange,
+  [data-skin='nightdrive'] .panel-action,
+  [data-skin='nightdrive'] .rooms-everywhere,
+  [data-skin='nightdrive'] .right-tab,
+  [data-skin='nightdrive'] .right-search,
+  [data-skin='nightdrive'] .crate-filter,
+  [data-skin='nightdrive'] .crate-face,
+  [data-skin='nightdrive'] .qrow,
+  [data-skin='nightdrive'] .mtab,
+  [data-skin='nightdrive'] .phone-room,
+  [data-skin='nightdrive'] .phone-tool {
+    transition: none;
+  }
+}

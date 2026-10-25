@@ -359,6 +359,12 @@ const LOOK: Record<Skin, { ground: string; ink: string; font: CSSProperties; str
     font: { fontFamily: "'Cormorant Garamond', 'Hiragino Mincho ProN', Georgia, serif", fontWeight: 500, fontStyle: 'italic' },
     strip: ['#0a0706', '#e8a06a', '#efb59c', '#4f6ef0', '#a9e8ff'],
   },
+  nightdrive: {
+    ground: 'linear-gradient(165deg, #3b3d40, #2c2e31 60%, #24262a)',
+    ink: '#ff8a2e',
+    font: { fontFamily: "'Barlow Condensed', 'Arial Narrow', sans-serif", fontWeight: 700, letterSpacing: '0.12em', textShadow: '0 0 6px rgba(255,122,26,0.7)' },
+    strip: ['#2c2e31', '#111111', '#e6e1d9', '#ff8a2e', '#7bd36a'],
+  },
 };
 
 function Appearance() {

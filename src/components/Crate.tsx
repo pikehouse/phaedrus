@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSonos } from '../store/useSonos';
+import { useSkin } from '../store/skin';
 import { useLongPress } from '../hooks/useLongPress';
 import { pickBy } from '../lib/hash';
 import { serviceLabel } from '../lib/format';
@@ -10,10 +11,23 @@ import '../styles/crate.css';
 // Sleeve stocks for favourites with no artwork.
 const GROUNDS = ['walnut', 'burgundy', 'olive', 'mustard', 'wine'] as const;
 
+// Nightdrive's filter keys: which favourites each one shows.
+type Filter = 'all' | 'albums' | 'playlists' | 'radio';
+const FILTERS: { id: Filter; label: string; kind?: Favorite['kind'] }[] = [
+  { id: 'all', label: 'All' },
+  { id: 'albums', label: 'Albums', kind: 'album' },
+  { id: 'playlists', label: 'Playlists', kind: 'playlist' },
+  { id: 'radio', label: 'Radio', kind: 'station' },
+];
+
 export default function Crate() {
   const favorites = useSonos((s) => s.favorites);
   const playFavorite = useSonos((s) => s.playFavorite);
   const playFavoriteTap = useSonos((s) => s.playFavoriteTap);
+  const filtered = useSkin((s) => s.skin === 'nightdrive');
+  const [filter, setFilter] = useState<Filter>('all');
+  const kind = filtered ? FILTERS.find((f) => f.id === filter)?.kind : undefined;
+  const shown = kind ? favorites.filter((f) => f.kind === kind) : favorites;
 
   return (
     <div className="panel">
@@ -23,8 +37,25 @@ export default function Crate() {
         </span>
       </header>
 
+      {filtered && (
+        <div className="crate-filters" role="radiogroup" aria-label="Show">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              role="radio"
+              aria-checked={filter === f.id}
+              className={`crate-filter${filter === f.id ? ' is-on' : ''}`}
+              onClick={() => setFilter(f.id)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="crate scroll">
-        {favorites.map((f) => (
+        {shown.map((f) => (
           <Sleeve
             key={f.id}
             fav={f}
@@ -33,6 +64,9 @@ export default function Crate() {
         ))}
         {favorites.length === 0 && (
           <p className="panel-empty-line crate-empty">No Sonos favourites yet.</p>
+        )}
+        {favorites.length > 0 && shown.length === 0 && (
+          <p className="panel-empty-line crate-empty">Nothing here in your favourites.</p>
         )}
       </div>
     </div>
