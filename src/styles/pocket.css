@@ -1,0 +1,769 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   POCKET — the player (PocketStage, PocketWheel, PocketLcd)
+
+   Every dimension of the player is in em of its own width: `.pk-device` has
+   font-size: var(--pk-w), so 1em is the width of the front and the whole
+   object scales as one. Proportions follow the first-generation original:
+   62 × 102 mm, a 2" panel, a wheel 83% of the width.
+
+     front        1em × 1.66em, corners 0.1em, a 0.011em steel rim
+     screen       window 0.676em × 0.554em, 0.07em from the top
+     LCD          0.608em × 0.4864em (160 × 128, 5:4) inside a 0.034em bezel
+     wheel        0.833em across, centred 1.122em down the face
+                  ring of buttons 0.77–1.0 of its radius, the turning wheel
+                  0.3–0.77, the centre button inside 0.28
+
+   Scoped under html[data-skin='pocket'] like the rest of the skin.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+html[data-skin='pocket'] .pocket {
+  --pk-dock: 40px;
+  /* As large as the stage allows: by height (leaving the dock), by width. */
+  --pk-w: clamp(200px, min(calc((100cqh - var(--pk-dock) - 36px) / 1.89), calc(100cqw * 0.66)), 480px);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.6vh, 16px);
+  width: 100%;
+  margin: auto 0;
+}
+
+html[data-skin='pocket'] .pk-scene {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding-top: calc(var(--pk-w) * 0.19);
+}
+
+/* ── The earphone lead, off the top and away out of frame ──────────────── */
+
+html[data-skin='pocket'] .pk-lead {
+  position: absolute;
+  /* The top strip starts 0.12em in and 0.022em up; this svg's origin is
+     the device's top-left corner, 0.6em above it. */
+  left: -0.12em;
+  top: calc(-0.6em + 0.022em);
+  width: 3em;
+  height: 2.6em;
+  overflow: visible;
+  pointer-events: none;
+}
+
+html[data-skin='pocket'] .pk-lead path {
+  fill: none;
+  stroke-linecap: round;
+}
+
+html[data-skin='pocket'] .pk-lead-shadow {
+  stroke: rgba(0, 0, 0, 0.6);
+  stroke-width: 3.2;
+  filter: blur(2px);
+}
+
+html[data-skin='pocket'] .pk-lead-under {
+  stroke: #6f767d;
+  stroke-width: 2.1;
+}
+
+html[data-skin='pocket'] .pk-lead-wire {
+  stroke: #e4e6e7;
+  stroke-width: 1.5;
+}
+
+html[data-skin='pocket'] .pk-lead-shine {
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 0.45;
+}
+
+html[data-skin='pocket'] .pk-plug {
+  fill: #f2f2ef;
+  stroke: #9aa0a6;
+  stroke-width: 0.35;
+}
+
+html[data-skin='pocket'] .pk-plug-collar {
+  fill: #b9bec3;
+  stroke: #6c7278;
+  stroke-width: 0.3;
+}
+
+/* ── The object ────────────────────────────────────────────────────────── */
+
+html[data-skin='pocket'] .pk-device {
+  position: relative;
+  z-index: 1;
+  font-size: var(--pk-w);
+  width: 1em;
+  height: 1.66em;
+  border-radius: 0.1em;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Its shadow on the desk: a dark contact line under the base, and a long
+   soft fall-off behind, as from a lamp above and in front. */
+html[data-skin='pocket'] .pk-device::before {
+  content: '';
+  position: absolute;
+  inset: 0.08em -0.02em -0.03em;
+  border-radius: 0.14em;
+  background: rgba(0, 0, 0, 0.55);
+  box-shadow:
+    0 0.05em 0.09em rgba(0, 0, 0, 0.55),
+    0 0.16em 0.32em rgba(0, 0, 0, 0.45),
+    0 0.02em 0.02em rgba(0, 0, 0, 0.6);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* The steel: the back wraps round the sides and shows as a mirror rim,
+   reflecting a blurred room (a window up left, a lamp to the right, the
+   dark desk below). Two layers of the same room, mirrored, read as a
+   curved surface. */
+html[data-skin='pocket'] .pk-chrome {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 6%, transparent 92%, rgba(0, 0, 0, 0.5)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.35), transparent 5%, transparent 95%, rgba(255, 255, 255, 0.18)),
+    var(--pk-room) 18% 30% / 220% 60% no-repeat,
+    conic-gradient(
+      from 210deg at 50% 50%,
+      #2b2e33 0deg,
+      #c9ced4 30deg,
+      #f4f6f8 48deg,
+      #8d939a 70deg,
+      #3c4046 110deg,
+      #6d737a 150deg,
+      #d9c3a6 172deg,
+      #4a4d52 200deg,
+      #16181b 250deg,
+      #2e3136 290deg,
+      #a9b0b8 330deg,
+      #2b2e33 360deg
+    );
+  background-blend-mode: normal, normal, screen, normal;
+  box-shadow:
+    inset 0 0 0 0.0015em rgba(255, 255, 255, 0.35),
+    0 0 0 0.0012em rgba(0, 0, 0, 0.7);
+}
+
+/* The polycarbonate front: white under a clear skin, the clear layer
+   showing at the edge as a faint grey band before the steel. */
+html[data-skin='pocket'] .pk-face {
+  position: absolute;
+  inset: 0.011em;
+  border-radius: 0.09em;
+  overflow: hidden;
+  background:
+    radial-gradient(140% 70% at 30% 0%, rgba(255, 255, 255, 0.9), transparent 60%),
+    linear-gradient(180deg, #f8f8f5 0%, #f1f1ed 40%, #ebebe6 78%, #e2e2dc 100%);
+  box-shadow:
+    inset 0 0 0 0.0035em rgba(178, 184, 190, 0.55),
+    inset 0 0.006em 0.006em -0.003em rgba(255, 255, 255, 0.95),
+    inset 0 -0.012em 0.02em -0.006em rgba(90, 95, 100, 0.22),
+    inset 0.01em 0 0.02em -0.012em rgba(90, 95, 100, 0.12),
+    inset -0.01em 0 0.02em -0.012em rgba(90, 95, 100, 0.12);
+}
+
+/* A softbox above and to the left, caught in the gloss. */
+html[data-skin='pocket'] .pk-face-gloss {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(103deg, transparent 8%, rgba(255, 255, 255, 0.55) 16%, rgba(255, 255, 255, 0.12) 27%, transparent 34%),
+    radial-gradient(60% 18% at 50% -4%, rgba(255, 255, 255, 0.8), transparent 70%),
+    linear-gradient(180deg, transparent 70%, rgba(150, 156, 162, 0.08));
+  z-index: 3;
+}
+
+/* The slow sheen, only while music plays (see the motion notes in
+   PocketStage). It parks where it is when the music stops. */
+html[data-skin='pocket'] .pk-face-sheen {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: 0;
+  width: 70%;
+  pointer-events: none;
+  z-index: 3;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.09) 44%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.09) 56%,
+    transparent 70%
+  );
+  transform: translate3d(-110%, 0, 0);
+  animation: pk-sheen 44s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+html[data-skin='pocket'] .pk-device.is-alive .pk-face-sheen {
+  animation-play-state: running;
+}
+
+@keyframes pk-sheen {
+  0% {
+    transform: translate3d(-110%, 0, 0);
+  }
+  55% {
+    transform: translate3d(160%, 0, 0);
+  }
+  100% {
+    transform: translate3d(160%, 0, 0);
+  }
+}
+
+/* ── The top edge: hold switch, headphone socket, port ─────────────────── */
+
+html[data-skin='pocket'] .pk-top {
+  position: absolute;
+  left: 0.12em;
+  right: 0.12em;
+  top: -0.022em;
+  height: 0.03em;
+  border-radius: 0.02em 0.02em 0 0;
+  background:
+    linear-gradient(180deg, #ced3d8, #8c939a 45%, #555b62),
+    #9aa0a6;
+  box-shadow: inset 0 0.002em 0 rgba(255, 255, 255, 0.7);
+  z-index: 0;
+}
+
+html[data-skin='pocket'] .pk-hold {
+  position: absolute;
+  left: 0.05em;
+  top: -0.01em;
+  width: 0.12em;
+  height: 0.046em;
+  padding: 0;
+  border-radius: 0.012em;
+  cursor: pointer;
+  /* A generous target around a small part. */
+  outline-offset: 0.01em;
+}
+
+html[data-skin='pocket'] .pk-hold::before {
+  /* the slot */
+  content: '';
+  position: absolute;
+  left: 0.012em;
+  right: 0.012em;
+  top: 0.016em;
+  height: 0.016em;
+  border-radius: 0.006em;
+  background: linear-gradient(180deg, #1a1c1f, #3b3f44);
+  box-shadow: inset 0 0.002em 0.003em rgba(0, 0, 0, 0.8);
+}
+
+html[data-skin='pocket'] .pk-hold::after {
+  /* the orange that shows when it's on */
+  content: '';
+  position: absolute;
+  left: 0.016em;
+  top: 0.019em;
+  width: 0.034em;
+  height: 0.01em;
+  border-radius: 0.003em;
+  background: #e8822e;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+
+html[data-skin='pocket'] .pk-hold.is-on::after {
+  opacity: 1;
+}
+
+html[data-skin='pocket'] .pk-hold i {
+  position: absolute;
+  top: 0.012em;
+  left: 0.016em;
+  width: 0.05em;
+  height: 0.024em;
+  border-radius: 0.005em;
+  background: linear-gradient(180deg, #ffffff, #dcdcd7 60%, #b9bab5);
+  box-shadow: 0 0.002em 0.003em rgba(0, 0, 0, 0.5);
+  transition: transform 0.45s var(--ease);
+}
+
+html[data-skin='pocket'] .pk-hold.is-on i {
+  transform: translateX(0.038em);
+}
+
+html[data-skin='pocket'] .pk-hold:focus-visible {
+  outline: 2px solid rgba(150, 196, 240, 0.85);
+}
+
+html[data-skin='pocket'] .pk-jack {
+  position: absolute;
+  left: 0.27em;
+  top: -0.002em;
+  width: 0.05em;
+  height: 0.02em;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #0b0c0d 55%, #6c7279 62%, #e3e6e9 80%, #7d838a);
+}
+
+html[data-skin='pocket'] .pk-port {
+  position: absolute;
+  right: 0.07em;
+  top: 0.005em;
+  width: 0.13em;
+  height: 0.014em;
+  border-radius: 0.006em;
+  background: linear-gradient(180deg, #121315, #2c2f33);
+  box-shadow: 0 0.002em 0 rgba(255, 255, 255, 0.45);
+}
+
+/* ── The screen ────────────────────────────────────────────────────────── */
+
+html[data-skin='pocket'] .pk-screen {
+  position: absolute;
+  left: 0.146em;
+  top: 0.07em;
+  width: 0.676em;
+  height: 0.554em;
+  border-radius: 0.02em;
+  z-index: 2;
+  /* A smoked window: near black, the faintest grey at the edges. */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 14%, transparent 86%, rgba(255, 255, 255, 0.05)),
+    radial-gradient(120% 120% at 50% 40%, #2a2e32, #16181b 70%);
+  box-shadow:
+    0 -0.0016em 0.002em rgba(0, 0, 0, 0.35),
+    0 0.0018em 0.001em rgba(255, 255, 255, 0.95),
+    0 0 0 0.0012em rgba(120, 126, 132, 0.6),
+    inset 0 0.004em 0.01em rgba(0, 0, 0, 0.75);
+}
+
+/* The light leaking round the panel when the backlight is on: a faint
+   halation, the way bright things bloom on film. Static; it only fades. */
+html[data-skin='pocket'] .pk-halation {
+  position: absolute;
+  inset: -0.05em -0.06em;
+  border-radius: 0.08em;
+  background: radial-gradient(closest-side, rgba(178, 214, 255, 0.34), rgba(178, 214, 255, 0.1) 60%, transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 2.6s var(--ease-soft);
+  pointer-events: none;
+  z-index: 4;
+}
+
+html[data-skin='pocket'] .pk-device.is-lit .pk-halation {
+  opacity: 1;
+  transition-duration: 0.5s;
+}
+
+html[data-skin='pocket'] .pk-lcd {
+  position: absolute;
+  left: 0.034em;
+  top: 0.0338em;
+  width: 0.608em;
+  height: 0.4864em;
+  border-radius: 0.006em;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Unlit: grey with a green-blue cast, never perfectly even, darker toward
+   the edges where the bezel shades it. */
+html[data-skin='pocket'] .pk-lcd-glass {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(130% 120% at 46% 38%, transparent 40%, rgba(40, 52, 50, 0.32) 100%),
+    var(--pk-mottle) 0 0 / 100% 100%,
+    linear-gradient(170deg, #a9b2ab 0%, #9ea8a2 55%, #949e99 100%);
+  background-blend-mode: normal, soft-light, normal;
+}
+
+/* The backlight: a cool, slightly uneven blue-white from behind the panel. */
+html[data-skin='pocket'] .pk-lcd-light {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 80% at 50% 42%, rgba(236, 246, 255, 0.95), rgba(214, 233, 252, 0.6) 55%, transparent 100%),
+    radial-gradient(60% 50% at 18% 80%, rgba(188, 216, 244, 0.5), transparent 70%),
+    linear-gradient(180deg, #c6def4, #b4d0ec);
+  opacity: 0;
+  transition: opacity 2.6s var(--ease-soft);
+}
+
+html[data-skin='pocket'] .pk-device.is-lit .pk-lcd-light {
+  opacity: 1;
+  transition-duration: 0.5s;
+}
+
+html[data-skin='pocket'] .pk-lcd-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+  touch-action: manipulation;
+  cursor: default;
+}
+
+/* The glass over it all: the bezel's shadow falling on the panel, and a
+   faint reflection of the room. */
+html[data-skin='pocket'] .pk-lcd-reflect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.06) 22%, transparent 44%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.12), transparent 9%);
+  box-shadow:
+    inset 0 0.006em 0.008em rgba(0, 0, 0, 0.5),
+    inset 0.003em 0 0.006em rgba(0, 0, 0, 0.3),
+    inset -0.003em 0 0.006em rgba(0, 0, 0, 0.3);
+}
+
+/* ── The wheel ─────────────────────────────────────────────────────────── */
+
+html[data-skin='pocket'] .pk-wheel {
+  position: absolute;
+  left: 0.0725em;
+  top: 0.7055em;
+  width: 0.833em;
+  height: 0.833em;
+  border-radius: 50%;
+  z-index: 2;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+}
+
+html[data-skin='pocket'] .pk-wheel[data-pressed] {
+  cursor: grabbing;
+}
+
+html[data-skin='pocket'] .pk-wheel-turn {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  outline: none;
+}
+
+html[data-skin='pocket'] .pk-wheel-turn:focus-visible {
+  box-shadow: 0 0 0 0.006em rgba(150, 196, 240, 0.9), 0 0 0 0.012em rgba(150, 196, 240, 0.25);
+}
+
+/* The ring of four buttons, sitting in a hairline groove in the front. */
+html[data-skin='pocket'] .pk-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, transparent 76%, rgba(255, 255, 255, 0.7) 79%, transparent 84%),
+    linear-gradient(180deg, #fbfbf9 0%, #f2f2ee 45%, #e6e6e1 100%);
+  box-shadow:
+    0 0 0 0.0022em rgba(150, 156, 162, 0.55),
+    0 -0.002em 0.004em rgba(0, 0, 0, 0.12),
+    0 0.002em 0.002em rgba(255, 255, 255, 0.9),
+    inset 0 0.004em 0.006em rgba(255, 255, 255, 1),
+    inset 0 -0.006em 0.012em rgba(120, 125, 130, 0.16);
+}
+
+html[data-skin='pocket'] .pk-ring-gloss {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(70% 30% at 40% 6%, rgba(255, 255, 255, 0.85), transparent 70%);
+  pointer-events: none;
+}
+
+/* Pressing a button shades its quarter of the ring. */
+html[data-skin='pocket'] .pk-seg {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.32s var(--ease);
+  -webkit-mask: radial-gradient(closest-side, transparent 77%, #000 77.4%);
+  mask: radial-gradient(closest-side, transparent 77%, #000 77.4%);
+}
+
+html[data-skin='pocket'] .pk-seg-menu {
+  background: conic-gradient(from -45deg, rgba(70, 76, 82, 0.13) 0 90deg, transparent 90deg);
+}
+
+html[data-skin='pocket'] .pk-seg-next {
+  background: conic-gradient(from 45deg, rgba(70, 76, 82, 0.13) 0 90deg, transparent 90deg);
+}
+
+html[data-skin='pocket'] .pk-seg-play {
+  background: conic-gradient(from 135deg, rgba(70, 76, 82, 0.13) 0 90deg, transparent 90deg);
+}
+
+html[data-skin='pocket'] .pk-seg-prev {
+  background: conic-gradient(from 225deg, rgba(70, 76, 82, 0.13) 0 90deg, transparent 90deg);
+}
+
+html[data-skin='pocket'] .pk-wheel[data-pressed='menu'] .pk-seg-menu,
+html[data-skin='pocket'] .pk-wheel[data-pressed='next'] .pk-seg-next,
+html[data-skin='pocket'] .pk-wheel[data-pressed='play'] .pk-seg-play,
+html[data-skin='pocket'] .pk-wheel[data-pressed='prev'] .pk-seg-prev {
+  opacity: 1;
+  transition-duration: 0.08s;
+}
+
+/* The four seams between the buttons, on the diagonals: a dark line with a
+   lit lip beside it. */
+html[data-skin='pocket'] .pk-ring-seams {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-conic-gradient(
+      from 44.6deg,
+      rgba(118, 124, 130, 0.65) 0deg 0.5deg,
+      rgba(255, 255, 255, 0.95) 0.5deg 0.95deg,
+      transparent 0.95deg 90deg
+    );
+  -webkit-mask: radial-gradient(closest-side, transparent 77.2%, #000 77.6%, #000 99%, transparent 99.6%);
+  mask: radial-gradient(closest-side, transparent 77.2%, #000 77.6%, #000 99%, transparent 99.6%);
+}
+
+/* Legends, printed in a soft grey. */
+html[data-skin='pocket'] .pk-legend {
+  position: absolute;
+  color: #a7acb1;
+  fill: currentColor;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease);
+}
+
+html[data-skin='pocket'] .pk-legend-menu {
+  left: 50%;
+  top: 2.4%;
+  transform: translateX(-50%);
+  font-family: var(--pk-sans);
+  font-size: 0.046em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+html[data-skin='pocket'] .pk-legend-prev,
+html[data-skin='pocket'] .pk-legend-next {
+  top: 50%;
+  width: 0.06em;
+  height: 0.03em;
+  transform: translateY(-50%);
+}
+
+html[data-skin='pocket'] .pk-legend-prev {
+  left: 4.4%;
+}
+
+html[data-skin='pocket'] .pk-legend-next {
+  right: 4.4%;
+}
+
+html[data-skin='pocket'] .pk-legend-play {
+  left: 50%;
+  bottom: 4.6%;
+  width: 0.066em;
+  height: 0.03em;
+  transform: translateX(-50%);
+}
+
+html[data-skin='pocket'] .pk-wheel[data-skips='off'] .pk-legend-prev,
+html[data-skin='pocket'] .pk-wheel[data-skips='off'] .pk-legend-next {
+  opacity: 0.32;
+}
+
+/* The groove between the ring and the wheel, shadowed on its upper side. */
+html[data-skin='pocket'] .pk-gap {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+html[data-skin='pocket'] .pk-gap-outer {
+  inset: 11.1%;
+  background: linear-gradient(180deg, #7f858b, #b9bec2 60%, #d9dcde);
+}
+
+/* The wheel: dished, so its upper wall sits in shade and its lower wall
+   catches the light. It is the part that turns (see --pk-turn). */
+html[data-skin='pocket'] .pk-disc {
+  position: absolute;
+  inset: 11.5%;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(closest-side at 50% 52%, #f8f8f5 0%, #f4f4f0 46%, #ececE7 74%, #dedfd9 92%, #d2d3cd 100%);
+  box-shadow:
+    inset 0 0.012em 0.022em rgba(70, 76, 82, 0.2),
+    inset 0 -0.008em 0.012em rgba(255, 255, 255, 0.95);
+}
+
+html[data-skin='pocket'] .pk-disc-turn {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--pk-scuff) 50% 50% / 100% 100% no-repeat;
+  opacity: 0.55;
+  transform: rotate(var(--pk-turn, 0deg));
+}
+
+html[data-skin='pocket'] .pk-disc-dish {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(90, 96, 102, 0.12) 0%, transparent 26%, transparent 70%, rgba(255, 255, 255, 0.5) 94%),
+    radial-gradient(closest-side, transparent 78%, rgba(90, 96, 102, 0.06) 96%);
+}
+
+html[data-skin='pocket'] .pk-disc-gloss {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(46% 12% at 50% 90%, rgba(255, 255, 255, 0.85), transparent 70%),
+    radial-gradient(30% 10% at 36% 14%, rgba(255, 255, 255, 0.45), transparent 70%);
+}
+
+html[data-skin='pocket'] .pk-gap-inner {
+  inset: 35.2%;
+  background: linear-gradient(180deg, #7f858b, #b7bcc0 60%, #dcdfe1);
+}
+
+/* The centre button: shallow, a little concave, a separate part. */
+html[data-skin='pocket'] .pk-centre {
+  position: absolute;
+  inset: 35.6%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side at 50% 56%, #fafaf7 0%, #f3f3ef 60%, #e3e4de 92%, #d6d7d1 100%);
+  box-shadow:
+    inset 0 0.006em 0.012em rgba(70, 76, 82, 0.18),
+    inset 0 -0.004em 0.006em rgba(255, 255, 255, 0.95);
+  transition: box-shadow 0.3s var(--ease), filter 0.3s var(--ease);
+}
+
+html[data-skin='pocket'] .pk-centre-dish {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(40% 14% at 50% 86%, rgba(255, 255, 255, 0.9), transparent 70%),
+    linear-gradient(180deg, rgba(90, 96, 102, 0.08), transparent 30%);
+}
+
+html[data-skin='pocket'] .pk-wheel[data-pressed='select'] .pk-centre {
+  box-shadow:
+    inset 0 0.009em 0.016em rgba(60, 66, 72, 0.32),
+    inset 0 -0.003em 0.004em rgba(255, 255, 255, 0.8);
+  filter: brightness(0.975);
+  transition-duration: 0.06s;
+}
+
+/* The keyboard's buttons sit over their parts, invisible until focused. */
+html[data-skin='pocket'] .pk-key {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  outline: none;
+}
+
+html[data-skin='pocket'] .pk-key:focus-visible {
+  box-shadow: 0 0 0 0.005em rgba(150, 196, 240, 0.95), 0 0 0 0.01em rgba(150, 196, 240, 0.28);
+}
+
+html[data-skin='pocket'] .pk-key-menu {
+  left: 40%;
+  top: 1%;
+  width: 20%;
+  height: 10%;
+}
+
+html[data-skin='pocket'] .pk-key-play {
+  left: 40%;
+  bottom: 1%;
+  width: 20%;
+  height: 10%;
+}
+
+html[data-skin='pocket'] .pk-key-prev {
+  left: 1%;
+  top: 40%;
+  width: 10%;
+  height: 20%;
+}
+
+html[data-skin='pocket'] .pk-key-next {
+  right: 1%;
+  top: 40%;
+  width: 10%;
+  height: 20%;
+}
+
+html[data-skin='pocket'] .pk-key-select {
+  inset: 36%;
+}
+
+/* ── The dock below the player: the app's progress bar and transport ───── */
+
+/* One slim row: shuffle, the seek bar, repeat and crossfade. Play and the
+   skips are the wheel's, so the transport's big buttons stand down. */
+html[data-skin='pocket'] .pk-dock {
+  width: min(calc(var(--pk-w) * 1.32), 100%);
+  height: var(--pk-dock);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+html[data-skin='pocket'] .pk-dock .transport {
+  display: contents;
+}
+
+html[data-skin='pocket'] .pk-dock .transport-main {
+  display: none;
+}
+
+html[data-skin='pocket'] .pk-dock .transport-mods {
+  flex: none;
+  gap: 4px;
+}
+
+html[data-skin='pocket'] .pk-dock .transport-mods-left {
+  order: 0;
+}
+
+html[data-skin='pocket'] .pk-dock .progress {
+  order: 1;
+  flex: 1;
+  min-width: 0;
+}
+
+html[data-skin='pocket'] .pk-dock .transport-mods-right {
+  order: 2;
+}
+
+/* ── Reduced motion: the light still comes and goes; nothing travels. ──── */
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-skin='pocket'] .pk-face-sheen {
+    animation: none;
+    opacity: 0;
+  }
+
+  html[data-skin='pocket'] .pk-hold i,
+  html[data-skin='pocket'] .pk-seg,
+  html[data-skin='pocket'] .pk-centre {
+    transition: none;
+  }
+}

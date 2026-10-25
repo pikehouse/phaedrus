@@ -11,6 +11,7 @@ import './styles/skin-deck.css';
 import './styles/skin-prism.css';
 import './styles/skin-putty.css';
 import './styles/skin-kissa.css';
+import './styles/skin-pocket.css';
 import './styles/skin-hifi.css';
 import './store/skin'; // stamps data-skin before the first paint
 import './store/settings'; // and Putty's appearance
