@@ -557,17 +557,18 @@ html[data-skin='pocket'] .pk-legend-menu {
 html[data-skin='pocket'] .pk-legend-prev,
 html[data-skin='pocket'] .pk-legend-next {
   top: 50%;
-  width: 0.06em;
-  height: 0.03em;
+  width: 0.052em;
+  height: 0.026em;
   transform: translateY(-50%);
 }
 
+/* Centred in the ring band (0.5%–11.2% of the wheel's width), clear of the groove. */
 html[data-skin='pocket'] .pk-legend-prev {
-  left: 4.4%;
+  left: 3.25%;
 }
 
 html[data-skin='pocket'] .pk-legend-next {
-  right: 4.4%;
+  right: 3.25%;
 }
 
 html[data-skin='pocket'] .pk-legend-play {
